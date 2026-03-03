@@ -1,0 +1,16 @@
+[project]
+name = "pystarter"
+version = "0.1.0"
+description = "A beginner-friendly Python training platform"
+requires-python = ">=3.13"
+dependencies = [
+    "django>=5.1",
+    "djangorestframework>=3.15",
+    "djangorestframework-simplejwt>=5.3",
+    "django-cors-headers>=4.3",
+    "anthropic>=0.40",
+    "python-dotenv>=1.0",
+    "sentry-sdk[django]>=2.0",
+    "psycopg2-binary>=2.9",
+    "gunicorn>=22.0",
+]

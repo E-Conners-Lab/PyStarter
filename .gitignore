@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+.venv/
+
+# Environment
+.env
+*.env.local
+
+# Database
+*.sqlite3
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node / Frontend
+node_modules/
+frontend/dist/
+
+# Test artifacts
+test-results/
+playwright-report/
+frontend/test-results/
+backend/test-results/
+
+# Claude
+CLAUDE.md
+.claude/
+frontend/.claude/

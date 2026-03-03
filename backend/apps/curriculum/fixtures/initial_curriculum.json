@@ -1,0 +1,524 @@
+[
+  {
+    "model": "curriculum.module",
+    "pk": 1,
+    "fields": {
+      "title": "Your First Program",
+      "slug": "your-first-program",
+      "description": "Write your very first lines of Python code! Learn how to make Python talk using the print() function.",
+      "order": 1,
+      "icon": "rocket",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.module",
+    "pk": 2,
+    "fields": {
+      "title": "Variables & Data Types",
+      "slug": "variables-and-data-types",
+      "description": "Learn how to store information in variables — the building blocks of every program.",
+      "order": 2,
+      "icon": "box",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.module",
+    "pk": 3,
+    "fields": {
+      "title": "Making Decisions",
+      "slug": "making-decisions",
+      "description": "Teach your programs to make choices using if, elif, and else statements.",
+      "order": 3,
+      "icon": "git-branch",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.module",
+    "pk": 4,
+    "fields": {
+      "title": "Loops",
+      "slug": "loops",
+      "description": "Make Python repeat things for you using for loops and while loops.",
+      "order": 4,
+      "icon": "repeat",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.module",
+    "pk": 5,
+    "fields": {
+      "title": "Functions",
+      "slug": "functions",
+      "description": "Create reusable blocks of code by writing your own functions.",
+      "order": 5,
+      "icon": "code",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.module",
+    "pk": 6,
+    "fields": {
+      "title": "Lists & Tuples",
+      "slug": "lists-and-tuples",
+      "description": "Store collections of items and learn to work with ordered data.",
+      "order": 6,
+      "icon": "list",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.module",
+    "pk": 7,
+    "fields": {
+      "title": "Dictionaries",
+      "slug": "dictionaries",
+      "description": "Store data as key-value pairs — like a real dictionary but for your code.",
+      "order": 7,
+      "icon": "book-open",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.module",
+    "pk": 8,
+    "fields": {
+      "title": "String Magic",
+      "slug": "string-magic",
+      "description": "Master text manipulation — slicing, formatting, and transforming strings.",
+      "order": 8,
+      "icon": "type",
+      "is_published": true
+    }
+  },
+
+  {
+    "model": "curriculum.lesson",
+    "pk": 1,
+    "fields": {
+      "module": 1,
+      "title": "What is Python?",
+      "slug": "what-is-python",
+      "order": 1,
+      "lesson_type": "concept",
+      "content": "# Welcome to Python!\n\nPython is one of the most popular programming languages in the world — and for good reason. It's designed to be **easy to read** and **fun to write**.\n\n## Why Python?\n\n- **It reads like English.** Python code looks almost like writing instructions for a human.\n- **It's used everywhere.** Web apps, data science, AI, games, automation — Python does it all.\n- **Huge community.** Millions of developers use Python, so help is always available.\n\n## What does Python code look like?\n\nHere's your first peek at Python:\n\n```python\nprint(\"Hello, World!\")\n```\n\nThat's it! One line of code, and Python will display `Hello, World!` on the screen.\n\nCompare that to some other languages that need 5-10 lines just to say hello. Python keeps things simple.\n\n## How does it work?\n\n1. You **write** code (instructions for the computer)\n2. Python **reads** your code from top to bottom\n3. It **executes** each instruction one at a time\n4. You see the **result** on screen\n\nReady to write your first program? Let's go!",
+      "sandbox_code": "",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.lesson",
+    "pk": 2,
+    "fields": {
+      "module": 1,
+      "title": "The print() Function",
+      "slug": "the-print-function",
+      "order": 2,
+      "lesson_type": "interactive",
+      "content": "# Talking to the World with print()\n\nThe `print()` function is how Python displays information on screen. It's the most basic — and one of the most useful — tools in Python.\n\n## How it works\n\n```python\nprint(\"Hello, World!\")\n```\n\nThe text inside the quotes is called a **string**. Python displays whatever string you put inside `print()`.\n\n## You can print anything!\n\n```python\nprint(\"My name is Alex\")\nprint(\"I am learning Python\")\nprint(\"2 + 2 =\", 2 + 2)\n```\n\nOutput:\n```\nMy name is Alex\nI am learning Python\n2 + 2 = 4\n```\n\nNotice that last line — `print()` can do math too!\n\n## Important rules\n\n- Text must be wrapped in quotes: `\"like this\"` or `'like this'`\n- The parentheses `()` are required\n- Each `print()` starts a new line\n\n## Try it yourself!\n\nUse the code editor below to experiment. Try printing your name, a math equation, or anything you like!",
+      "sandbox_code": "# Try it out! Change the text and click Run\nprint(\"Hello, World!\")\nprint(\"Python is awesome!\")",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.lesson",
+    "pk": 3,
+    "fields": {
+      "module": 1,
+      "title": "Practice: print()",
+      "slug": "practice-print",
+      "order": 3,
+      "lesson_type": "exercise",
+      "content": "# Time to Practice!\n\nNow it's your turn. Complete the exercises below to master the `print()` function.\n\nRemember:\n- Text goes inside quotes: `print(\"your text\")`\n- Each `print()` creates a new line\n- You can print multiple things: `print(\"Hello\", \"World\")`",
+      "sandbox_code": "",
+      "is_published": true
+    }
+  },
+
+  {
+    "model": "curriculum.exercise",
+    "pk": 1,
+    "fields": {
+      "lesson": 3,
+      "title": "Say Hello",
+      "slug": "say-hello",
+      "order": 1,
+      "exercise_type": "fill_blank",
+      "difficulty": 1,
+      "instructions": "Complete the code below to print `Hello, World!` to the screen.",
+      "starter_code": "# Complete the code to print Hello, World!\n___(\"Hello, World!\")",
+      "solution_code": "print(\"Hello, World!\")",
+      "xp_value": 10,
+      "concepts": "print"
+    }
+  },
+  {
+    "model": "curriculum.exercise",
+    "pk": 2,
+    "fields": {
+      "lesson": 3,
+      "title": "Print Your Name",
+      "slug": "print-your-name",
+      "order": 2,
+      "exercise_type": "write_code",
+      "difficulty": 1,
+      "instructions": "Write a program that prints `My name is Python` on one line, then `I love coding!` on the next line.\n\nExpected output:\n```\nMy name is Python\nI love coding!\n```",
+      "starter_code": "# Print two lines:\n# Line 1: My name is Python\n# Line 2: I love coding!\n",
+      "solution_code": "print(\"My name is Python\")\nprint(\"I love coding!\")",
+      "xp_value": 15,
+      "concepts": "print, strings"
+    }
+  },
+  {
+    "model": "curriculum.exercise",
+    "pk": 3,
+    "fields": {
+      "lesson": 3,
+      "title": "Fix the Bug",
+      "slug": "fix-the-bug",
+      "order": 3,
+      "exercise_type": "fix_bug",
+      "difficulty": 1,
+      "instructions": "The code below has a bug! It should print `Python is fun!` but something is wrong. Find and fix the error.",
+      "starter_code": "# Fix the bug in this code\nprint(\"Python is fun!\"",
+      "solution_code": "print(\"Python is fun!\")",
+      "xp_value": 15,
+      "concepts": "print, syntax, debugging"
+    }
+  },
+  {
+    "model": "curriculum.exercise",
+    "pk": 4,
+    "fields": {
+      "lesson": 3,
+      "title": "Math Printer",
+      "slug": "math-printer",
+      "order": 4,
+      "exercise_type": "write_code",
+      "difficulty": 1,
+      "instructions": "Use `print()` to display the result of `7 * 8`.\n\nHint: You can do math inside print! For example: `print(2 + 3)` outputs `5`.\n\nExpected output:\n```\n56\n```",
+      "starter_code": "# Print the result of 7 * 8\n",
+      "solution_code": "print(7 * 8)",
+      "xp_value": 10,
+      "concepts": "print, math operations"
+    }
+  },
+
+  {
+    "model": "curriculum.lesson",
+    "pk": 4,
+    "fields": {
+      "module": 2,
+      "title": "What Are Variables?",
+      "slug": "what-are-variables",
+      "order": 1,
+      "lesson_type": "concept",
+      "content": "# Variables: Storing Information\n\nImagine you have labeled boxes where you can store things. That's exactly what **variables** are in Python — named containers for storing data.\n\n## Creating a Variable\n\n```python\nname = \"Alice\"\nage = 25\nheight = 5.6\n```\n\nThat's it! No special keywords, no declarations. Just pick a name, use `=`, and assign a value.\n\n## The `=` Sign\n\nIn Python, `=` doesn't mean \"equals\" like in math. It means **\"store this value\"**.\n\n```python\nscore = 100  # Store 100 in the variable called 'score'\n```\n\nThink of it as an arrow pointing left: the value on the right gets stored in the name on the left.\n\n## Using Variables\n\nOnce you've stored something, you can use it:\n\n```python\nname = \"Alice\"\nprint(name)        # Output: Alice\nprint(\"Hi,\", name) # Output: Hi, Alice\n```\n\n## Variable Naming Rules\n\n- Must start with a letter or underscore: `name`, `_count`\n- Can contain letters, numbers, underscores: `player_1`, `total_score`\n- **Cannot** contain spaces: use `my_name` not `my name`\n- **Cannot** start with a number: `1st_place` won't work\n- Case-sensitive: `Name` and `name` are different variables\n\n## Pro tip: Use descriptive names!\n\n```python\n# Bad (what is x?)\nx = 30\n\n# Good (clear and readable)\ntemperature = 30\n```",
+      "sandbox_code": "",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.lesson",
+    "pk": 5,
+    "fields": {
+      "module": 2,
+      "title": "Data Types",
+      "slug": "data-types",
+      "order": 2,
+      "lesson_type": "interactive",
+      "content": "# Data Types: What Kind of Data?\n\nPython has several types of data. The three most common ones for beginners:\n\n## Strings (str) — Text\n```python\nname = \"Alice\"         # Text wrapped in quotes\ngreeting = 'Hello!'    # Single quotes work too\n```\n\n## Integers (int) — Whole Numbers\n```python\nage = 25\nscore = 1000\ntemperature = -5\n```\n\n## Floats (float) — Decimal Numbers\n```python\nheight = 5.9\nprice = 19.99\npi = 3.14159\n```\n\n## Checking the Type\n\nUse `type()` to check what kind of data you have:\n\n```python\nprint(type(\"hello\"))  # <class 'str'>\nprint(type(42))       # <class 'int'>\nprint(type(3.14))     # <class 'float'>\n```\n\n## Mixing Types\n\nBe careful mixing types! This works:\n```python\nprint(\"Age:\", 25)  # Python is smart enough to handle this\n```\n\nBut this causes an error:\n```python\n\"Age: \" + 25  # Can't add a string and a number!\n```\n\nYou'll learn how to fix this with **type conversion** soon!\n\n## Try it!\n\nExperiment with different data types in the editor below.",
+      "sandbox_code": "# Try creating variables with different data types\nname = \"Alice\"\nage = 25\nheight = 5.9\n\nprint(name, \"is\", age, \"years old\")\nprint(\"Height:\", height)\nprint(type(name))\nprint(type(age))\nprint(type(height))",
+      "is_published": true
+    }
+  },
+  {
+    "model": "curriculum.lesson",
+    "pk": 6,
+    "fields": {
+      "module": 2,
+      "title": "Practice: Variables",
+      "slug": "practice-variables",
+      "order": 3,
+      "lesson_type": "exercise",
+      "content": "# Practice Time!\n\nPut your variable knowledge to the test.\n\nRemember:\n- Create variables with `=`: `name = \"value\"`\n- Use variables inside `print()`: `print(name)`\n- Python has strings (`\"text\"`), integers (`42`), and floats (`3.14`)",
+      "sandbox_code": "",
+      "is_published": true
+    }
+  },
+
+  {
+    "model": "curriculum.exercise",
+    "pk": 5,
+    "fields": {
+      "lesson": 6,
+      "title": "Create a Variable",
+      "slug": "create-a-variable",
+      "order": 1,
+      "exercise_type": "write_code",
+      "difficulty": 1,
+      "instructions": "Create a variable called `message` and set it to `\"Hello, Python!\"`. Then print the variable.\n\nExpected output:\n```\nHello, Python!\n```",
+      "starter_code": "# Create a variable called message and print it\n",
+      "solution_code": "message = \"Hello, Python!\"\nprint(message)",
+      "xp_value": 10,
+      "concepts": "variables, print, strings"
+    }
+  },
+  {
+    "model": "curriculum.exercise",
+    "pk": 6,
+    "fields": {
+      "lesson": 6,
+      "title": "Math with Variables",
+      "slug": "math-with-variables",
+      "order": 2,
+      "exercise_type": "write_code",
+      "difficulty": 2,
+      "instructions": "Create two variables: `width` set to `10` and `height` set to `5`. Then print their product (width times height).\n\nExpected output:\n```\n50\n```",
+      "starter_code": "# Create width and height variables\n# Then print width * height\n",
+      "solution_code": "width = 10\nheight = 5\nprint(width * height)",
+      "xp_value": 15,
+      "concepts": "variables, math, print"
+    }
+  },
+  {
+    "model": "curriculum.exercise",
+    "pk": 7,
+    "fields": {
+      "lesson": 6,
+      "title": "Predict the Output",
+      "slug": "predict-the-output",
+      "order": 3,
+      "exercise_type": "output_predict",
+      "difficulty": 1,
+      "instructions": "What will this code print?\n\n```python\nx = 5\ny = 3\nx = x + y\nprint(x)\n```",
+      "starter_code": "",
+      "solution_code": "",
+      "choices": [
+        {"label": "5", "is_correct": false},
+        {"label": "3", "is_correct": false},
+        {"label": "8", "is_correct": true},
+        {"label": "Error", "is_correct": false}
+      ],
+      "xp_value": 10,
+      "concepts": "variables, reassignment, math"
+    }
+  },
+  {
+    "model": "curriculum.exercise",
+    "pk": 8,
+    "fields": {
+      "lesson": 6,
+      "title": "Introduction Card",
+      "slug": "introduction-card",
+      "order": 4,
+      "exercise_type": "write_code",
+      "difficulty": 2,
+      "instructions": "Create three variables:\n- `name` set to `\"Sam\"`\n- `age` set to `20`\n- `city` set to `\"Austin\"`\n\nThen print them in this exact format:\n```\nName: Sam\nAge: 20\nCity: Austin\n```\n\nHint: You can use commas in print: `print(\"Label:\", variable)`",
+      "starter_code": "# Create the three variables\n\n\n# Print them in the right format\n",
+      "solution_code": "name = \"Sam\"\nage = 20\ncity = \"Austin\"\nprint(\"Name:\", name)\nprint(\"Age:\", age)\nprint(\"City:\", city)",
+      "xp_value": 20,
+      "concepts": "variables, print, strings, formatting"
+    }
+  },
+
+  {
+    "model": "curriculum.testcase",
+    "pk": 1,
+    "fields": {
+      "exercise": 1,
+      "input_data": "",
+      "expected_output": "Hello, World!",
+      "is_hidden": false,
+      "description": "Should print Hello, World!",
+      "order": 1
+    }
+  },
+  {
+    "model": "curriculum.testcase",
+    "pk": 2,
+    "fields": {
+      "exercise": 2,
+      "input_data": "",
+      "expected_output": "My name is Python\nI love coding!",
+      "is_hidden": false,
+      "description": "Should print both lines",
+      "order": 1
+    }
+  },
+  {
+    "model": "curriculum.testcase",
+    "pk": 3,
+    "fields": {
+      "exercise": 3,
+      "input_data": "",
+      "expected_output": "Python is fun!",
+      "is_hidden": false,
+      "description": "Should print Python is fun!",
+      "order": 1
+    }
+  },
+  {
+    "model": "curriculum.testcase",
+    "pk": 4,
+    "fields": {
+      "exercise": 4,
+      "input_data": "",
+      "expected_output": "56",
+      "is_hidden": false,
+      "description": "Should print 56",
+      "order": 1
+    }
+  },
+  {
+    "model": "curriculum.testcase",
+    "pk": 5,
+    "fields": {
+      "exercise": 5,
+      "input_data": "",
+      "expected_output": "Hello, Python!",
+      "is_hidden": false,
+      "description": "Should print Hello, Python!",
+      "order": 1
+    }
+  },
+  {
+    "model": "curriculum.testcase",
+    "pk": 6,
+    "fields": {
+      "exercise": 6,
+      "input_data": "",
+      "expected_output": "50",
+      "is_hidden": false,
+      "description": "Should print 50",
+      "order": 1
+    }
+  },
+  {
+    "model": "curriculum.testcase",
+    "pk": 7,
+    "fields": {
+      "exercise": 8,
+      "input_data": "",
+      "expected_output": "Name: Sam\nAge: 20\nCity: Austin",
+      "is_hidden": false,
+      "description": "Should print the formatted introduction card",
+      "order": 1
+    }
+  },
+
+  {
+    "model": "curriculum.hint",
+    "pk": 1,
+    "fields": {
+      "exercise": 1,
+      "level": 1,
+      "content": "The blank should be filled with a function that displays text on screen...",
+      "xp_penalty_percent": 0
+    }
+  },
+  {
+    "model": "curriculum.hint",
+    "pk": 2,
+    "fields": {
+      "exercise": 1,
+      "level": 2,
+      "content": "The function is called `print`. Replace the `___` with `print`.",
+      "xp_penalty_percent": 10
+    }
+  },
+  {
+    "model": "curriculum.hint",
+    "pk": 3,
+    "fields": {
+      "exercise": 2,
+      "level": 1,
+      "content": "You'll need two `print()` statements — one for each line.",
+      "xp_penalty_percent": 0
+    }
+  },
+  {
+    "model": "curriculum.hint",
+    "pk": 4,
+    "fields": {
+      "exercise": 2,
+      "level": 2,
+      "content": "Make sure the text inside the quotes matches exactly: `\"My name is Python\"` and `\"I love coding!\"`",
+      "xp_penalty_percent": 10
+    }
+  },
+  {
+    "model": "curriculum.hint",
+    "pk": 5,
+    "fields": {
+      "exercise": 3,
+      "level": 1,
+      "content": "Look carefully at the parentheses. Is something missing?",
+      "xp_penalty_percent": 0
+    }
+  },
+  {
+    "model": "curriculum.hint",
+    "pk": 6,
+    "fields": {
+      "exercise": 3,
+      "level": 2,
+      "content": "The closing parenthesis `)` is missing at the end of the line.",
+      "xp_penalty_percent": 10
+    }
+  },
+  {
+    "model": "curriculum.hint",
+    "pk": 7,
+    "fields": {
+      "exercise": 4,
+      "level": 1,
+      "content": "You can put math directly inside `print()`. For example: `print(2 + 3)` outputs `5`.",
+      "xp_penalty_percent": 0
+    }
+  },
+  {
+    "model": "curriculum.hint",
+    "pk": 8,
+    "fields": {
+      "exercise": 5,
+      "level": 1,
+      "content": "First create the variable: `message = \"Hello, Python!\"`. Then on the next line, print it.",
+      "xp_penalty_percent": 0
+    }
+  },
+  {
+    "model": "curriculum.hint",
+    "pk": 9,
+    "fields": {
+      "exercise": 6,
+      "level": 1,
+      "content": "Use `*` for multiplication in Python. For example: `print(3 * 4)` outputs `12`.",
+      "xp_penalty_percent": 0
+    }
+  },
+  {
+    "model": "curriculum.hint",
+    "pk": 10,
+    "fields": {
+      "exercise": 8,
+      "level": 1,
+      "content": "Use commas in print to combine text and variables: `print(\"Label:\", variable)`",
+      "xp_penalty_percent": 0
+    }
+  },
+  {
+    "model": "curriculum.hint",
+    "pk": 11,
+    "fields": {
+      "exercise": 8,
+      "level": 2,
+      "content": "You need three print statements. Each one should start with the label (like `\"Name:\"`) followed by a comma and the variable.",
+      "xp_penalty_percent": 10
+    }
+  }
+]
