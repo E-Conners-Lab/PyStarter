@@ -72,7 +72,7 @@ Open http://localhost:5173, register an account, and start learning.
 | 13 | Regular Expressions          | `re.search()`, `re.findall()`, `re.sub()`, groups, patterns    |
 | 14 | Building a Network Toolkit   | Capstone: validation functions, parsing pipelines, audit reports |
 
-Each module has 3 lessons (concept, interactive sandbox, graded exercises) and 4-6 exercises. 66 exercises total across 42 lessons.
+Each module has 4 lessons (concept, interactive sandbox, graded exercises, "Try It Yourself" challenges) and 4-6 exercises. 66 exercises total across 56 lessons.
 
 ## Environment Variables
 
