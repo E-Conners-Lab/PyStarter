@@ -45,6 +45,8 @@ git clone https://github.com/E-Conners-Lab/PyStarter.git
 cd PyStarter
 ```
 
+> **No git?** Click **Code → Download ZIP** on GitHub, unzip, and run `cd PyStarter-main` instead.
+
 ### 2. Start the backend
 
 ```bash
