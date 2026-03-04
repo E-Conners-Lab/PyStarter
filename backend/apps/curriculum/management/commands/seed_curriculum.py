@@ -255,22 +255,7 @@ Remember:
                 "============================\n"
                 "```\n\n"
                 "Use `=` for top/bottom borders and `|` for side borders.",
-            sandbox_code='# === Challenge 1: ASCII Art ===\n'
-                '# Draw a picture using print() — be creative!\n'
-                'print("   /\\\\")\n'
-                'print("  /  \\\\")\n'
-                'print(" /____\\\\")\n'
-                'print(" |    |")\n'
-                'print(" |____|")\n'
-                'print()\n\n'
-                '# === Challenge 2: Receipt Printer ===\n'
-                '# Print a formatted receipt with aligned prices\n'
-                'print("===== RECEIPT =====")\n'
-                '# Add your items and total here\n'
-                'print("===== THANK YOU ===")\n'
-                'print()\n\n'
-                '# === Challenge 3: Business Card ===\n'
-                '# Print a card with = and | borders\n',
+            sandbox_code='',
         )
 
         # === MODULE 2: Variables & Data Types ===
@@ -492,20 +477,7 @@ Try it yourself in the editor!""",
                 "The <color> <animal> ate <number> plates of <food> and fell asleep.\n"
                 "```\n\n"
                 "Make it as silly as you want!",
-            sandbox_code='# === Challenge 1: Road Trip Calculator ===\n'
-                'distance = 350        # miles\n'
-                'mpg = 25              # miles per gallon\n'
-                'gas_price = 3.50      # dollars per gallon\n\n'
-                '# Calculate and print the trip cost\n\n\n'
-                '# === Challenge 2: Age Calculator ===\n'
-                'age_years = 25\n\n'
-                '# Calculate days, hours, minutes\n\n\n'
-                '# === Challenge 3: Mad Libs Story ===\n'
-                'animal = "penguin"\n'
-                'color = "purple"\n'
-                'food = "tacos"\n'
-                'number = 47\n\n'
-                '# Print your silly story using these variables\n',
+            sandbox_code='',
         )
 
         # === MODULE 3: Making Decisions ===
@@ -786,23 +758,7 @@ Change the `score` variable in the editor and run the code to see different resu
                 "2. Contains at least one digit\n"
                 "3. Contains at least one uppercase letter\n\n"
                 "Print the result of each check, then `\"Password accepted!\"` if all pass or `\"Password rejected.\"` if any fail.",
-            sandbox_code='# === Challenge 1: Shipping Calculator ===\n'
-                'weights = [0.5, 3, 15, 25]\n\n'
-                'for weight in weights:\n'
-                '    # Calculate cost based on weight ranges\n'
-                '    pass\n\n\n'
-                '# === Challenge 2: Weather Advisor ===\n'
-                'temperatures = [25, 45, 65, 80]\n\n'
-                'for temp in temperatures:\n'
-                '    # Print clothing recommendation\n'
-                '    pass\n\n\n'
-                '# === Challenge 3: Password Validator ===\n'
-                'password = "Hello123"\n\n'
-                '# Check each rule\n'
-                'has_length = len(password) >= 8\n'
-                'has_digit = False  # check if any character is a digit\n'
-                'has_upper = False  # check if any character is uppercase\n\n'
-                '# Print results and final verdict\n',
+            sandbox_code='',
         )
 
         # === MODULE 4: Loops ===
@@ -1068,16 +1024,7 @@ Modify the code in the editor to see how loops work.""",
                 "1 2 3 4 5\n"
                 "```\n\n"
                 "Hint: Use a nested loop or `range()` with `print(..., end=\" \")`.",
-            sandbox_code='# === Challenge 1: Star Triangle ===\n'
-                '# Print 7 rows of stars (row N has N stars)\n\n\n'
-                '# === Challenge 2: FizzBuzz ===\n'
-                '# Print 1-30 with Fizz/Buzz/FizzBuzz replacements\n\n\n'
-                '# === Challenge 3: Even Sum ===\n'
-                '# Sum all even numbers from 2 to 100\n'
-                'total = 0\n\n'
-                'print("Sum of evens 2-100:", total)\n\n\n'
-                '# === Challenge 4: Number Pyramid ===\n'
-                '# Print 5 rows: 1, then 1 2, then 1 2 3, etc.\n',
+            sandbox_code='',
         )
 
         # === MODULE 5: Functions ===
@@ -1316,24 +1263,7 @@ Modify the function in the editor and see what happens.""",
                 "Total:     $100.89\n"
                 "```\n\n"
                 "Round the tip to 2 decimal places using `round()`.",
-            sandbox_code='# === Challenge 1: Max of Three ===\n'
-                'def max_of_three(a, b, c):\n'
-                '    # Return the largest without using max()\n'
-                '    pass\n\n'
-                'print(max_of_three(10, 25, 17))\n'
-                'print(max_of_three(99, 5, 42))\n'
-                'print(max_of_three(3, 3, 7))\n\n\n'
-                '# === Challenge 2: Even Filter ===\n'
-                'def is_even(n):\n'
-                '    # Return True if n is even\n'
-                '    pass\n\n'
-                'numbers = [1, 4, 7, 10, 13, 16, 19, 22]\n'
-                '# Use is_even() to filter and print even numbers\n\n\n'
-                '# === Challenge 3: Tip Calculator ===\n'
-                'def calculate_tip(bill, percent):\n'
-                '    # Return the tip amount, rounded to 2 decimals\n'
-                '    pass\n\n'
-                '# Print a receipt for a $85.50 bill with 18% tip\n',
+            sandbox_code='',
         )
 
         # === MODULE 6: Lists & Tuples ===
@@ -1580,19 +1510,7 @@ Play with the list in the editor.""",
                 "students = [(\"Alice\", 92), (\"Bob\", 65), (\"Charlie\", 88), (\"Diana\", 71), (\"Eve\", 95)]\n"
                 "```\n\n"
                 "Print: `Alice: 92` etc. for passing students only.",
-            sandbox_code='# === Challenge 1: Even/Odd Splitter ===\n'
-                'numbers = [14, 7, 22, 3, 18, 9, 30, 11, 6, 25]\n'
-                'evens = []\n'
-                'odds = []\n\n'
-                '# Split numbers into evens and odds\n\n\n'
-                'print("Evens:", evens)\n'
-                'print("Odds:", odds)\n\n\n'
-                '# === Challenge 2: Stats Without Built-ins ===\n'
-                'scores = [85, 92, 78, 95, 88, 73, 91]\n\n'
-                '# Find min, max, and average using loops only\n\n\n'
-                '# === Challenge 3: Student Scores Filter ===\n'
-                'students = [("Alice", 92), ("Bob", 65), ("Charlie", 88), ("Diana", 71), ("Eve", 95)]\n\n'
-                '# Print students who scored above 80\n',
+            sandbox_code='',
         )
 
         # === MODULE 7: Dictionaries ===
@@ -1824,29 +1742,7 @@ Modify the dictionary in the editor and see what happens.""",
                 "}\n"
                 "```\n\n"
                 "Print the switch hostname, count of `up` interfaces, and details of each interface.",
-            sandbox_code='# === Challenge 1: Contact Book ===\n'
-                'contacts = {"Alice": "555-0101", "Bob": "555-0102", "Charlie": "555-0103"}\n\n'
-                '# Look up Bob\n'
-                '# Add Diana\n'
-                '# Delete Charlie\n'
-                '# Print final book\n\n\n'
-                '# === Challenge 2: Inventory System ===\n'
-                'inventory = {"apples": 50, "bananas": 30, "oranges": 25, "grapes": 10}\n\n'
-                '# Restock bananas by 20\n'
-                '# Sell 15 apples\n'
-                '# Print low stock items (below 20)\n'
-                '# Print final inventory\n\n\n'
-                '# === Challenge 3: Nested Network Switch ===\n'
-                'switch = {\n'
-                '    "hostname": "SW-CORE-01",\n'
-                '    "model": "Cisco 3850",\n'
-                '    "interfaces": [\n'
-                '        {"name": "Gi0/0", "status": "up", "speed": "1Gbps"},\n'
-                '        {"name": "Gi0/1", "status": "down", "speed": "1Gbps"},\n'
-                '        {"name": "Gi0/2", "status": "up", "speed": "10Gbps"},\n'
-                '    ]\n'
-                '}\n\n'
-                '# Print hostname, count of up interfaces, and interface details\n',
+            sandbox_code='',
         )
 
         # === MODULE 8: String Magic ===
@@ -2072,27 +1968,7 @@ Play with the string operations in the editor.""",
                 "Charlie,35,Tokyo\n"
                 "```\n\n"
                 "Output a table with aligned columns using `split()`, `join()`, and f-strings.",
-            sandbox_code='# === Challenge 1: Password Strength Checker ===\n'
-                'password = "MyP@ss1"\n\n'
-                '# Check each criterion and rate the password\n'
-                'checks = {\n'
-                '    "length >= 8": len(password) >= 8,\n'
-                '    # Add more checks here\n'
-                '}\n\n'
-                '# Print results and overall rating\n\n\n'
-                '# === Challenge 2: Caesar Cipher ===\n'
-                'def caesar_cipher(text, shift):\n'
-                '    result = ""\n'
-                '    for char in text:\n'
-                '        # Shift letters, keep others unchanged\n'
-                '        pass\n'
-                '    return result\n\n'
-                'print(caesar_cipher("Hello, World!", 3))\n'
-                'print(caesar_cipher("abc xyz", 1))\n\n\n'
-                '# === Challenge 3: CSV Table Formatter ===\n'
-                'csv_data = "Name,Age,City\\nAlice,30,New York\\nBob,25,London\\nCharlie,35,Tokyo"\n\n'
-                '# Parse and print a formatted table\n'
-                'rows = csv_data.strip().split("\\n")\n',
+            sandbox_code='',
         )
 
         # === MODULE 9: Writing Cleaner Code ===
@@ -2347,36 +2223,7 @@ Try modifying the examples and see what happens!""",
                 "items = [\"apple\", \"banana\", \"cherry\", \"STOP\", \"date\", \"elderberry\"]\n"
                 "```\n\n"
                 "Print each item before STOP, then print how many items were processed.",
-            sandbox_code='# === Challenge 1: Ternary Rewrites ===\n'
-                '# Rewrite each block as a single-line ternary\n\n'
-                '# Block A\n'
-                'age = 20\n'
-                '# status = ???\n'
-                '# print(f"Status: {status}")\n\n'
-                '# Block B\n'
-                'score = 75\n'
-                '# result = ???\n'
-                '# print(f"Result: {result}")\n\n'
-                '# Block C\n'
-                'items = []\n'
-                '# message = ???\n'
-                '# print(f"Message: {message}")\n\n\n'
-                '# === Challenge 2: List Comprehension Conversions ===\n'
-                '# 1. Squares of 1-10 (as a comprehension)\n'
-                'squares = []  # rewrite this\n'
-                'print(squares)\n\n'
-                '# 2. Uppercase words longer than 3 letters\n'
-                'words = ["hi", "hello", "hey", "wonderful", "go", "python"]\n'
-                'long_upper = []  # rewrite as comprehension with filter\n'
-                'print(long_upper)\n\n'
-                '# 3. Even numbers from 1-20\n'
-                'evens = []  # rewrite this\n'
-                'print(evens)\n\n\n'
-                '# === Challenge 3: Walrus Operator ===\n'
-                'items = ["apple", "banana", "cherry", "STOP", "date", "elderberry"]\n'
-                'index = 0\n'
-                'count = 0\n\n'
-                '# Use := in a while loop to process items until "STOP"\n',
+            sandbox_code='',
         )
 
         # === MODULE 10: Python for Network Engineers ===
@@ -2670,27 +2517,7 @@ Modify the examples and see what happens.""",
                 "172.16.0.0/16   via 172.16.0.1  eth2\n"
                 "```\n\n"
                 "Print only the default route lines and their next-hop addresses.",
-            sandbox_code='import ipaddress\n\n'
-                '# === Challenge 1: IP Validator & Classifier ===\n'
-                'ips = ["192.168.1.1", "8.8.8.8", "999.999.999.999", "10.0.0.1", "172.16.0.1", "not_an_ip", "1.1.1.1"]\n\n'
-                'for ip_str in ips:\n'
-                '    # Validate with try/except, classify as private/public\n'
-                '    pass\n\n\n'
-                '# === Challenge 2: Subnet Calculator ===\n'
-                'subnets = ["10.0.0.0/24", "192.168.1.0/28", "172.16.0.0/16"]\n\n'
-                'for subnet_str in subnets:\n'
-                '    net = ipaddress.ip_network(subnet_str)\n'
-                '    # Print network address, broadcast address, usable host count\n'
-                '    pass\n\n\n'
-                '# === Challenge 3: Routing Table Parser ===\n'
-                'routing_table = """0.0.0.0/0       via 10.0.0.1    eth0\n'
-                '192.168.1.0/24  via 192.168.1.1 eth1\n'
-                '10.0.0.0/8      via 10.0.0.1    eth0\n'
-                '0.0.0.0/0       via 172.16.0.1  eth2\n'
-                '172.16.0.0/16   via 172.16.0.1  eth2"""\n\n'
-                '# Parse and print only default routes (0.0.0.0/0) with next-hop\n'
-                'for line in routing_table.strip().split("\\n"):\n'
-                '    pass\n',
+            sandbox_code='',
         )
 
         # === MODULE 11: Handling Errors ===
@@ -2930,30 +2757,7 @@ The sandbox has examples of `ValueError`, `KeyError`, and `ZeroDivisionError`. M
                 "```\n\n"
                 "Try to read: `host`, `port`, `timeout`, `retries` — provide defaults for missing keys.\n"
                 "Print the final configuration.",
-            sandbox_code='# === Challenge 1: Safe Division Function ===\n'
-                'def safe_divide(a, b):\n'
-                '    # Handle ZeroDivisionError and TypeError\n'
-                '    pass\n\n'
-                '# Test it\n'
-                'print(safe_divide(10, 2))\n'
-                'print(safe_divide(10, 0))\n'
-                'print(safe_divide("ten", 2))\n\n\n'
-                '# === Challenge 2: Mixed String Converter ===\n'
-                'values = ["42", "hello", "17", "3.14", "99", "world", "0"]\n'
-                'successes = 0\n'
-                'failures = 0\n\n'
-                'for v in values:\n'
-                '    # Try converting to int, track results\n'
-                '    pass\n\n'
-                'print(f"Successes: {successes}, Failures: {failures}")\n\n\n'
-                '# === Challenge 3: Config Reader with Defaults ===\n'
-                'config = {"host": "192.168.1.1", "port": 8080}\n'
-                'defaults = {"host": "0.0.0.0", "port": 80, "timeout": 30, "retries": 3}\n\n'
-                '# Read each key with try/except, use default if missing\n'
-                'final_config = {}\n'
-                'for key in ["host", "port", "timeout", "retries"]:\n'
-                '    pass\n\n'
-                'print("Final config:", final_config)\n',
+            sandbox_code='',
         )
 
         # === MODULE 12: User Input & While Loops ===
@@ -3186,26 +2990,7 @@ Modify the code and see what happens.""",
                 "]\n"
                 "```\n\n"
                 "For each question, compare a simulated answer and print right/wrong. At the end, print the total score.",
-            sandbox_code='# === Challenge 1: Number Guessing Game ===\n'
-                'target = 42\n'
-                'guesses = [25, 50, 40, 42]\n\n'
-                '# Loop through guesses and print hints\n'
-                '# Stop when the guess matches the target\n\n\n'
-                '# === Challenge 2: Simple Calculator ===\n'
-                'operations = [("add", 10), ("multiply", 3), ("subtract", 5), ("add", 7), ("multiply", 2)]\n'
-                'total = 0\n\n'
-                'for op, value in operations:\n'
-                '    # Apply the operation to total and print\n'
-                '    pass\n\n\n'
-                '# === Challenge 3: Quiz Game ===\n'
-                'quiz = [\n'
-                '    ("What keyword defines a function in Python?", "def"),\n'
-                '    ("What built-in function prints to the screen?", "print"),\n'
-                '    ("What data type stores True or False?", "bool"),\n'
-                ']\n'
-                'answers = ["def", "input", "bool"]  # simulated user answers\n'
-                'score = 0\n\n'
-                '# Loop through quiz and answers, track score\n',
+            sandbox_code='',
         )
 
         # === MODULE 13: Regular Expressions ===
@@ -3458,23 +3243,7 @@ The sandbox shows how to extract IPs from log lines, parse interface status, and
                 "dates = [\"03/15/2024\", \"12/01/2023\", \"07/04/1776\"]\n"
                 "```\n\n"
                 "Print each reformatted date on its own line.",
-            sandbox_code='import re\n\n'
-                '# === Challenge 1: Phone Number Standardizer ===\n'
-                'phones = ["(555) 123-4567", "555.123.4567", "5551234567", "555-123-4567"]\n\n'
-                'for phone in phones:\n'
-                '    # Strip all non-digit characters, then reformat\n'
-                '    pass\n\n\n'
-                '# === Challenge 2: Email Validator ===\n'
-                'emails = ["user@example.com", "bad-email@", "name.last@company.org", "@missing.com", "test@site.co.uk"]\n\n'
-                '# Write a regex pattern for email validation\n'
-                'pattern = r""  # your pattern here\n\n'
-                'for email in emails:\n'
-                '    pass  # Check and print VALID or INVALID\n\n\n'
-                '# === Challenge 3: Date Reformatter ===\n'
-                'dates = ["03/15/2024", "12/01/2023", "07/04/1776"]\n\n'
-                'for date in dates:\n'
-                '    # Use re.sub or re.search with groups to reformat\n'
-                '    pass\n',
+            sandbox_code='',
         )
 
         # === MODULE 14: Building a Network Toolkit ===
@@ -3700,37 +3469,7 @@ Modify the device data and see how the output changes.""",
                 "networks = [\"10.0.0.0/24\", \"10.0.0.128/25\", \"192.168.1.0/24\", \"172.16.0.0/16\", \"172.16.5.0/24\"]\n"
                 "```\n\n"
                 "Hint: `ipaddress.ip_network()` objects support the `overlaps()` method.",
-            sandbox_code='import re\n'
-                'import ipaddress\n\n'
-                '# === Challenge 1: Multi-Device show version Parser ===\n'
-                'show_output = """Device 1:\n'
-                'Cisco IOS Software, Version 15.4(3)M\n'
-                'hostname R1\n'
-                '\n'
-                'Device 2:\n'
-                'Cisco IOS Software, Version 16.9.4\n'
-                'hostname SW1\n'
-                '\n'
-                'Device 3:\n'
-                'Cisco IOS Software, Version 15.7(3)M\n'
-                'hostname R2"""\n\n'
-                '# Parse hostname and version from each device block\n'
-                '# Hint: use re.findall() with a pattern for version and hostname\n\n\n'
-                '# === Challenge 2: Function Pipeline ===\n'
-                'test_ips = ["10.0.0.1", "8.8.8.8", "not_valid", "192.168.1.1", "1.1.1.1"]\n\n'
-                'def validate_ips(ip_list):\n'
-                '    # Return only valid IP strings\n'
-                '    pass\n\n'
-                'def classify_ips(valid_ips):\n'
-                '    # Return {"private": [...], "public": [...]}\n'
-                '    pass\n\n'
-                'def generate_report(classified):\n'
-                '    # Print a formatted summary\n'
-                '    pass\n\n'
-                '# Chain: validate -> classify -> report\n\n\n'
-                '# === Challenge 3: Subnet Overlap Detector ===\n'
-                'networks = ["10.0.0.0/24", "10.0.0.128/25", "192.168.1.0/24", "172.16.0.0/16", "172.16.5.0/24"]\n\n'
-                '# Check every pair for overlaps\n',
+            sandbox_code='',
         )
 
         self.stdout.write(self.style.SUCCESS(

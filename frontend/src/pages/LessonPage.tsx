@@ -101,7 +101,7 @@ export default function LessonPage() {
       </div>
 
       {/* Interactive Sandbox */}
-      {lesson.lesson_type === 'interactive' && lesson.sandbox_code && (
+      {lesson.lesson_type === 'interactive' && (
         <div className="mb-8 border border-gray-700 rounded-xl overflow-hidden">
           <div className="bg-gray-800 px-4 py-2 border-b border-gray-700 flex items-center justify-between">
             <span className="text-sm text-gray-400">🧪 Try it yourself</span>
