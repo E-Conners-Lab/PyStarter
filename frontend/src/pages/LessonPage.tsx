@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { getLesson, getModule, markLessonComplete } from '../api/curriculum';
 import { sandboxRun } from '../api/submissions';
 import CodeEditor from '../components/editor/CodeEditor';
@@ -96,7 +97,7 @@ export default function LessonPage() {
 
       {/* Lesson Content */}
       <div className="lesson-content mb-8">
-        <ReactMarkdown>{lesson.content}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{lesson.content}</ReactMarkdown>
       </div>
 
       {/* Interactive Sandbox */}
