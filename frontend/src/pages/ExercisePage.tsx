@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { getExercise, getLesson, getModule, revealHint, getRevealedHints } from '../api/curriculum';
 import { runCode, submitCode, getAiHint, getAiCritique, explainError } from '../api/submissions';
 import { useAuthStore } from '../stores/authStore';
@@ -212,7 +213,7 @@ export default function ExercisePage() {
 
       {/* Instructions */}
       <div className="lesson-content bg-gray-800/50 border border-gray-700/50 rounded-xl p-6 mb-6">
-        <ReactMarkdown>{exercise.instructions}</ReactMarkdown>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{exercise.instructions}</ReactMarkdown>
       </div>
 
       {/* Output Predict Exercise */}
@@ -361,7 +362,7 @@ export default function ExercisePage() {
         <div className="bg-blue-500/5 border border-blue-700/50 rounded-xl p-5 mb-4">
           <h3 className="font-semibold text-blue-400 mb-2">🤖 Error Explanation</h3>
           <div className="text-sm text-gray-300 lesson-content">
-            <ReactMarkdown>{aiExplanation}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiExplanation}</ReactMarkdown>
           </div>
         </div>
       )}
@@ -371,7 +372,7 @@ export default function ExercisePage() {
         <div className="bg-primary-500/5 border border-primary-700/50 rounded-xl p-5 mb-4">
           <h3 className="font-semibold text-primary-400 mb-2">🤖 Code Feedback</h3>
           <div className="text-sm text-gray-300 lesson-content">
-            <ReactMarkdown>{aiCritique}</ReactMarkdown>
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiCritique}</ReactMarkdown>
           </div>
         </div>
       )}
@@ -413,7 +414,7 @@ export default function ExercisePage() {
               )}
             </div>
             <div className="text-sm text-gray-300 lesson-content">
-              <ReactMarkdown>{hint.content}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{hint.content}</ReactMarkdown>
             </div>
           </div>
         ))}
@@ -422,7 +423,7 @@ export default function ExercisePage() {
           <div className="bg-primary-500/5 border border-primary-700/30 rounded-lg p-4 mb-2">
             <span className="text-xs font-medium text-primary-400">🤖 AI Hint</span>
             <div className="text-sm text-gray-300 mt-1 lesson-content">
-              <ReactMarkdown>{aiHint}</ReactMarkdown>
+              <ReactMarkdown remarkPlugins={[remarkGfm]}>{aiHint}</ReactMarkdown>
             </div>
           </div>
         )}
