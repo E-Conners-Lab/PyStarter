@@ -58,7 +58,7 @@ uv run python manage.py runserver 8002
 ### 3. Start the frontend (in a separate terminal)
 
 ```bash
-cd frontend
+cd PyStarter/frontend
 npm install
 npm run dev
 ```
