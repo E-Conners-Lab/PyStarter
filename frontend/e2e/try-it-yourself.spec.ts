@@ -173,9 +173,9 @@ test.describe('Try It Yourself Challenge Lessons', () => {
       // Run the code
       await page.getByRole('button', { name: /Run/ }).click();
 
-      // Verify output contains expected text
+      // Verify output contains expected text (scope to the green output pre, not starter code)
       await expect(
-        page.locator('pre').filter({ hasText: lesson.expectedOutput })
+        page.locator('pre.text-green-400').filter({ hasText: lesson.expectedOutput })
       ).toBeVisible({ timeout: 15000 });
     });
   }
