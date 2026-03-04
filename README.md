@@ -145,6 +145,8 @@ Set `ANTHROPIC_BASE_URL` to your server's URL and `ANTHROPIC_MODEL` to the model
 
 ## Docker Deployment
 
+> **Prerequisite:** [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Docker Compose) must be installed and running.
+
 Run the full stack with Docker Compose:
 
 ```bash
