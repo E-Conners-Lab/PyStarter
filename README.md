@@ -73,40 +73,58 @@ Open http://localhost:5173, register an account, and start learning.
 
 Each module has 3 lessons (concept, interactive sandbox, graded exercises) and 4-6 exercises. 66 exercises total across 42 lessons.
 
-## Environment Variables
+## AI Setup
 
-Copy `backend/.env.example` to `backend/.env` and fill in your own values:
-
-```
-DJANGO_SECRET_KEY=<your-random-secret>
-ANTHROPIC_API_KEY=<your-anthropic-api-key>
-ANTHROPIC_MODEL=claude-haiku-4-5-20241001
-```
-
-### `DJANGO_SECRET_KEY`
-
-Django uses this key to sign session cookies, CSRF tokens, password reset links, and other security-critical data. Every deployment **must** have a unique, unpredictable key. If an attacker learns your secret key, they can forge sessions and bypass CSRF protection.
-
-Generate one with:
+The AI features (contextual hints, code critique, error explanations) need an LLM. Everything else works without one. You have two options:
 
 ```bash
-python -c "import secrets; print(secrets.token_urlsafe(50))"
+cd backend
+cp .env.example .env
 ```
 
-### `ANTHROPIC_API_KEY`
+### Option A: Anthropic API (recommended)
 
-PyStarter's AI features (contextual hints, code critique, error explanations) call the Anthropic Claude API. You need your own API key because:
+Edit `backend/.env`:
 
-1. **API keys are billed to your account** — each hint/critique request costs a small amount of tokens. You control your own usage and spending limits.
-2. **Keys should never be shared** — a leaked key lets anyone make API calls charged to your account.
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
 
-To get a key:
+To get a key: sign up at [console.anthropic.com](https://console.anthropic.com), go to **API Keys**, and create one. API calls are billed to your account — each hint costs a fraction of a cent.
 
-1. Sign up at [console.anthropic.com](https://console.anthropic.com)
-2. Navigate to **API Keys** and create a new key
-3. Copy the key (starts with `sk-ant-...`) into your `.env` file
+### Option B: Local LLM (free, private, offline)
 
-The AI features are **optional** — the core curriculum, exercises, and code sandbox work without an API key. Only the "Ask AI for Help" button requires it.
+You can run a local model instead of using the Anthropic API. Any tool that provides an OpenAI-compatible API will work.
+
+**Using [Ollama](https://ollama.com):**
+
+1. Install Ollama and pull a model:
+   ```bash
+   ollama pull llama3.2
+   ```
+
+2. Edit `backend/.env`:
+   ```
+   ANTHROPIC_API_KEY=not-needed
+   ANTHROPIC_MODEL=llama3.2
+   ANTHROPIC_BASE_URL=http://localhost:11434/v1
+   ```
+
+**Using [LM Studio](https://lmstudio.ai):**
+
+1. Download a model in LM Studio and start the local server
+2. Edit `backend/.env`:
+   ```
+   ANTHROPIC_API_KEY=not-needed
+   ANTHROPIC_MODEL=<your-model-name>
+   ANTHROPIC_BASE_URL=http://localhost:1234/v1
+   ```
+
+**Using any OpenAI-compatible server** (llama.cpp, vLLM, text-generation-webui, etc.):
+
+Set `ANTHROPIC_BASE_URL` to your server's URL and `ANTHROPIC_MODEL` to the model name it expects. The `ANTHROPIC_API_KEY` can be any non-empty string if your server doesn't require auth.
+
+> **Note:** Hint quality depends on the model. Smaller local models (~3B–8B parameters) work but may give less precise hints than Claude. For the best experience, use a 13B+ model or the Anthropic API.
 
 ## Testing
 

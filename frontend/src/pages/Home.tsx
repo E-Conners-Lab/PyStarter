@@ -75,6 +75,12 @@ export default function Home() {
               { num: 6, title: 'Lists & Tuples', desc: 'Ordered collections' },
               { num: 7, title: 'Dictionaries', desc: 'Key-value data storage' },
               { num: 8, title: 'String Magic', desc: 'Text manipulation mastery' },
+              { num: 9, title: 'Writing Cleaner Code', desc: 'Ternary, comprehensions, and Pythonic patterns' },
+              { num: 10, title: 'Python for Network Engineers', desc: 'IP addresses, CLI parsing, and JSON configs' },
+              { num: 11, title: 'Handling Errors', desc: 'try/except and graceful error handling' },
+              { num: 12, title: 'User Input & While Loops', desc: 'Interactive CLI tools with input()' },
+              { num: 13, title: 'Regular Expressions', desc: 'Pattern matching for logs and device output' },
+              { num: 14, title: 'Building a Network Toolkit', desc: 'Capstone: real-world automation scripts' },
             ].map((m) => (
               <div
                 key={m.num}
