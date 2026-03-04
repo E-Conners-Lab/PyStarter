@@ -34,26 +34,36 @@ A beginner-friendly Python training platform that teaches programming through in
 
 ### Prerequisites
 
-- Python 3.13+ with [uv](https://docs.astral.sh/uv/)
-- Node.js 18+
+- [Python 3.13+](https://www.python.org/downloads/)
+- [uv](https://docs.astral.sh/uv/) (Python package manager)
+- [Node.js 18+](https://nodejs.org/)
 
-### Backend
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/E-Conners-Lab/PyStarter.git
+cd PyStarter
+```
+
+### 2. Start the backend
 
 ```bash
 cd backend
-cp .env.example .env          # fill in your API keys
+cp .env.example .env          # fill in your API keys (see AI Setup below)
 uv run python manage.py migrate
 uv run python manage.py seed_curriculum
 uv run python manage.py runserver 8002
 ```
 
-### Frontend
+### 3. Start the frontend (in a separate terminal)
 
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+
+### 4. Start learning
 
 Open http://localhost:5173, register an account, and start learning.
 
