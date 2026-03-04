@@ -105,10 +105,10 @@ Edit `backend/.env`:
 
 ```
 ANTHROPIC_API_KEY=sk-ant-...
-ANTHROPIC_MODEL=claude-haiku-4-5-20241001
+ANTHROPIC_MODEL=claude-haiku-4-5-20251001
 ```
 
-Both values are required. `ANTHROPIC_API_KEY` authenticates your requests and `ANTHROPIC_MODEL` tells the app which Claude model to use. We recommend `claude-haiku-4-5-20241001` for fast, low-cost hints.
+Both values are required. `ANTHROPIC_API_KEY` authenticates your requests and `ANTHROPIC_MODEL` tells the app which Claude model to use. We recommend `claude-haiku-4-5-20251001` for fast, low-cost hints.
 
 To get a key: sign up at [console.anthropic.com](https://console.anthropic.com), go to **API Keys**, and create one. API calls are billed to your account — each hint costs a fraction of a cent.
 
