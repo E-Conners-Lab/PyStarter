@@ -13,5 +13,6 @@ dependencies = [
     "sentry-sdk[django]>=2.0",
     "psycopg2-binary>=2.9",
     "gunicorn>=22.0",
+    "whitenoise>=6.5",
     "openai>=2.24.0",
 ]

@@ -6,8 +6,8 @@ class User(AbstractUser):
     """Custom user model for PyStarter."""
 
     email = models.EmailField(unique=True)
-    bio = models.TextField(blank=True, default="")
-    total_xp = models.PositiveIntegerField(default=0)
+    bio = models.TextField(blank=True, default="", max_length=500)
+    total_xp = models.PositiveIntegerField(default=0, db_index=True)
     current_streak = models.PositiveIntegerField(default=0)
     longest_streak = models.PositiveIntegerField(default=0)
     last_activity_date = models.DateField(null=True, blank=True)
@@ -77,8 +77,8 @@ class UserModuleProgress(models.Model):
     module = models.ForeignKey(
         "curriculum.Module", on_delete=models.CASCADE, related_name="user_progress"
     )
-    is_unlocked = models.BooleanField(default=False)
-    is_completed = models.BooleanField(default=False)
+    is_unlocked = models.BooleanField(default=False, db_index=True)
+    is_completed = models.BooleanField(default=False, db_index=True)
     started_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
 
@@ -114,7 +114,7 @@ class UserExerciseProgress(models.Model):
     exercise = models.ForeignKey(
         "curriculum.Exercise", on_delete=models.CASCADE, related_name="user_progress"
     )
-    is_completed = models.BooleanField(default=False)
+    is_completed = models.BooleanField(default=False, db_index=True)
     best_code = models.TextField(blank=True, default="")
     xp_earned = models.PositiveIntegerField(default=0)
     attempts = models.PositiveIntegerField(default=0)

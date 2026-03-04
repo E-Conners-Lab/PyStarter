@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import axios from 'axios';
 import { getExercise, getLesson, getModule, revealHint, getRevealedHints } from '../api/curriculum';
 import { runCode, submitCode, getAiHint, getAiCritique, explainError } from '../api/submissions';
 import { useAuthStore } from '../stores/authStore';
@@ -19,7 +20,7 @@ export default function ExercisePage() {
   const queryClient = useQueryClient();
   const loadUser = useAuthStore((s) => s.loadUser);
 
-  const { data: exercise, isLoading } = useQuery({
+  const { data: exercise, isLoading, isError } = useQuery({
     queryKey: ['exercise', moduleSlug, lessonSlug, exerciseSlug],
     queryFn: () => getExercise(moduleSlug!, lessonSlug!, exerciseSlug!),
     enabled: !!moduleSlug && !!lessonSlug && !!exerciseSlug,
@@ -48,6 +49,7 @@ export default function ExercisePage() {
   const [aiLoading, setAiLoading] = useState(false);
   const [selectedChoice, setSelectedChoice] = useState<number | null>(null);
   const [choiceResult, setChoiceResult] = useState<'correct' | 'wrong' | null>(null);
+  const [errorMessage, setErrorMessage] = useState('');
 
   // Initialize code when exercise loads
   const [codeInitialized, setCodeInitialized] = useState('');
@@ -77,11 +79,16 @@ export default function ExercisePage() {
     setRunning(true);
     setResult(null);
     setAiExplanation('');
+    setErrorMessage('');
     try {
       const res = await runCode(exercise.id, code);
       setResult(res);
-    } catch {
+    } catch (err) {
       setResult(null);
+      if (!axios.isAxiosError(err) || !err.response || err.response.status >= 500) {
+        console.error('Run code error:', err);
+      }
+      setErrorMessage('Failed to run code. Please try again.');
     } finally {
       setRunning(false);
     }
@@ -93,6 +100,7 @@ export default function ExercisePage() {
     setResult(null);
     setAiExplanation('');
     setAiCritique('');
+    setErrorMessage('');
     try {
       const res = await submitCode(exercise.id, code);
       setResult(res);
@@ -104,8 +112,12 @@ export default function ExercisePage() {
         queryClient.invalidateQueries({ queryKey: ['progress'] });
         loadUser(); // Refresh user XP in header
       }
-    } catch {
+    } catch (err) {
       setResult(null);
+      if (!axios.isAxiosError(err) || !err.response || err.response.status >= 500) {
+        console.error('Submit code error:', err);
+      }
+      setErrorMessage('Failed to submit code. Please try again.');
     } finally {
       setSubmitting(false);
     }
@@ -113,11 +125,17 @@ export default function ExercisePage() {
 
   const handleRevealHint = useCallback(async () => {
     if (!exercise) return;
+    setErrorMessage('');
     try {
       const hint = await revealHint(exercise.id);
       setHints((prev) => [...prev, hint]);
-    } catch {
-      // No more hints
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 404) {
+        // No more hints — expected
+      } else {
+        console.error('Reveal hint error:', err);
+        setErrorMessage('Failed to load hint. Please try again.');
+      }
     }
   }, [exercise]);
 
@@ -178,6 +196,18 @@ export default function ExercisePage() {
     }
   }, [exercise, selectedChoice, queryClient]);
 
+  if (isError) {
+    return (
+      <div className="max-w-5xl mx-auto px-4 py-12 text-center">
+        <h1 className="text-2xl font-bold text-gray-300 mb-4">Not Found</h1>
+        <p className="text-gray-400 mb-6">This content doesn't exist or isn't available.</p>
+        <Link to="/dashboard" className="text-primary-400 hover:text-primary-300">
+          Back to Learning Path
+        </Link>
+      </div>
+    );
+  }
+
   if (isLoading || !exercise) {
     return (
       <div className="max-w-5xl mx-auto px-4 py-12">
@@ -202,6 +232,18 @@ export default function ExercisePage() {
         </svg>
         Back to Lesson
       </Link>
+
+      {errorMessage && (
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-sm mb-4 flex items-center justify-between">
+          <span>{errorMessage}</span>
+          <button
+            onClick={() => setErrorMessage('')}
+            className="text-red-400 hover:text-red-300 ml-4 text-lg leading-none"
+          >
+            &times;
+          </button>
+        </div>
+      )}
 
       <div className="flex items-center gap-3 mb-4">
         <h1 className="text-2xl font-bold">{exercise.title}</h1>

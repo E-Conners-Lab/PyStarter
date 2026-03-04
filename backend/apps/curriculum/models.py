@@ -28,7 +28,7 @@ class Module(models.Model):
     description = models.TextField()
     order = models.PositiveIntegerField(unique=True)
     icon = models.CharField(max_length=50, default="book")
-    is_published = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -67,7 +67,7 @@ class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=200)
     slug = models.SlugField()
-    order = models.PositiveIntegerField()
+    order = models.PositiveIntegerField(db_index=True)
     lesson_type = models.CharField(max_length=20, choices=LESSON_TYPES, default="concept")
 
     # Teaching content (Markdown)
@@ -82,7 +82,7 @@ class Lesson(models.Model):
         help_text="Pre-loaded code for the interactive sandbox.",
     )
 
-    is_published = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -123,7 +123,7 @@ class Exercise(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE, related_name="exercises")
     title = models.CharField(max_length=200)
     slug = models.SlugField()
-    order = models.PositiveIntegerField()
+    order = models.PositiveIntegerField(db_index=True)
     exercise_type = models.CharField(max_length=20, choices=EXERCISE_TYPES, default="write_code")
     difficulty = models.PositiveSmallIntegerField(choices=DIFFICULTY_CHOICES, default=1)
 
@@ -160,7 +160,7 @@ class Exercise(models.Model):
         help_text="Comma-separated Python concepts (e.g., 'variables, print, strings')",
     )
 
-    is_published = models.BooleanField(default=True)
+    is_published = models.BooleanField(default=True, db_index=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

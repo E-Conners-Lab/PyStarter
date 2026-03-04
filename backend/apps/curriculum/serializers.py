@@ -42,6 +42,10 @@ class ExerciseListSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if not request or not request.user.is_authenticated:
             return False
+        # Use prefetched data if available (from LessonDetailView)
+        prefetched = getattr(obj, "_user_completed_progress", None)
+        if prefetched is not None:
+            return len(prefetched) > 0
         return obj.user_progress.filter(user=request.user, is_completed=True).exists()
 
 
@@ -185,19 +189,11 @@ class ModuleListSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if not request or not request.user.is_authenticated:
             return 0
-        total_exercises = sum(
-            lesson.exercises.filter(is_published=True).count()
-            for lesson in obj.lessons.filter(is_published=True)
-        )
-        if total_exercises == 0:
+        total = getattr(obj, "_total_exercises", None)
+        completed = getattr(obj, "_completed_exercises", None)
+        if total is None or completed is None or total == 0:
             return 0
-        completed = sum(
-            1
-            for lesson in obj.lessons.filter(is_published=True)
-            for exercise in lesson.exercises.filter(is_published=True)
-            if exercise.user_progress.filter(user=request.user, is_completed=True).exists()
-        )
-        return round((completed / total_exercises) * 100)
+        return round((completed / total) * 100)
 
 
 class ModuleDetailSerializer(serializers.ModelSerializer):

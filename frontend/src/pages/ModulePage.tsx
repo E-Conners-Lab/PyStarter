@@ -18,11 +18,23 @@ const LESSON_TYPE_LABELS: Record<string, string> = {
 export default function ModulePage() {
   const { moduleSlug } = useParams<{ moduleSlug: string }>();
 
-  const { data: module, isLoading } = useQuery({
+  const { data: module, isLoading, isError } = useQuery({
     queryKey: ['module', moduleSlug],
     queryFn: () => getModule(moduleSlug!),
     enabled: !!moduleSlug,
   });
+
+  if (isError) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-12 text-center">
+        <h1 className="text-2xl font-bold text-gray-300 mb-4">Not Found</h1>
+        <p className="text-gray-400 mb-6">This content doesn't exist or isn't available.</p>
+        <Link to="/dashboard" className="text-primary-400 hover:text-primary-300">
+          Back to Learning Path
+        </Link>
+      </div>
+    );
+  }
 
   if (isLoading || !module) {
     return (

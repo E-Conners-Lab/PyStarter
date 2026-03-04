@@ -39,6 +39,26 @@ test.describe('Authentication', () => {
     await expect(page).toHaveURL('/login');
   });
 
+  test('"Forgot your password?" link is visible on login page', async ({ page }) => {
+    await page.goto('/login');
+    await expect(page.getByText('Forgot your password?')).toBeVisible();
+  });
+
+  test('wrong password shows error message', async ({ page }) => {
+    const { username } = await registerUser(page);
+
+    // Log out
+    await page.getByRole('button', { name: 'Logout' }).click();
+
+    // Try to log in with wrong password
+    await page.goto('/login');
+    await page.getByLabel('Username').fill(username);
+    await page.getByLabel('Password').fill('WrongPassword999!');
+    await page.getByRole('button', { name: 'Log In' }).click();
+
+    await expect(page.locator('.text-red-400')).toBeVisible({ timeout: 5000 });
+  });
+
   test('registration fails with duplicate username', async ({ page }) => {
     const { username } = await registerUser(page);
 
@@ -46,7 +66,6 @@ test.describe('Authentication', () => {
     await page.getByRole('button', { name: 'Logout' }).click();
     await page.goto('/register');
     await page.getByLabel('Username').fill(username);
-    await page.getByLabel('Email').fill('other@example.com');
     await page.getByLabel('Password').fill('TestPass123!');
     await page.getByRole('button', { name: 'Create Free Account' }).click();
 
