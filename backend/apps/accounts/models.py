@@ -14,16 +14,16 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # Belt progression thresholds
+    # Belt progression thresholds (890 total XP available across 66 exercises)
     BELT_THRESHOLDS = [
         (0, "white", "White Belt"),
-        (200, "yellow", "Yellow Belt"),
-        (600, "orange", "Orange Belt"),
-        (1500, "green", "Green Belt"),
-        (3000, "blue", "Blue Belt"),
-        (6000, "purple", "Purple Belt"),
-        (10000, "brown", "Brown Belt"),
-        (18000, "black", "Black Belt"),
+        (50, "yellow", "Yellow Belt"),       # ~4 exercises — quick first win
+        (125, "orange", "Orange Belt"),      # ~15% of curriculum
+        (250, "green", "Green Belt"),        # ~28% of curriculum
+        (400, "blue", "Blue Belt"),          # ~45% of curriculum
+        (550, "purple", "Purple Belt"),      # ~62% of curriculum
+        (700, "brown", "Brown Belt"),        # ~79% of curriculum
+        (850, "black", "Black Belt"),        # ~95% — near-perfect, minimal hints
     ]
 
     @property
