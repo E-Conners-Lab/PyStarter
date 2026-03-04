@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../stores/authStore';
+import axios from 'axios';
 
 export default function Login() {
   const [username, setUsername] = useState('');
@@ -17,8 +18,12 @@ export default function Login() {
     try {
       await login(username, password);
       navigate('/dashboard');
-    } catch {
-      setError('Invalid username or password');
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        setError('Invalid username or password');
+      } else {
+        setError('Something went wrong, please try again');
+      }
     } finally {
       setLoading(false);
     }
@@ -64,7 +69,12 @@ export default function Login() {
             {loading ? 'Logging in...' : 'Log In'}
           </button>
         </form>
-        <p className="text-center text-gray-400 mt-6 text-sm">
+        <p className="text-center text-gray-400 mt-4 text-sm">
+          <Link to="/forgot-password" className="text-primary-400 hover:text-primary-300">
+            Forgot your password?
+          </Link>
+        </p>
+        <p className="text-center text-gray-400 mt-2 text-sm">
           Don't have an account?{' '}
           <Link to="/register" className="text-primary-400 hover:text-primary-300">
             Sign up free

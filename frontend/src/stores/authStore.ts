@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { create } from 'zustand';
 import type { AuthTokens, User } from '../api/types';
 import * as authApi from '../api/auth';
@@ -47,9 +48,12 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     try {
       const user = await authApi.getMe();
       set({ user, isLoading: false });
-    } catch {
+    } catch (err) {
       set({ isLoading: false });
-      get().logout();
+      // Only logout on 401 (invalid/expired token), not on network errors or 500s
+      if (axios.isAxiosError(err) && err.response?.status === 401) {
+        get().logout();
+      }
     }
   },
 }));

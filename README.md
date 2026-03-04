@@ -131,10 +131,39 @@ Set `ANTHROPIC_BASE_URL` to your server's URL and `ANTHROPIC_MODEL` to the model
 
 > **Note:** Hint quality depends on the model. Smaller local models (~3B–8B parameters) work but may give less precise hints than Claude. For the best experience, use a 13B+ model or the Anthropic API.
 
+## Docker Deployment
+
+Run the full stack with Docker Compose:
+
+```bash
+cp backend/.env.example .env    # fill in DJANGO_SECRET_KEY, ALLOWED_HOSTS, etc.
+
+docker compose build
+docker compose up -d
+```
+
+This starts 4 services:
+
+| Service    | Description                              |
+|------------|------------------------------------------|
+| `db`       | PostgreSQL 16                            |
+| `backend`  | Django + Gunicorn (3 workers)            |
+| `frontend` | Built React app served by nginx          |
+| `nginx`    | Reverse proxy (`/api/` → backend, `/` → frontend) |
+
+The app is available at `http://localhost` (or the port set via `NGINX_PORT`).
+
+To run migrations and seed data:
+
+```bash
+docker compose exec backend python manage.py migrate
+docker compose exec backend python manage.py seed_curriculum
+```
+
 ## Testing
 
 ```bash
-# End-to-end tests (Playwright, 74 tests)
+# End-to-end tests (Playwright, 99 tests)
 cd frontend
 npx playwright test
 

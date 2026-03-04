@@ -30,3 +30,19 @@ export async function getLeaderboard(): Promise<
   const res = await client.get('/accounts/leaderboard/');
   return res.data;
 }
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  await client.post('/accounts/password-reset/', { email });
+}
+
+export async function confirmPasswordReset(
+  uid: string,
+  token: string,
+  newPassword: string
+): Promise<void> {
+  await client.post('/accounts/password-reset-confirm/', {
+    uid,
+    token,
+    new_password: newPassword,
+  });
+}

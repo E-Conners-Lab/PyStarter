@@ -19,6 +19,12 @@ test.describe('Module Completion Flow', () => {
     await page.getByRole('button', { name: /Mark as Complete/ }).click();
     await page.waitForURL(/\/module\/your-first-program$/);
 
+    // ── Complete the Try It Yourself lesson ──
+
+    await page.goto('/module/your-first-program/lesson/try-it-yourself-print');
+    await page.getByRole('button', { name: /Mark as Complete/ }).click();
+    await page.waitForURL(/\/module\/your-first-program$/);
+
     // ── Complete first 3 exercises ──
 
     const exercises = [

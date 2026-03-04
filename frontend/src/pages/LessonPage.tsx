@@ -3,6 +3,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import axios from 'axios';
 import { getLesson, getModule, markLessonComplete } from '../api/curriculum';
 import { sandboxRun } from '../api/submissions';
 import CodeEditor from '../components/editor/CodeEditor';
@@ -15,7 +16,7 @@ export default function LessonPage() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
-  const { data: lesson, isLoading } = useQuery({
+  const { data: lesson, isLoading, isError } = useQuery({
     queryKey: ['lesson', moduleSlug, lessonSlug],
     queryFn: () => getLesson(moduleSlug!, lessonSlug!),
     enabled: !!moduleSlug && !!lessonSlug,
@@ -30,6 +31,7 @@ export default function LessonPage() {
   const [sandboxCode, setSandboxCode] = useState('');
   const [sandboxOutput, setSandboxOutput] = useState('');
   const [running, setRunning] = useState(false);
+  const [error, setError] = useState('');
 
   // Initialize sandbox code when lesson loads
   const [initialized, setInitialized] = useState(false);
@@ -58,6 +60,7 @@ export default function LessonPage() {
 
   const handleMarkComplete = async () => {
     if (!lesson) return;
+    setError('');
     try {
       await markLessonComplete(lesson.id);
       queryClient.invalidateQueries({ queryKey: ['lesson'] });
@@ -65,11 +68,26 @@ export default function LessonPage() {
       queryClient.invalidateQueries({ queryKey: ['modules'] });
       queryClient.invalidateQueries({ queryKey: ['progress'] });
       navigate(`/module/${moduleSlug}`);
-    } catch {
-      // Silently handle - might already be completed
-      navigate(`/module/${moduleSlug}`);
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.status === 400) {
+        navigate(`/module/${moduleSlug}`);
+      } else {
+        setError('Failed to mark lesson as complete. Please try again.');
+      }
     }
   };
+
+  if (isError) {
+    return (
+      <div className="max-w-3xl mx-auto px-4 py-12 text-center">
+        <h1 className="text-2xl font-bold text-gray-300 mb-4">Not Found</h1>
+        <p className="text-gray-400 mb-6">This content doesn't exist or isn't available.</p>
+        <Link to="/dashboard" className="text-primary-400 hover:text-primary-300">
+          Back to Learning Path
+        </Link>
+      </div>
+    );
+  }
 
   if (isLoading || !lesson) {
     return (
@@ -94,6 +112,18 @@ export default function LessonPage() {
         </svg>
         Back to Module
       </Link>
+
+      {error && (
+        <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg text-sm mb-4 flex items-center justify-between">
+          <span>{error}</span>
+          <button
+            onClick={() => setError('')}
+            className="text-red-400 hover:text-red-300 ml-4 text-lg leading-none"
+          >
+            &times;
+          </button>
+        </div>
+      )}
 
       {/* Lesson Content */}
       <div className="lesson-content mb-8">

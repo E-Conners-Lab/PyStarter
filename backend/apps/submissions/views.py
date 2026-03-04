@@ -1,7 +1,9 @@
 from django.utils import timezone
 from rest_framework import permissions, status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, throttle_classes
 from rest_framework.response import Response
+
+from apps.common.throttles import CodeExecutionThrottle
 
 from apps.accounts.models import UserExerciseProgress, UserLessonProgress
 from apps.curriculum.models import Exercise, Hint
@@ -14,6 +16,7 @@ from .serializers import SubmissionSerializer, SubmitCodeSerializer
 
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
+@throttle_classes([CodeExecutionThrottle])
 def sandbox_run(request):
     """Run code freely in the sandbox — no exercise or test cases needed."""
     serializer = SubmitCodeSerializer(data=request.data)
@@ -31,6 +34,7 @@ def sandbox_run(request):
 
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
+@throttle_classes([CodeExecutionThrottle])
 def run_code(request, exercise_id):
     """Run code against visible test cases (doesn't count as a submission)."""
     serializer = SubmitCodeSerializer(data=request.data)
@@ -78,6 +82,7 @@ def run_code(request, exercise_id):
 
 @api_view(["POST"])
 @permission_classes([permissions.IsAuthenticated])
+@throttle_classes([CodeExecutionThrottle])
 def submit_code(request, exercise_id):
     """Submit code for grading against all test cases (visible + hidden)."""
     serializer = SubmitCodeSerializer(data=request.data)

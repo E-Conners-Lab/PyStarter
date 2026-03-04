@@ -1,3 +1,4 @@
+from django.db.models import Count, Prefetch, Q
 from django.utils import timezone
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes
@@ -22,9 +23,39 @@ class ModuleListView(ListAPIView):
     pagination_class = None
 
     def get_queryset(self):
-        return Module.objects.filter(is_published=True).prefetch_related(
-            "lessons", "lessons__exercises", "user_progress"
+        user = self.request.user
+        qs = Module.objects.filter(is_published=True)
+
+        # Annotate total published exercises per module
+        qs = qs.annotate(
+            _total_exercises=Count(
+                "lessons__exercises",
+                filter=Q(
+                    lessons__is_published=True,
+                    lessons__exercises__is_published=True,
+                ),
+            )
         )
+
+        if user.is_authenticated:
+            # Annotate completed exercises for current user
+            qs = qs.annotate(
+                _completed_exercises=Count(
+                    "lessons__exercises",
+                    filter=Q(
+                        lessons__is_published=True,
+                        lessons__exercises__is_published=True,
+                        lessons__exercises__user_progress__user=user,
+                        lessons__exercises__user_progress__is_completed=True,
+                    ),
+                )
+            )
+        else:
+            qs = qs.annotate(
+                _completed_exercises=Count("lessons__exercises", filter=Q(pk__isnull=True))
+            )
+
+        return qs.prefetch_related("lessons", "lessons__exercises", "user_progress")
 
 
 class ModuleDetailView(RetrieveAPIView):
@@ -45,8 +76,24 @@ class LessonDetailView(RetrieveAPIView):
     def get_object(self):
         module_slug = self.kwargs["module_slug"]
         lesson_slug = self.kwargs["lesson_slug"]
+        user = self.request.user
+
+        prefetches = ["exercises"]
+        if user.is_authenticated:
+            prefetches.append(
+                Prefetch(
+                    "exercises__user_progress",
+                    queryset=UserExerciseProgress.objects.filter(
+                        user=user, is_completed=True
+                    ),
+                    to_attr="_user_completed_progress",
+                )
+            )
+        else:
+            prefetches.append("exercises__user_progress")
+
         return Lesson.objects.select_related("module").prefetch_related(
-            "exercises", "exercises__user_progress"
+            *prefetches
         ).get(
             module__slug=module_slug,
             slug=lesson_slug,

@@ -31,6 +31,11 @@ test.describe('Module Progression', () => {
     await page.getByRole('button', { name: /Mark as Complete/ }).click();
     await page.waitForURL(/\/module\/your-first-program$/);
 
+    // Complete the Try It Yourself lesson
+    await page.goto('/module/your-first-program/lesson/try-it-yourself-print');
+    await page.getByRole('button', { name: /Mark as Complete/ }).click();
+    await page.waitForURL(/\/module\/your-first-program$/);
+
     // Complete all 4 exercises
     const exercises = [
       { slug: 'say-hello', code: 'print("Hello, World!")' },

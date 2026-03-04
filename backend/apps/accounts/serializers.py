@@ -13,9 +13,14 @@ class RegisterSerializer(serializers.ModelSerializer):
         fields = ("id", "username", "email", "password")
 
     def create(self, validated_data):
+        email = validated_data.get("email", "")
+        if not email:
+            # Generate a unique placeholder when no email is provided,
+            # since User.email has unique=True
+            email = f"{validated_data['username']}@placeholder.pystarter.dev"
         user = User.objects.create_user(
             username=validated_data["username"],
-            email=validated_data.get("email", ""),
+            email=email,
             password=validated_data["password"],
         )
         return user
@@ -43,6 +48,16 @@ class UserSerializer(serializers.ModelSerializer):
             "created_at",
         )
         read_only_fields = ("total_xp", "current_streak", "longest_streak", "created_at")
+
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(min_length=8)
 
 
 class UserProgressSummarySerializer(serializers.Serializer):
