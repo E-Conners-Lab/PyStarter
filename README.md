@@ -19,15 +19,16 @@ A beginner-friendly Python training platform that teaches programming through in
 
 ## Tech Stack
 
-| Layer | Stack |
-|-------|-------|
-| Backend | Django 6, Django REST Framework, SimpleJWT |
-| Frontend | React 19, TypeScript, Vite |
-| Styling | TailwindCSS (dark theme) |
-| State | Zustand (auth) + TanStack Query (data fetching) |
-| Code Editor | Monaco Editor |
-| AI | Anthropic Claude API |
-| Database | SQLite (dev) / PostgreSQL (prod) |
+| Layer       | Stack                                          |
+|-------------|------------------------------------------------|
+| Backend     | Django 6, Django REST Framework, SimpleJWT      |
+| Frontend    | React 19, TypeScript, Vite                     |
+| Styling     | TailwindCSS (dark theme)                       |
+| State       | Zustand (auth) + TanStack Query (data fetching) |
+| Code Editor | Monaco Editor                                  |
+| Markdown    | react-markdown + remark-gfm                   |
+| AI          | Anthropic Claude API                           |
+| Database    | SQLite (dev) / PostgreSQL (prod)               |
 
 ## Quick Start
 
@@ -58,22 +59,22 @@ Open http://localhost:5173, register an account, and start learning.
 
 ## Curriculum
 
-| # | Module | Topics |
-|---|--------|--------|
-| 1 | Your First Program | `print()`, strings, basic output |
-| 2 | Variables & Data Types | Assignment, int/float/str, `type()` |
-| 3 | Making Decisions | if/elif/else, comparisons, booleans |
-| 4 | Loops | for, while, `range()`, break/continue |
-| 5 | Functions | def, parameters, return values, scope |
-| 6 | Lists & Tuples | Indexing, slicing, methods, immutability |
-| 7 | Dictionaries | Key-value pairs, methods, iteration |
-| 8 | String Magic | Slicing, methods, f-strings, split/join |
-| 9 | Writing Cleaner Code | Ternary, enumerate, comprehensions, walrus operator |
-| 10 | Python for Network Engineers | `ipaddress`, CLI output parsing, JSON configs |
-| 11 | Handling Errors | try/except, common exceptions, error messages |
-| 12 | User Input & While Loops | `input()`, type conversion, sentinel values, break/continue |
-| 13 | Regular Expressions | `re.search()`, `re.findall()`, `re.sub()`, groups, patterns |
-| 14 | Building a Network Toolkit | Capstone: validation functions, parsing pipelines, audit reports |
+| #  | Module                       | Topics                                                         |
+|----|------------------------------|----------------------------------------------------------------|
+| 1  | Your First Program           | `print()`, strings, basic output                               |
+| 2  | Variables & Data Types       | Assignment, int/float/str, `type()`                            |
+| 3  | Making Decisions             | if/elif/else, comparisons, booleans                            |
+| 4  | Loops                        | for, while, `range()`, break/continue                          |
+| 5  | Functions                    | def, parameters, return values, scope                          |
+| 6  | Lists & Tuples               | Indexing, slicing, methods, immutability                       |
+| 7  | Dictionaries                 | Key-value pairs, methods, iteration                            |
+| 8  | String Magic                 | Slicing, methods, f-strings, split/join                        |
+| 9  | Writing Cleaner Code         | Ternary, enumerate, comprehensions, walrus operator            |
+| 10 | Python for Network Engineers | `ipaddress`, CLI output parsing, JSON configs                  |
+| 11 | Handling Errors              | try/except, common exceptions, else/finally                    |
+| 12 | User Input & While Loops     | `input()`, type conversion, sentinel values, break/continue    |
+| 13 | Regular Expressions          | `re.search()`, `re.findall()`, `re.sub()`, groups, patterns    |
+| 14 | Building a Network Toolkit   | Capstone: validation functions, parsing pipelines, audit reports |
 
 Each module has 3 lessons (concept, interactive sandbox, graded exercises) and 4-6 exercises. 66 exercises total across 42 lessons.
 
