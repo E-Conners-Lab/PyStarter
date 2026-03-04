@@ -4,7 +4,7 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from apps.executor.sandbox import MEMORY_LIMIT_BYTES, _set_memory_limit, execute_code
+from apps.executor.sandbox import MEMORY_LIMIT_BYTES, _set_memory_limit, _restore_memory_limit, execute_code
 
 
 class SetMemoryLimitTests(TestCase):
@@ -15,30 +15,44 @@ class SetMemoryLimitTests(TestCase):
     @patch("resource.getrlimit", return_value=(resource.RLIM_INFINITY, resource.RLIM_INFINITY))
     def test_linux_uses_rlimit_as(self, mock_getrlimit, mock_setrlimit, mock_platform):
         mock_platform.system.return_value = "Linux"
-        _set_memory_limit()
+        saved = _set_memory_limit()
         mock_setrlimit.assert_called_once_with(
             resource.RLIMIT_AS, (MEMORY_LIMIT_BYTES, resource.RLIM_INFINITY)
         )
+        self.assertIsNotNone(saved)
 
     @patch("apps.executor.sandbox.platform")
     @patch("resource.setrlimit")
     @patch("resource.getrlimit", return_value=(resource.RLIM_INFINITY, resource.RLIM_INFINITY))
     def test_darwin_uses_rlimit_rss(self, mock_getrlimit, mock_setrlimit, mock_platform):
         mock_platform.system.return_value = "Darwin"
-        _set_memory_limit()
+        saved = _set_memory_limit()
         mock_setrlimit.assert_called_once_with(
             resource.RLIMIT_RSS, (MEMORY_LIMIT_BYTES, resource.RLIM_INFINITY)
         )
+        self.assertIsNotNone(saved)
 
     def test_set_memory_limit_does_not_crash(self):
         """_set_memory_limit() should never raise, even if platform doesn't support it."""
-        _set_memory_limit()
+        saved = _set_memory_limit()
+        _restore_memory_limit(saved)
 
     def test_normal_code_works_with_memory_limit(self):
         """Normal code should still execute successfully."""
         result = execute_code('print("hello")')
         self.assertEqual(result["status"], "success")
         self.assertEqual(result["output"].strip(), "hello")
+
+    def test_memory_limit_restored_after_execution(self):
+        """Memory limit should be restored after sandbox execution."""
+        from apps.executor.sandbox import _get_limit_type
+        limit_type = _get_limit_type()
+        if limit_type is None:
+            self.skipTest("No resource limits on this platform")
+        before = resource.getrlimit(limit_type)
+        execute_code('print("test")')
+        after = resource.getrlimit(limit_type)
+        self.assertEqual(before, after)
 
     def test_excessive_memory_returns_error_on_linux(self):
         """On Linux, code allocating excessive memory should fail.

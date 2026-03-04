@@ -14,32 +14,52 @@ from contextlib import redirect_stderr, redirect_stdout
 MEMORY_LIMIT_BYTES = 128 * 1024 * 1024  # 128 MB
 
 
-def _set_memory_limit():
-    """Set a memory limit for the current process/thread.
-
-    Uses RLIMIT_AS on Linux, RLIMIT_RSS on macOS.
-    Silently skips on Windows or if resource module is unavailable.
-    """
+def _get_limit_type():
+    """Return the appropriate resource limit type for the current platform, or None."""
     try:
-        import resource
+        import resource  # noqa: F811
     except ImportError:
-        return  # Windows — no resource module
-
+        return None  # Windows
     system = platform.system()
     if system == "Linux":
-        limit_type = resource.RLIMIT_AS
+        return resource.RLIMIT_AS
     elif system == "Darwin":
-        limit_type = resource.RLIMIT_RSS
-    else:
-        return
+        return resource.RLIMIT_RSS
+    return None
+
+
+def _set_memory_limit():
+    """Set a memory limit for the current process.
+
+    Uses RLIMIT_AS on Linux, RLIMIT_RSS on macOS.
+    Returns the previous limits so they can be restored after execution.
+    """
+    limit_type = _get_limit_type()
+    if limit_type is None:
+        return None
+
+    import resource
 
     try:
-        soft, hard = resource.getrlimit(limit_type)
-        # On macOS, hard limit may be lower than our target; clamp to hard limit
+        old_soft, hard = resource.getrlimit(limit_type)
         new_soft = min(MEMORY_LIMIT_BYTES, hard) if hard != resource.RLIM_INFINITY else MEMORY_LIMIT_BYTES
         resource.setrlimit(limit_type, (new_soft, hard))
+        return (limit_type, old_soft, hard)
     except (ValueError, OSError):
-        pass  # Platform doesn't support this limit; skip silently
+        return None
+
+
+def _restore_memory_limit(saved):
+    """Restore memory limits saved by _set_memory_limit()."""
+    if saved is None:
+        return
+    try:
+        import resource
+
+        limit_type, old_soft, hard = saved
+        resource.setrlimit(limit_type, (old_soft, hard))
+    except (ValueError, OSError, ImportError):
+        pass
 
 # Imports allowed for beginner exercises
 ALLOWED_IMPORTS = {
@@ -121,7 +141,8 @@ def execute_code(code, input_data="", timeout=5):
     """
 
     def _run():
-        _set_memory_limit()
+        saved_memory = _set_memory_limit()
+        old_recursion_limit = sys.getrecursionlimit()
         sys.setrecursionlimit(200)
         stdout_capture = io.StringIO()
         stderr_capture = io.StringIO()
@@ -174,6 +195,9 @@ def execute_code(code, input_data="", timeout=5):
                 "error": friendly_error,
                 "execution_time": round(execution_time, 4),
             }
+        finally:
+            sys.setrecursionlimit(old_recursion_limit)
+            _restore_memory_limit(saved_memory)
 
     # Run with timeout
     with ThreadPoolExecutor(max_workers=1) as pool:
