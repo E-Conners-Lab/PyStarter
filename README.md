@@ -208,4 +208,4 @@ This is appropriate for a single-tenant training platform. For untrusted multi-t
 
 ## License
 
-[MIT](LICENSE)
+Personal use only. See [LICENSE](LICENSE) for details.
