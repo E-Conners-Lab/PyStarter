@@ -17,6 +17,10 @@ class Module(models.Model):
     8. String Magic
     9. Writing Cleaner Code
     10. Python for Network Engineers
+    11. Handling Errors
+    12. User Input & While Loops
+    13. Regular Expressions
+    14. Building a Network Toolkit
     """
 
     title = models.CharField(max_length=200)

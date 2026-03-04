@@ -26,6 +26,10 @@ const MODULE_ICONS: Record<string, string> = {
   type: '✨',
   wand: '🪄',
   network: '🌐',
+  shield: '🛡️',
+  terminal: '💻',
+  search: '🔍',
+  wrench: '🔧',
 };
 
 export default function Dashboard() {
