@@ -474,14 +474,14 @@ Python checks conditions **top to bottom** and runs the **first** block that mat
 
 ## Comparison Operators
 
-| Operator | Meaning |
-|----------|---------|
-| `==` | Equal to |
-| `!=` | Not equal to |
-| `>` | Greater than |
-| `<` | Less than |
-| `>=` | Greater than or equal |
-| `<=` | Less than or equal |
+| Operator | Meaning                |
+|----------|------------------------|
+| `==`     | Equal to               |
+| `!=`     | Not equal to           |
+| `>`      | Greater than           |
+| `<`      | Less than              |
+| `>=`     | Greater than or equal  |
+| `<=`     | Less than or equal     |
 
 ## Common Mistake: `=` vs `==`
 
@@ -710,11 +710,11 @@ The variable `i` takes on a new value each time through the loop. You can name i
 
 `range()` generates numbers on the fly — it doesn't create a list in memory. It just produces the next number each time the loop asks for one.
 
-| Code | Produces |
-|------|----------|
-| `range(5)` | 0, 1, 2, 3, 4 |
-| `range(1, 6)` | 1, 2, 3, 4, 5 |
-| `range(0, 10, 2)` | 0, 2, 4, 6, 8 |
+| Code               | Produces        |
+|--------------------|-----------------|
+| `range(5)`         | 0, 1, 2, 3, 4  |
+| `range(1, 6)`      | 1, 2, 3, 4, 5  |
+| `range(0, 10, 2)`  | 0, 2, 4, 6, 8  |
 
 ### Common mistake: off-by-one
 
@@ -1200,14 +1200,14 @@ print(nums)      # [3, 1, 2] — still the original order
 
 ## Useful List Methods
 
-| Method | What it does |
-|--------|-------------|
-| `append(x)` | Add item to end |
-| `insert(i, x)` | Insert at position |
-| `remove(x)` | Remove first occurrence |
-| `pop()` | Remove and return last item |
-| `sort()` | Sort in place |
-| `len(list)` | Get number of items |
+| Method          | What it does                |
+|-----------------|-----------------------------|
+| `append(x)`     | Add item to end             |
+| `insert(i, x)`  | Insert at position          |
+| `remove(x)`     | Remove first occurrence     |
+| `pop()`          | Remove and return last item |
+| `sort()`         | Sort in place               |
+| `len(list)`      | Get number of items         |
 
 ## Tuples
 
@@ -1429,13 +1429,13 @@ Real-world analogy: think of a network device config. The device has a hostname,
 
 ## Useful Methods
 
-| Method | What it does |
-|--------|-------------|
-| `dict.keys()` | Get all keys |
-| `dict.values()` | Get all values |
-| `dict.items()` | Get all key-value pairs |
-| `dict.get(key, default)` | Get value safely |
-| `len(dict)` | Number of key-value pairs |""",
+| Method                   | What it does              |
+|--------------------------|---------------------------|
+| `dict.keys()`            | Get all keys              |
+| `dict.values()`          | Get all values            |
+| `dict.items()`           | Get all key-value pairs   |
+| `dict.get(key, default)` | Get value safely          |
+| `len(dict)`              | Number of key-value pairs |""",
         )
 
         Lesson.objects.create(
@@ -2102,11 +2102,11 @@ This pattern — parse JSON, access keys, loop through lists — is the foundati
 
 ## Key Takeaways
 
-| Task | Tool | Key function |
-|------|------|-------------|
-| Validate/inspect IPs | `ipaddress` | `ip_address()`, `ip_network()`, `in` |
-| Parse text output | `str` methods + `re` | `.split()`, `.strip()`, `re.search()` |
-| Read structured configs | `json` | `json.loads()` |
+| Task                   | Tool               | Key function                          |
+|------------------------|--------------------|---------------------------------------|
+| Validate/inspect IPs   | `ipaddress`        | `ip_address()`, `ip_network()`, `in`  |
+| Parse text output      | `str` methods + `re` | `.split()`, `.strip()`, `re.search()` |
+| Read structured configs | `json`            | `json.loads()`                        |
 
 All three modules (`ipaddress`, `re`, `json`) are built into Python — no extra installs needed!""",
         )
@@ -2220,13 +2220,13 @@ The code inside `try` runs normally. If an exception occurs, Python jumps to the
 
 ## Common Exception Types
 
-| Exception | When it happens |
-|-----------|----------------|
-| `ValueError` | Wrong type of value (e.g., `int("hello")`) |
-| `KeyError` | Missing dictionary key |
-| `TypeError` | Wrong type for an operation (e.g., `"a" + 1`) |
-| `IndexError` | List index out of range |
-| `ZeroDivisionError` | Dividing by zero |
+| Exception            | When it happens                              |
+|----------------------|----------------------------------------------|
+| `ValueError`         | Wrong type of value (e.g., `int("hello")`)   |
+| `KeyError`           | Missing dictionary key                       |
+| `TypeError`          | Wrong type for an operation (e.g., `"a" + 1`) |
+| `IndexError`         | List index out of range                      |
+| `ZeroDivisionError`  | Dividing by zero                             |
 
 ## Catching the Error Message
 
@@ -2683,17 +2683,17 @@ print(result)  # Port: XXXX, Port: XXXX
 
 ## Common Patterns
 
-| Pattern | Matches |
-|---------|---------|
-| `\\d` | A digit (0-9) |
-| `\\d+` | One or more digits |
-| `\\w+` | One or more word characters (letters, digits, underscore) |
-| `\\S+` | One or more non-whitespace characters |
-| `.` | Any character (except newline) |
-| `\\.` | A literal dot |
-| `[a-z]` | Any lowercase letter |
-| `^` | Start of string |
-| `$` | End of string |
+| Pattern | Matches                                                    |
+|---------|------------------------------------------------------------|
+| `\\d`   | A digit (0-9)                                              |
+| `\\d+`  | One or more digits                                         |
+| `\\w+`  | One or more word characters (letters, digits, underscore)  |
+| `\\S+`  | One or more non-whitespace characters                      |
+| `.`     | Any character (except newline)                             |
+| `\\.`   | A literal dot                                              |
+| `[a-z]` | Any lowercase letter                                      |
+| `^`     | Start of string                                            |
+| `$`     | End of string                                              |
 
 ### Common mistake: forgetting to escape dots
 
@@ -2738,13 +2738,13 @@ How the pattern works:
 
 ## Quantifiers
 
-| Quantifier | Meaning |
-|-----------|---------|
-| `+` | One or more |
-| `*` | Zero or more |
-| `?` | Zero or one |
-| `{3}` | Exactly 3 |
-| `{1,3}` | Between 1 and 3 |
+| Quantifier | Meaning         |
+|------------|-----------------|
+| `+`        | One or more     |
+| `*`        | Zero or more    |
+| `?`        | Zero or one     |
+| `{3}`      | Exactly 3       |
+| `{1,3}`    | Between 1 and 3 |
 
 Regex is a powerful tool in every network engineer's toolkit!""",
         )
