@@ -153,10 +153,9 @@ This starts 4 services:
 
 The app is available at `http://localhost` (or the port set via `NGINX_PORT`).
 
-To run migrations and seed data:
+Migrations run automatically on container start via the entrypoint script. To seed curriculum data:
 
 ```bash
-docker compose exec backend python manage.py migrate
 docker compose exec backend python manage.py seed_curriculum
 ```
 
@@ -171,6 +170,41 @@ npx playwright test
 cd backend
 uv run python manage.py test
 ```
+
+## Database Backups
+
+Back up the PostgreSQL database with the included script:
+
+```bash
+./scripts/backup-db.sh
+```
+
+Backups are saved to `./backups/` as timestamped gzipped SQL dumps (e.g. `pystarter_20260304_120000.sql.gz`).
+
+**Automatic daily backups with cron:**
+
+```bash
+0 2 * * * cd /path/to/project && PRUNE_DAYS=30 ./scripts/backup-db.sh >> /var/log/pystarter-backup.log 2>&1
+```
+
+**Restore from backup:**
+
+```bash
+gunzip -c backups/pystarter_20260304_120000.sql.gz | docker compose exec -T db psql -U pystarter pystarter
+```
+
+## Sandbox Security
+
+User-submitted code runs in a restricted Python sandbox (`backend/apps/executor/sandbox.py`) with these safeguards:
+
+- **Import whitelist** — only safe standard library modules (math, random, string, collections, datetime, json, re, typing, copy, itertools, functools, textwrap, ipaddress)
+- **Blocked builtins** — exec, eval, compile, open, \_\_import\_\_ (restricted), getattr, setattr, and other dangerous functions are removed or replaced
+- **Replaced input()** — reads from a pre-loaded input queue instead of stdin
+- **5-second timeout** — execution is killed after 5 seconds
+- **Memory limit** — resource limits prevent memory exhaustion
+- **Recursion limit** — set to 200 to prevent stack overflow
+
+This is appropriate for a single-tenant training platform. For untrusted multi-tenant use, code execution should be moved to containerized isolation (e.g. gVisor, Firecracker, or a dedicated code execution service).
 
 ## License
 
