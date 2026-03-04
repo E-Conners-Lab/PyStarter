@@ -8,10 +8,9 @@ export async function login(username: string, password: string): Promise<AuthTok
 
 export async function register(
   username: string,
-  email: string,
   password: string
 ): Promise<{ user: User; tokens: AuthTokens }> {
-  const res = await client.post('/accounts/register/', { username, email, password });
+  const res = await client.post('/accounts/register/', { username, password });
   return res.data;
 }
 

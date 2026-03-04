@@ -11,7 +11,6 @@ export async function registerUser(page: Page) {
 
   await page.goto('/register');
   await page.getByLabel('Username').fill(username);
-  await page.getByLabel('Email').fill(email);
   await page.getByLabel('Password').fill(password);
   await page.getByRole('button', { name: 'Create Free Account' }).click();
 

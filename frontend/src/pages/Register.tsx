@@ -4,7 +4,6 @@ import { useAuthStore } from '../stores/authStore';
 
 export default function Register() {
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,7 +15,7 @@ export default function Register() {
     setError('');
     setLoading(true);
     try {
-      await register(username, email, password);
+      await register(username, password);
       navigate('/dashboard');
     } catch (err: unknown) {
       if (err && typeof err === 'object' && 'response' in err) {
@@ -54,17 +53,6 @@ export default function Register() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary-500 focus:outline-none transition-colors"
-              required
-            />
-          </div>
-          <div>
-            <label htmlFor="reg-email" className="block text-sm text-gray-400 mb-1">Email</label>
-            <input
-              id="reg-email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white focus:border-primary-500 focus:outline-none transition-colors"
               required
             />
