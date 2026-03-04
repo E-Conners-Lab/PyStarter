@@ -1,4 +1,5 @@
 # PyStarter
+<img width="1294" height="664" alt="Screenshot 2026-03-03 at 7 14 10 PM" src="https://github.com/user-attachments/assets/dbdc5128-0f73-4169-a767-4f9a99b5ca45" />
 
 A beginner-friendly Python training platform that teaches programming through interactive lessons, sandboxed coding exercises, and AI-powered hints.
 
