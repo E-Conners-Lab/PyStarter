@@ -5,7 +5,7 @@ A beginner-friendly Python training platform that teaches programming through in
 
 ## Features
 
-- **10-module curriculum** covering Python fundamentals through network automation
+- **14-module curriculum** covering Python fundamentals through network automation
 - **4 exercise types**: fill-in-the-blank, fix-the-bug, write code, predict the output
 - **Sandboxed code execution** — user code runs in a restricted environment with import/builtin restrictions and timeouts
 - **Progressive hint system** with XP penalties (5 levels from gentle nudge to full solution)
@@ -66,23 +66,52 @@ Open http://localhost:5173, register an account, and start learning.
 | 8 | String Magic | Slicing, methods, f-strings, split/join |
 | 9 | Writing Cleaner Code | Ternary, enumerate, comprehensions, walrus operator |
 | 10 | Python for Network Engineers | `ipaddress`, CLI output parsing, JSON configs |
+| 11 | Handling Errors | try/except, common exceptions, error messages |
+| 12 | User Input & While Loops | `input()`, type conversion, sentinel values, break/continue |
+| 13 | Regular Expressions | `re.search()`, `re.findall()`, `re.sub()`, groups, patterns |
+| 14 | Building a Network Toolkit | Capstone: validation functions, parsing pipelines, audit reports |
 
-Each module has 3 lessons (concept, interactive sandbox, graded exercises) and 4 exercises.
+Each module has 3 lessons (concept, interactive sandbox, graded exercises) and 4-6 exercises. 66 exercises total across 42 lessons.
 
 ## Environment Variables
 
-Copy `backend/.env.example` to `backend/.env`:
+Copy `backend/.env.example` to `backend/.env` and fill in your own values:
 
 ```
-DJANGO_SECRET_KEY=<random-secret>
-ANTHROPIC_API_KEY=sk-ant-...
+DJANGO_SECRET_KEY=<your-random-secret>
+ANTHROPIC_API_KEY=<your-anthropic-api-key>
 ANTHROPIC_MODEL=claude-haiku-4-5-20241001
 ```
+
+### `DJANGO_SECRET_KEY`
+
+Django uses this key to sign session cookies, CSRF tokens, password reset links, and other security-critical data. Every deployment **must** have a unique, unpredictable key. If an attacker learns your secret key, they can forge sessions and bypass CSRF protection.
+
+Generate one with:
+
+```bash
+python -c "import secrets; print(secrets.token_urlsafe(50))"
+```
+
+### `ANTHROPIC_API_KEY`
+
+PyStarter's AI features (contextual hints, code critique, error explanations) call the Anthropic Claude API. You need your own API key because:
+
+1. **API keys are billed to your account** — each hint/critique request costs a small amount of tokens. You control your own usage and spending limits.
+2. **Keys should never be shared** — a leaked key lets anyone make API calls charged to your account.
+
+To get a key:
+
+1. Sign up at [console.anthropic.com](https://console.anthropic.com)
+2. Navigate to **API Keys** and create a new key
+3. Copy the key (starts with `sk-ant-...`) into your `.env` file
+
+The AI features are **optional** — the core curriculum, exercises, and code sandbox work without an API key. Only the "Ask AI for Help" button requires it.
 
 ## Testing
 
 ```bash
-# End-to-end tests (Playwright, 30 tests)
+# End-to-end tests (Playwright, 74 tests)
 cd frontend
 npx playwright test
 
