@@ -12,7 +12,7 @@ A beginner-friendly Python training platform that teaches programming through in
 - **14-module curriculum** covering Python fundamentals through network automation
 - **4 exercise types**: fill-in-the-blank, fix-the-bug, write code, predict the output
 - **Sandboxed code execution** — user code runs in a restricted environment with import/builtin restrictions and timeouts
-- **Progressive hint system** with XP penalties (5 levels from gentle nudge to full solution)
+- **Progressive hint system** with XP penalties (2 levels: free nudge + deeper hint at 10% XP cost)
 - **AI-powered help** via Claude — contextual hints, code critique, and error explanations
 - **XP and belt progression** — earn XP for completing exercises, level up through belt ranks
 - **Monaco code editor** with syntax highlighting in the browser

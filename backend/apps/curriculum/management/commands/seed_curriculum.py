@@ -217,6 +217,62 @@ Remember:
         TestCase.objects.create(exercise=e4, expected_output="56", description="Should print 56", order=1)
         Hint.objects.create(exercise=e4, level=1, content="You can put math directly inside `print()`. For example: `print(2 + 3)` outputs `5`.", xp_penalty_percent=0)
 
+        # Try It Yourself: Print
+        Lesson.objects.create(
+            module=m1, title="Try It Yourself: Print", slug="try-it-yourself-print", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Print\n\n"
+                "Time for creative challenges! Use `print()` to build something cool.\n\n"
+                "## Challenge 1 — ASCII Art\n\n"
+                "Create a 3-line ASCII art picture using only `print()` statements. Here's an example of a simple house:\n\n"
+                "```\n"
+                "   /\\\\\n"
+                "  /  \\\\\n"
+                " /____\\\\\n"
+                " |    |\n"
+                " |____|\n"
+                "```\n\n"
+                "Try making a cat, a rocket, a tree, or anything you like!\n\n"
+                "## Challenge 2 — Receipt Printer\n\n"
+                "Print a formatted receipt like this:\n\n"
+                "```\n"
+                "===== RECEIPT =====\n"
+                "Coffee        $4.50\n"
+                "Sandwich      $8.99\n"
+                "Cookie        $2.50\n"
+                "-------------------\n"
+                "TOTAL        $15.99\n"
+                "===== THANK YOU ===\n"
+                "```\n\n"
+                "Use spaces to align the prices on the right side.\n\n"
+                "## Challenge 3 — Business Card\n\n"
+                "Print a business card with borders:\n\n"
+                "```\n"
+                "============================\n"
+                "|      JANE SMITH          |\n"
+                "|      Python Developer    |\n"
+                "|      jane@example.com    |\n"
+                "============================\n"
+                "```\n\n"
+                "Use `=` for top/bottom borders and `|` for side borders.",
+            sandbox_code='# === Challenge 1: ASCII Art ===\n'
+                '# Draw a picture using print() — be creative!\n'
+                'print("   /\\\\")\n'
+                'print("  /  \\\\")\n'
+                'print(" /____\\\\")\n'
+                'print(" |    |")\n'
+                'print(" |____|")\n'
+                'print()\n\n'
+                '# === Challenge 2: Receipt Printer ===\n'
+                '# Print a formatted receipt with aligned prices\n'
+                'print("===== RECEIPT =====")\n'
+                '# Add your items and total here\n'
+                'print("===== THANK YOU ===")\n'
+                'print()\n\n'
+                '# === Challenge 3: Business Card ===\n'
+                '# Print a card with = and | borders\n',
+        )
+
         # === MODULE 2: Variables & Data Types ===
         m2 = modules["variables-and-data-types"]
 
@@ -408,6 +464,49 @@ Try it yourself in the editor!""",
         TestCase.objects.create(exercise=e8, expected_output="Name: Sam\nAge: 20\nCity: Austin", description="Should print the formatted introduction card", order=1)
         Hint.objects.create(exercise=e8, level=1, content='Use commas in print to combine text and variables: `print("Label:", variable)`', xp_penalty_percent=0)
         Hint.objects.create(exercise=e8, level=2, content='You need three print statements. Each one starts with the label (like `"Name:"`) followed by a comma and the variable.', xp_penalty_percent=10)
+
+        # Try It Yourself: Variables
+        Lesson.objects.create(
+            module=m2, title="Try It Yourself: Variables", slug="try-it-yourself-variables", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Variables & Data Types\n\n"
+                "Put your variable skills to work with these fun calculation challenges!\n\n"
+                "## Challenge 1 — Road Trip Calculator\n\n"
+                "Plan a road trip! Store these values in variables and calculate the total fuel cost:\n\n"
+                "- Distance: 350 miles\n"
+                "- Fuel efficiency: 25 miles per gallon\n"
+                "- Gas price: $3.50 per gallon\n\n"
+                "Print: `\"Trip cost: $XX.XX\"`\n\n"
+                "## Challenge 2 — Age Calculator\n\n"
+                "Given an age in years, calculate and print how many **days**, **hours**, and **minutes** old someone is (approximately):\n\n"
+                "```\n"
+                "Age: 25 years\n"
+                "Days: 9125\n"
+                "Hours: 219000\n"
+                "Minutes: 13140000\n"
+                "```\n\n"
+                "(Assume 365 days per year, 24 hours per day, 60 minutes per hour.)\n\n"
+                "## Challenge 3 — Mad Libs Story\n\n"
+                "Create variables for: an animal, a color, a food, and a number. Then print a silly story using those variables:\n\n"
+                "```\n"
+                "The <color> <animal> ate <number> plates of <food> and fell asleep.\n"
+                "```\n\n"
+                "Make it as silly as you want!",
+            sandbox_code='# === Challenge 1: Road Trip Calculator ===\n'
+                'distance = 350        # miles\n'
+                'mpg = 25              # miles per gallon\n'
+                'gas_price = 3.50      # dollars per gallon\n\n'
+                '# Calculate and print the trip cost\n\n\n'
+                '# === Challenge 2: Age Calculator ===\n'
+                'age_years = 25\n\n'
+                '# Calculate days, hours, minutes\n\n\n'
+                '# === Challenge 3: Mad Libs Story ===\n'
+                'animal = "penguin"\n'
+                'color = "purple"\n'
+                'food = "tacos"\n'
+                'number = 47\n\n'
+                '# Print your silly story using these variables\n',
+        )
 
         # === MODULE 3: Making Decisions ===
         m3 = modules["making-decisions"]
@@ -660,6 +759,52 @@ Change the `score` variable in the editor and run the code to see different resu
         Hint.objects.create(exercise=ex, level=1, content="Look at the comparison operator in the `if` statement. Is it the right one for checking equality?", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content="Use `==` (double equals) for comparison, not `=` (single equals, which is assignment).", xp_penalty_percent=10)
 
+        # Try It Yourself: Conditionals
+        Lesson.objects.create(
+            module=m3, title="Try It Yourself: Conditionals", slug="try-it-yourself-conditionals", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Making Decisions\n\n"
+                "Test your conditional logic with these real-world scenarios!\n\n"
+                "## Challenge 1 — Shipping Calculator\n\n"
+                "Build a shipping cost calculator based on package weight:\n\n"
+                "| Weight | Cost |\n"
+                "|--------|------|\n"
+                "| Under 1 kg | $5.00 |\n"
+                "| 1 - 5 kg | $10.00 |\n"
+                "| 5 - 20 kg | $20.00 |\n"
+                "| Over 20 kg | $50.00 |\n\n"
+                "Test with weights: `0.5`, `3`, `15`, `25`\n\n"
+                "## Challenge 2 — Weather Advisor\n\n"
+                "Given a temperature (in °F), print what to wear:\n\n"
+                "- Below 32°F → `\"Brrr! Stay inside if you can!\"`\n"
+                "- 32-50°F → `\"Wear a heavy coat and gloves\"`\n"
+                "- 50-70°F → `\"A light jacket should do\"`\n"
+                "- Above 70°F → `\"T-shirt weather!\"`\n\n"
+                "## Challenge 3 — Password Validator\n\n"
+                "Check a password against these rules and print which ones pass or fail:\n\n"
+                "1. Length is at least 8 characters\n"
+                "2. Contains at least one digit\n"
+                "3. Contains at least one uppercase letter\n\n"
+                "Print the result of each check, then `\"Password accepted!\"` if all pass or `\"Password rejected.\"` if any fail.",
+            sandbox_code='# === Challenge 1: Shipping Calculator ===\n'
+                'weights = [0.5, 3, 15, 25]\n\n'
+                'for weight in weights:\n'
+                '    # Calculate cost based on weight ranges\n'
+                '    pass\n\n\n'
+                '# === Challenge 2: Weather Advisor ===\n'
+                'temperatures = [25, 45, 65, 80]\n\n'
+                'for temp in temperatures:\n'
+                '    # Print clothing recommendation\n'
+                '    pass\n\n\n'
+                '# === Challenge 3: Password Validator ===\n'
+                'password = "Hello123"\n\n'
+                '# Check each rule\n'
+                'has_length = len(password) >= 8\n'
+                'has_digit = False  # check if any character is a digit\n'
+                'has_upper = False  # check if any character is uppercase\n\n'
+                '# Print results and final verdict\n',
+        )
+
         # === MODULE 4: Loops ===
         m4 = modules["loops"]
 
@@ -888,6 +1033,53 @@ Modify the code in the editor to see how loops work.""",
         Hint.objects.create(exercise=ex, level=1, content="There's a keyword that immediately exits a loop...", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content="Replace `___` with `break`. It exits the `for` loop immediately.", xp_penalty_percent=10)
 
+        # Try It Yourself: Loops
+        Lesson.objects.create(
+            module=m4, title="Try It Yourself: Loops", slug="try-it-yourself-loops", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Loops\n\n"
+                "These challenges give you hands-on practice with for loops, while loops, and range()!\n\n"
+                "## Challenge 1 — Star Triangle\n\n"
+                "Print a right triangle pattern of stars. Row 1 has 1 star, row 2 has 2 stars, etc., up to 7 rows.\n\n"
+                "```\n"
+                "*\n"
+                "**\n"
+                "***\n"
+                "****\n"
+                "*****\n"
+                "******\n"
+                "*******\n"
+                "```\n\n"
+                "## Challenge 2 — FizzBuzz\n\n"
+                "Print numbers from 1 to 30, but:\n"
+                "- For multiples of 3, print `Fizz` instead\n"
+                "- For multiples of 5, print `Buzz` instead\n"
+                "- For multiples of both 3 and 5, print `FizzBuzz`\n\n"
+                "## Challenge 3 — Even Sum\n\n"
+                "Calculate and print the sum of all even numbers from 2 to 100 (inclusive) using a loop.\n\n"
+                "The answer should be `2550`.\n\n"
+                "## Challenge 4 — Number Pyramid\n\n"
+                "Print a number pyramid where each row shows numbers from 1 up to the row number:\n\n"
+                "```\n"
+                "1\n"
+                "1 2\n"
+                "1 2 3\n"
+                "1 2 3 4\n"
+                "1 2 3 4 5\n"
+                "```\n\n"
+                "Hint: Use a nested loop or `range()` with `print(..., end=\" \")`.",
+            sandbox_code='# === Challenge 1: Star Triangle ===\n'
+                '# Print 7 rows of stars (row N has N stars)\n\n\n'
+                '# === Challenge 2: FizzBuzz ===\n'
+                '# Print 1-30 with Fizz/Buzz/FizzBuzz replacements\n\n\n'
+                '# === Challenge 3: Even Sum ===\n'
+                '# Sum all even numbers from 2 to 100\n'
+                'total = 0\n\n'
+                'print("Sum of evens 2-100:", total)\n\n\n'
+                '# === Challenge 4: Number Pyramid ===\n'
+                '# Print 5 rows: 1, then 1 2, then 1 2 3, etc.\n',
+        )
+
         # === MODULE 5: Functions ===
         m5 = modules["functions"]
 
@@ -1101,6 +1293,48 @@ Modify the function in the editor and see what happens.""",
         TestCase.objects.create(exercise=ex, expected_output="14", description="Should print 14", order=1)
         Hint.objects.create(exercise=ex, level=1, content="The function uses `print()` inside but the caller expects a value back. What keyword sends a value back?", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content="Replace `print(n * 2)` with `return n * 2`. Functions need `return` to send values back to the caller.", xp_penalty_percent=10)
+
+        # Try It Yourself: Functions
+        Lesson.objects.create(
+            module=m5, title="Try It Yourself: Functions", slug="try-it-yourself-functions", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Functions\n\n"
+                "Practice writing reusable functions that solve practical problems!\n\n"
+                "## Challenge 1 — Max of Three\n\n"
+                "Write a `max_of_three(a, b, c)` function that returns the largest of three numbers **without** using the built-in `max()` function. Use if/elif/else logic.\n\n"
+                "Test with: `max_of_three(10, 25, 17)` → `25`\n\n"
+                "## Challenge 2 — Even Filter\n\n"
+                "Write an `is_even(n)` function that returns `True` if `n` is even, `False` otherwise. Then use it to filter a list, printing only the even numbers.\n\n"
+                "```python\n"
+                "numbers = [1, 4, 7, 10, 13, 16, 19, 22]\n"
+                "```\n\n"
+                "## Challenge 3 — Tip Calculator\n\n"
+                "Write a `calculate_tip(bill, percent)` function that returns the tip amount. Then print a mini receipt:\n\n"
+                "```\n"
+                "Subtotal: $85.50\n"
+                "Tip (18%): $15.39\n"
+                "Total:     $100.89\n"
+                "```\n\n"
+                "Round the tip to 2 decimal places using `round()`.",
+            sandbox_code='# === Challenge 1: Max of Three ===\n'
+                'def max_of_three(a, b, c):\n'
+                '    # Return the largest without using max()\n'
+                '    pass\n\n'
+                'print(max_of_three(10, 25, 17))\n'
+                'print(max_of_three(99, 5, 42))\n'
+                'print(max_of_three(3, 3, 7))\n\n\n'
+                '# === Challenge 2: Even Filter ===\n'
+                'def is_even(n):\n'
+                '    # Return True if n is even\n'
+                '    pass\n\n'
+                'numbers = [1, 4, 7, 10, 13, 16, 19, 22]\n'
+                '# Use is_even() to filter and print even numbers\n\n\n'
+                '# === Challenge 3: Tip Calculator ===\n'
+                'def calculate_tip(bill, percent):\n'
+                '    # Return the tip amount, rounded to 2 decimals\n'
+                '    pass\n\n'
+                '# Print a receipt for a $85.50 bill with 18% tip\n',
+        )
 
         # === MODULE 6: Lists & Tuples ===
         m6 = modules["lists-and-tuples"]
@@ -1323,6 +1557,44 @@ Play with the list in the editor.""",
         Hint.objects.create(exercise=ex, level=1, content="Use `.sort(reverse=True)` to sort descending, then `scores[:3]` to get the first 3.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='`scores.sort(reverse=True)` then `for s in scores[:3]: print(s)`', xp_penalty_percent=10)
 
+        # Try It Yourself: Lists
+        Lesson.objects.create(
+            module=m6, title="Try It Yourself: Lists & Tuples", slug="try-it-yourself-lists", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Lists & Tuples\n\n"
+                "These challenges will strengthen your ability to work with collections of data!\n\n"
+                "## Challenge 1 — Even/Odd Splitter\n\n"
+                "Take this list of numbers and split it into two separate lists — one for even numbers and one for odd numbers. Print both lists.\n\n"
+                "```python\n"
+                "numbers = [14, 7, 22, 3, 18, 9, 30, 11, 6, 25]\n"
+                "```\n\n"
+                "## Challenge 2 — Stats Without Built-ins\n\n"
+                "Find the minimum, maximum, and average of a list of numbers **without** using `min()`, `max()`, or `sum()`. Use loops only!\n\n"
+                "```python\n"
+                "scores = [85, 92, 78, 95, 88, 73, 91]\n"
+                "```\n\n"
+                "Print: `Min: 73`, `Max: 95`, `Average: 86.0`\n\n"
+                "## Challenge 3 — Student Scores Filter\n\n"
+                "Create a list of tuples, each containing a student name and their score. Print only the students who scored above 80.\n\n"
+                "```python\n"
+                "students = [(\"Alice\", 92), (\"Bob\", 65), (\"Charlie\", 88), (\"Diana\", 71), (\"Eve\", 95)]\n"
+                "```\n\n"
+                "Print: `Alice: 92` etc. for passing students only.",
+            sandbox_code='# === Challenge 1: Even/Odd Splitter ===\n'
+                'numbers = [14, 7, 22, 3, 18, 9, 30, 11, 6, 25]\n'
+                'evens = []\n'
+                'odds = []\n\n'
+                '# Split numbers into evens and odds\n\n\n'
+                'print("Evens:", evens)\n'
+                'print("Odds:", odds)\n\n\n'
+                '# === Challenge 2: Stats Without Built-ins ===\n'
+                'scores = [85, 92, 78, 95, 88, 73, 91]\n\n'
+                '# Find min, max, and average using loops only\n\n\n'
+                '# === Challenge 3: Student Scores Filter ===\n'
+                'students = [("Alice", 92), ("Bob", 65), ("Charlie", 88), ("Diana", 71), ("Eve", 95)]\n\n'
+                '# Print students who scored above 80\n',
+        )
+
         # === MODULE 7: Dictionaries ===
         m7 = modules["dictionaries"]
 
@@ -1515,6 +1787,67 @@ Modify the dictionary in the editor and see what happens.""",
         TestCase.objects.create(exercise=ex, expected_output="hello: 2\nworld: 1\npython: 3", description="Should count word occurrences", order=1)
         Hint.objects.create(exercise=ex, level=1, content="Loop through `words`. For each word, check `if word in counts:` and increment, otherwise set it to 1.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content="`if word in counts: counts[word] = counts[word] + 1` else `counts[word] = 1`. Then loop `counts.items()` to print.", xp_penalty_percent=10)
+
+        # Try It Yourself: Dictionaries
+        Lesson.objects.create(
+            module=m7, title="Try It Yourself: Dictionaries", slug="try-it-yourself-dictionaries", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Dictionaries\n\n"
+                "These challenges go beyond basic lookups — you'll build real data structures with dicts!\n\n"
+                "## Challenge 1 — Contact Book\n\n"
+                "Build a simple contact book using a dictionary:\n\n"
+                "1. Start with 3 contacts: `{\"Alice\": \"555-0101\", \"Bob\": \"555-0102\", \"Charlie\": \"555-0103\"}`\n"
+                "2. Look up Bob's number and print it\n"
+                "3. Add a new contact: `\"Diana\": \"555-0104\"`\n"
+                "4. Delete Charlie's entry\n"
+                "5. Print the final contact book\n\n"
+                "## Challenge 2 — Inventory System\n\n"
+                "Manage a store inventory:\n\n"
+                "```python\n"
+                "inventory = {\"apples\": 50, \"bananas\": 30, \"oranges\": 25, \"grapes\": 10}\n"
+                "```\n\n"
+                "1. Restock bananas by 20\n"
+                "2. Sell 15 apples\n"
+                "3. Print items with quantity below 20 (low stock warning)\n"
+                "4. Print the final inventory\n\n"
+                "## Challenge 3 — Nested Network Switch\n\n"
+                "Create a nested dictionary representing a network switch:\n\n"
+                "```python\n"
+                "switch = {\n"
+                "    \"hostname\": \"SW-CORE-01\",\n"
+                "    \"model\": \"Cisco 3850\",\n"
+                "    \"interfaces\": [\n"
+                "        {\"name\": \"Gi0/0\", \"status\": \"up\", \"speed\": \"1Gbps\"},\n"
+                "        {\"name\": \"Gi0/1\", \"status\": \"down\", \"speed\": \"1Gbps\"},\n"
+                "        {\"name\": \"Gi0/2\", \"status\": \"up\", \"speed\": \"10Gbps\"},\n"
+                "    ]\n"
+                "}\n"
+                "```\n\n"
+                "Print the switch hostname, count of `up` interfaces, and details of each interface.",
+            sandbox_code='# === Challenge 1: Contact Book ===\n'
+                'contacts = {"Alice": "555-0101", "Bob": "555-0102", "Charlie": "555-0103"}\n\n'
+                '# Look up Bob\n'
+                '# Add Diana\n'
+                '# Delete Charlie\n'
+                '# Print final book\n\n\n'
+                '# === Challenge 2: Inventory System ===\n'
+                'inventory = {"apples": 50, "bananas": 30, "oranges": 25, "grapes": 10}\n\n'
+                '# Restock bananas by 20\n'
+                '# Sell 15 apples\n'
+                '# Print low stock items (below 20)\n'
+                '# Print final inventory\n\n\n'
+                '# === Challenge 3: Nested Network Switch ===\n'
+                'switch = {\n'
+                '    "hostname": "SW-CORE-01",\n'
+                '    "model": "Cisco 3850",\n'
+                '    "interfaces": [\n'
+                '        {"name": "Gi0/0", "status": "up", "speed": "1Gbps"},\n'
+                '        {"name": "Gi0/1", "status": "down", "speed": "1Gbps"},\n'
+                '        {"name": "Gi0/2", "status": "up", "speed": "10Gbps"},\n'
+                '    ]\n'
+                '}\n\n'
+                '# Print hostname, count of up interfaces, and interface details\n',
+        )
 
         # === MODULE 8: String Magic ===
         m8 = modules["string-magic"]
@@ -1711,6 +2044,56 @@ Play with the string operations in the editor.""",
         TestCase.objects.create(exercise=ex, expected_output="fun is Python", description="Should reverse the word order", order=1)
         Hint.objects.create(exercise=ex, level=1, content="Split into words with `.split()`, reverse the list with `.reverse()`, then join back with `\" \".join(words)`.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='`words = sentence.split()` then `words.reverse()` then `print(" ".join(words))`', xp_penalty_percent=10)
+
+        # Try It Yourself: Strings
+        Lesson.objects.create(
+            module=m8, title="Try It Yourself: String Magic", slug="try-it-yourself-strings", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: String Magic\n\n"
+                "These challenges test your string manipulation skills with fun, practical scenarios!\n\n"
+                "## Challenge 1 — Password Strength Checker\n\n"
+                "Analyze a password string and rate its strength based on:\n"
+                "- Length >= 8 characters\n"
+                "- Contains at least one uppercase letter\n"
+                "- Contains at least one lowercase letter\n"
+                "- Contains at least one digit\n"
+                "- Contains at least one special character (`!@#$%^&*`)\n\n"
+                "Print which checks pass/fail, then rate: **Strong** (all pass), **Medium** (3-4 pass), **Weak** (0-2 pass).\n\n"
+                "## Challenge 2 — Caesar Cipher\n\n"
+                "Implement a simple Caesar cipher that shifts each letter by N positions in the alphabet. Non-letter characters stay unchanged. The shift should wrap around (z + 1 = a).\n\n"
+                "Test with: `\"Hello, World!\"` shifted by 3 → `\"Khoor, Zruog!\"`\n\n"
+                "Hint: Use `ord()` and `chr()` to work with character codes.\n\n"
+                "## Challenge 3 — CSV Table Formatter\n\n"
+                "Parse a CSV-like string into a neatly formatted table:\n\n"
+                "```\n"
+                "Name,Age,City\n"
+                "Alice,30,New York\n"
+                "Bob,25,London\n"
+                "Charlie,35,Tokyo\n"
+                "```\n\n"
+                "Output a table with aligned columns using `split()`, `join()`, and f-strings.",
+            sandbox_code='# === Challenge 1: Password Strength Checker ===\n'
+                'password = "MyP@ss1"\n\n'
+                '# Check each criterion and rate the password\n'
+                'checks = {\n'
+                '    "length >= 8": len(password) >= 8,\n'
+                '    # Add more checks here\n'
+                '}\n\n'
+                '# Print results and overall rating\n\n\n'
+                '# === Challenge 2: Caesar Cipher ===\n'
+                'def caesar_cipher(text, shift):\n'
+                '    result = ""\n'
+                '    for char in text:\n'
+                '        # Shift letters, keep others unchanged\n'
+                '        pass\n'
+                '    return result\n\n'
+                'print(caesar_cipher("Hello, World!", 3))\n'
+                'print(caesar_cipher("abc xyz", 1))\n\n\n'
+                '# === Challenge 3: CSV Table Formatter ===\n'
+                'csv_data = "Name,Age,City\\nAlice,30,New York\\nBob,25,London\\nCharlie,35,Tokyo"\n\n'
+                '# Parse and print a formatted table\n'
+                'rows = csv_data.strip().split("\\n")\n',
+        )
 
         # === MODULE 9: Writing Cleaner Code ===
         m9 = modules["writing-cleaner-code"]
@@ -1920,6 +2303,81 @@ Try modifying the examples and see what happens!""",
         TestCase.objects.create(exercise=ex, expected_output="[0, 2, 4, 6, 8]", description="Should print even numbers", order=1)
         Hint.objects.create(exercise=ex, level=1, content="Look at the comparison inside the `if` filter. Is it using the right operator?", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content="Change `= 0` to `== 0`. Use `==` for comparison, not `=` (assignment).", xp_penalty_percent=10)
+
+        # Try It Yourself: Cleaner Code
+        Lesson.objects.create(
+            module=m9, title="Try It Yourself: Cleaner Code", slug="try-it-yourself-cleaner-code", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Writing Cleaner Code\n\n"
+                "Practice transforming verbose Python into clean, Pythonic one-liners!\n\n"
+                "## Challenge 1 — Ternary Rewrites\n\n"
+                "Rewrite each of these if/else blocks as a single-line ternary expression:\n\n"
+                "**Block A:**\n"
+                "```python\n"
+                "age = 20\n"
+                "if age >= 18:\n"
+                "    status = \"adult\"\n"
+                "else:\n"
+                "    status = \"minor\"\n"
+                "```\n\n"
+                "**Block B:**\n"
+                "```python\n"
+                "score = 75\n"
+                "if score >= 60:\n"
+                "    result = \"pass\"\n"
+                "else:\n"
+                "    result = \"fail\"\n"
+                "```\n\n"
+                "**Block C:**\n"
+                "```python\n"
+                "items = []\n"
+                "if items:\n"
+                "    message = \"has items\"\n"
+                "else:\n"
+                "    message = \"empty\"\n"
+                "```\n\n"
+                "## Challenge 2 — List Comprehension Conversions\n\n"
+                "Convert these 3 loops into list comprehensions. At least one should include a filter condition.\n\n"
+                "1. Squares of 1-10\n"
+                "2. Uppercase words from a list (filter: only words longer than 3 letters)\n"
+                "3. Even numbers from 1-20\n\n"
+                "## Challenge 3 — Walrus Operator\n\n"
+                "Use the walrus operator (`:=`) inside a while loop to process items from a list until a sentinel value (`\"STOP\"`) is found.\n\n"
+                "```python\n"
+                "items = [\"apple\", \"banana\", \"cherry\", \"STOP\", \"date\", \"elderberry\"]\n"
+                "```\n\n"
+                "Print each item before STOP, then print how many items were processed.",
+            sandbox_code='# === Challenge 1: Ternary Rewrites ===\n'
+                '# Rewrite each block as a single-line ternary\n\n'
+                '# Block A\n'
+                'age = 20\n'
+                '# status = ???\n'
+                '# print(f"Status: {status}")\n\n'
+                '# Block B\n'
+                'score = 75\n'
+                '# result = ???\n'
+                '# print(f"Result: {result}")\n\n'
+                '# Block C\n'
+                'items = []\n'
+                '# message = ???\n'
+                '# print(f"Message: {message}")\n\n\n'
+                '# === Challenge 2: List Comprehension Conversions ===\n'
+                '# 1. Squares of 1-10 (as a comprehension)\n'
+                'squares = []  # rewrite this\n'
+                'print(squares)\n\n'
+                '# 2. Uppercase words longer than 3 letters\n'
+                'words = ["hi", "hello", "hey", "wonderful", "go", "python"]\n'
+                'long_upper = []  # rewrite as comprehension with filter\n'
+                'print(long_upper)\n\n'
+                '# 3. Even numbers from 1-20\n'
+                'evens = []  # rewrite this\n'
+                'print(evens)\n\n\n'
+                '# === Challenge 3: Walrus Operator ===\n'
+                'items = ["apple", "banana", "cherry", "STOP", "date", "elderberry"]\n'
+                'index = 0\n'
+                'count = 0\n\n'
+                '# Use := in a while loop to process items until "STOP"\n',
+        )
 
         # === MODULE 10: Python for Network Engineers ===
         m10 = modules["python-for-network-engineers"]
@@ -2183,6 +2641,58 @@ Modify the examples and see what happens.""",
         Hint.objects.create(exercise=ex, level=1, content="Use `json.loads()` to parse the string, then access keys like `config['hostname']`.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='`config = json.loads(config_str)` then print each field with f-strings. Loop through `config["interfaces"]` for the list.', xp_penalty_percent=10)
 
+        # Try It Yourself: Network Python
+        Lesson.objects.create(
+            module=m10, title="Try It Yourself: Network Python", slug="try-it-yourself-network-python", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Python for Network Engineers\n\n"
+                "Apply your networking Python skills to real-world scenarios!\n\n"
+                "## Challenge 1 — IP Address Validator & Classifier\n\n"
+                "Validate a list of IP address strings and classify the valid ones as private or public.\n\n"
+                "```python\n"
+                "ips = [\"192.168.1.1\", \"8.8.8.8\", \"999.999.999.999\", \"10.0.0.1\", \"172.16.0.1\", \"not_an_ip\", \"1.1.1.1\"]\n"
+                "```\n\n"
+                "For each, print: `192.168.1.1 -> valid (private)` or `999.999.999.999 -> invalid`\n\n"
+                "Hint: Use `ipaddress.ip_address()` in a try/except, then check `.is_private`.\n\n"
+                "## Challenge 2 — Subnet Calculator\n\n"
+                "Given a list of CIDR subnets, calculate and print network details.\n\n"
+                "```python\n"
+                "subnets = [\"10.0.0.0/24\", \"192.168.1.0/28\", \"172.16.0.0/16\"]\n"
+                "```\n\n"
+                "For each, print: network address, broadcast address, number of usable hosts.\n\n"
+                "## Challenge 3 — Routing Table Parser\n\n"
+                "Parse a mock routing table and extract only the default routes.\n\n"
+                "```\n"
+                "0.0.0.0/0       via 10.0.0.1    eth0\n"
+                "192.168.1.0/24  via 192.168.1.1 eth1\n"
+                "10.0.0.0/8      via 10.0.0.1    eth0\n"
+                "0.0.0.0/0       via 172.16.0.1  eth2\n"
+                "172.16.0.0/16   via 172.16.0.1  eth2\n"
+                "```\n\n"
+                "Print only the default route lines and their next-hop addresses.",
+            sandbox_code='import ipaddress\n\n'
+                '# === Challenge 1: IP Validator & Classifier ===\n'
+                'ips = ["192.168.1.1", "8.8.8.8", "999.999.999.999", "10.0.0.1", "172.16.0.1", "not_an_ip", "1.1.1.1"]\n\n'
+                'for ip_str in ips:\n'
+                '    # Validate with try/except, classify as private/public\n'
+                '    pass\n\n\n'
+                '# === Challenge 2: Subnet Calculator ===\n'
+                'subnets = ["10.0.0.0/24", "192.168.1.0/28", "172.16.0.0/16"]\n\n'
+                'for subnet_str in subnets:\n'
+                '    net = ipaddress.ip_network(subnet_str)\n'
+                '    # Print network address, broadcast address, usable host count\n'
+                '    pass\n\n\n'
+                '# === Challenge 3: Routing Table Parser ===\n'
+                'routing_table = """0.0.0.0/0       via 10.0.0.1    eth0\n'
+                '192.168.1.0/24  via 192.168.1.1 eth1\n'
+                '10.0.0.0/8      via 10.0.0.1    eth0\n'
+                '0.0.0.0/0       via 172.16.0.1  eth2\n'
+                '172.16.0.0/16   via 172.16.0.1  eth2"""\n\n'
+                '# Parse and print only default routes (0.0.0.0/0) with next-hop\n'
+                'for line in routing_table.strip().split("\\n"):\n'
+                '    pass\n',
+        )
+
         # === MODULE 11: Handling Errors ===
         m11 = modules["handling-errors"]
 
@@ -2395,6 +2905,57 @@ The sandbox has examples of `ValueError`, `KeyError`, and `ZeroDivisionError`. M
         Hint.objects.create(exercise=ex, level=1, content="Use a `for` loop and wrap `ipaddress.ip_address(ip)` in a `try/except ValueError` block.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='`for ip in ips:` then `try:` `ipaddress.ip_address(ip)` `print(f"Valid: {ip}")` `except ValueError:` `print(f"Invalid: {ip}")`', xp_penalty_percent=10)
 
+        # Try It Yourself: Error Handling
+        Lesson.objects.create(
+            module=m11, title="Try It Yourself: Error Handling", slug="try-it-yourself-error-handling", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Handling Errors\n\n"
+                "Practice writing robust code that handles unexpected situations gracefully!\n\n"
+                "## Challenge 1 — Safe Division Function\n\n"
+                "Write a `safe_divide(a, b)` function that:\n"
+                "- Returns the result of `a / b`\n"
+                "- Catches `ZeroDivisionError` and prints a friendly message\n"
+                "- Catches `TypeError` (e.g., dividing a string) and prints a friendly message\n\n"
+                "Test with: `safe_divide(10, 2)`, `safe_divide(10, 0)`, `safe_divide(\"ten\", 2)`\n\n"
+                "## Challenge 2 — Mixed String Converter\n\n"
+                "Given a list of strings, try to convert each to an integer. Track successes and failures.\n\n"
+                "```python\n"
+                "values = [\"42\", \"hello\", \"17\", \"3.14\", \"99\", \"world\", \"0\"]\n"
+                "```\n\n"
+                "Print each conversion attempt, then a summary: `Successes: X, Failures: Y`\n\n"
+                "## Challenge 3 — Config Reader with Defaults\n\n"
+                "Build a function that reads config values from a dictionary, using try/except to handle missing keys and provide default values.\n\n"
+                "```python\n"
+                "config = {\"host\": \"192.168.1.1\", \"port\": 8080}\n"
+                "```\n\n"
+                "Try to read: `host`, `port`, `timeout`, `retries` — provide defaults for missing keys.\n"
+                "Print the final configuration.",
+            sandbox_code='# === Challenge 1: Safe Division Function ===\n'
+                'def safe_divide(a, b):\n'
+                '    # Handle ZeroDivisionError and TypeError\n'
+                '    pass\n\n'
+                '# Test it\n'
+                'print(safe_divide(10, 2))\n'
+                'print(safe_divide(10, 0))\n'
+                'print(safe_divide("ten", 2))\n\n\n'
+                '# === Challenge 2: Mixed String Converter ===\n'
+                'values = ["42", "hello", "17", "3.14", "99", "world", "0"]\n'
+                'successes = 0\n'
+                'failures = 0\n\n'
+                'for v in values:\n'
+                '    # Try converting to int, track results\n'
+                '    pass\n\n'
+                'print(f"Successes: {successes}, Failures: {failures}")\n\n\n'
+                '# === Challenge 3: Config Reader with Defaults ===\n'
+                'config = {"host": "192.168.1.1", "port": 8080}\n'
+                'defaults = {"host": "0.0.0.0", "port": 80, "timeout": 30, "retries": 3}\n\n'
+                '# Read each key with try/except, use default if missing\n'
+                'final_config = {}\n'
+                'for key in ["host", "port", "timeout", "retries"]:\n'
+                '    pass\n\n'
+                'print("Final config:", final_config)\n',
+        )
+
         # === MODULE 12: User Input & While Loops ===
         m12 = modules["user-input-and-while-loops"]
 
@@ -2595,6 +3156,57 @@ Modify the code and see what happens.""",
         TestCase.objects.create(exercise=ex, input_data="5\n-3\n0\n7\n-1\nstop", expected_output="positive\nnegative\nzero\npositive\nnegative\nPositive: 2 Negative: 2 Zero: 1", description="Should classify and count numbers", order=1)
         Hint.objects.create(exercise=ex, level=1, content='Use three counters (`pos`, `neg`, `zero`). In a `while True:` loop, read with `input()`, break on `"stop"`, classify with `if/elif/else`.', xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='After the loop: `print(f"Positive: {pos} Negative: {neg} Zero: {zero}")`', xp_penalty_percent=10)
+
+        # Try It Yourself: Input & Loops
+        Lesson.objects.create(
+            module=m12, title="Try It Yourself: Input & Loops", slug="try-it-yourself-input-loops", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Input & While Loops\n\n"
+                "These challenges combine loops with decision-making for interactive-style programs.\n\n"
+                "## Challenge 1 — Number Guessing Game\n\n"
+                "Build a guessing game! Hardcode a target number and loop until a guess matches. Print hints each round.\n\n"
+                "```python\n"
+                "target = 42\n"
+                "guesses = [25, 50, 40, 42]  # simulate guesses from a list\n"
+                "```\n\n"
+                "For each guess, print `Too low!`, `Too high!`, or `Correct! You got it in N guesses!`\n\n"
+                "## Challenge 2 — Simple Calculator\n\n"
+                "Process a list of operations to build a running total, starting at 0:\n\n"
+                "```python\n"
+                "operations = [(\"add\", 10), (\"multiply\", 3), (\"subtract\", 5), (\"add\", 7), (\"multiply\", 2)]\n"
+                "```\n\n"
+                "After each operation, print the running total. Example: `add 10 -> 10`, `multiply 3 -> 30`, etc.\n\n"
+                "## Challenge 3 — Quiz Game\n\n"
+                "Store 3 question/answer pairs, loop through them, and track the score:\n\n"
+                "```python\n"
+                "quiz = [\n"
+                "    (\"What keyword defines a function in Python?\", \"def\"),\n"
+                "    (\"What built-in function prints to the screen?\", \"print\"),\n"
+                "    (\"What data type stores True or False?\", \"bool\"),\n"
+                "]\n"
+                "```\n\n"
+                "For each question, compare a simulated answer and print right/wrong. At the end, print the total score.",
+            sandbox_code='# === Challenge 1: Number Guessing Game ===\n'
+                'target = 42\n'
+                'guesses = [25, 50, 40, 42]\n\n'
+                '# Loop through guesses and print hints\n'
+                '# Stop when the guess matches the target\n\n\n'
+                '# === Challenge 2: Simple Calculator ===\n'
+                'operations = [("add", 10), ("multiply", 3), ("subtract", 5), ("add", 7), ("multiply", 2)]\n'
+                'total = 0\n\n'
+                'for op, value in operations:\n'
+                '    # Apply the operation to total and print\n'
+                '    pass\n\n\n'
+                '# === Challenge 3: Quiz Game ===\n'
+                'quiz = [\n'
+                '    ("What keyword defines a function in Python?", "def"),\n'
+                '    ("What built-in function prints to the screen?", "print"),\n'
+                '    ("What data type stores True or False?", "bool"),\n'
+                ']\n'
+                'answers = ["def", "input", "bool"]  # simulated user answers\n'
+                'score = 0\n\n'
+                '# Loop through quiz and answers, track score\n',
+        )
 
         # === MODULE 13: Regular Expressions ===
         m13 = modules["regular-expressions"]
@@ -2821,6 +3433,50 @@ The sandbox shows how to extract IPs from log lines, parse interface status, and
         Hint.objects.create(exercise=ex, level=1, content="Split into lines, then use `re.search()` with groups to capture the severity and message parts.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='Pattern: `r"\\S+\\s+(\\w+)\\s+(.*)"` — skips timestamp, captures severity in group(1) and message in group(2).', xp_penalty_percent=10)
 
+        # Try It Yourself: Regex
+        Lesson.objects.create(
+            module=m13, title="Try It Yourself: Regex", slug="try-it-yourself-regex", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Regular Expressions\n\n"
+                "Put your regex skills to the test with these practical pattern-matching challenges!\n\n"
+                "## Challenge 1 — Phone Number Standardizer\n\n"
+                "Given phone numbers in various formats, extract the digits and reformat them consistently.\n\n"
+                "```python\n"
+                "phones = [\"(555) 123-4567\", \"555.123.4567\", \"5551234567\", \"555-123-4567\"]\n"
+                "```\n\n"
+                "For each, print the standardized format: `555-123-4567`\n\n"
+                "Hint: Use `re.sub()` to strip non-digits, then reformat with slicing.\n\n"
+                "## Challenge 2 — Email Validator\n\n"
+                "Write a regex pattern that matches valid email addresses. Test it against these strings:\n\n"
+                "```python\n"
+                "emails = [\"user@example.com\", \"bad-email@\", \"name.last@company.org\", \"@missing.com\", \"test@site.co.uk\"]\n"
+                "```\n\n"
+                "Print `VALID` or `INVALID` for each.\n\n"
+                "## Challenge 3 — Date Reformatter\n\n"
+                "Convert dates from `MM/DD/YYYY` format to `YYYY-MM-DD` using regex groups.\n\n"
+                "```python\n"
+                "dates = [\"03/15/2024\", \"12/01/2023\", \"07/04/1776\"]\n"
+                "```\n\n"
+                "Print each reformatted date on its own line.",
+            sandbox_code='import re\n\n'
+                '# === Challenge 1: Phone Number Standardizer ===\n'
+                'phones = ["(555) 123-4567", "555.123.4567", "5551234567", "555-123-4567"]\n\n'
+                'for phone in phones:\n'
+                '    # Strip all non-digit characters, then reformat\n'
+                '    pass\n\n\n'
+                '# === Challenge 2: Email Validator ===\n'
+                'emails = ["user@example.com", "bad-email@", "name.last@company.org", "@missing.com", "test@site.co.uk"]\n\n'
+                '# Write a regex pattern for email validation\n'
+                'pattern = r""  # your pattern here\n\n'
+                'for email in emails:\n'
+                '    pass  # Check and print VALID or INVALID\n\n\n'
+                '# === Challenge 3: Date Reformatter ===\n'
+                'dates = ["03/15/2024", "12/01/2023", "07/04/1776"]\n\n'
+                'for date in dates:\n'
+                '    # Use re.sub or re.search with groups to reformat\n'
+                '    pass\n',
+        )
+
         # === MODULE 14: Building a Network Toolkit ===
         m14 = modules["building-a-network-toolkit"]
 
@@ -3004,6 +3660,78 @@ Modify the device data and see how the output changes.""",
         TestCase.objects.create(exercise=ex, expected_output="SW1: OK\nSW2: ISSUE - No interfaces\nSW3: ISSUE - Missing hostname", description="Should audit all devices", order=1)
         Hint.objects.create(exercise=ex, level=1, content="Loop through devices. Check `device[\"interfaces\"]` (empty list is falsy) and `device[\"hostname\"]` (empty string is falsy).", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='For the device with empty hostname, use `"SW3"` as the display name. Check `if not device["interfaces"]:` first, then `elif not device["hostname"]:`.', xp_penalty_percent=10)
+
+        # Try It Yourself: Toolkit
+        Lesson.objects.create(
+            module=m14, title="Try It Yourself: Toolkit", slug="try-it-yourself-toolkit", order=4,
+            lesson_type="interactive",
+            content="# Try It Yourself: Building a Network Toolkit\n\n"
+                "Put everything together! These challenges combine regex, `ipaddress`, JSON, and function pipelines into realistic automation scenarios.\n\n"
+                "## Challenge 1 — Multi-Device `show version` Parser\n\n"
+                "Given raw `show version` output from 3 network devices, extract the **hostname** and **OS version** from each using regex.\n\n"
+                "```\n"
+                "Device 1:\n"
+                "Cisco IOS Software, Version 15.4(3)M\n"
+                "hostname R1\n"
+                "\n"
+                "Device 2:\n"
+                "Cisco IOS Software, Version 16.9.4\n"
+                "hostname SW1\n"
+                "\n"
+                "Device 3:\n"
+                "Cisco IOS Software, Version 15.7(3)M\n"
+                "hostname R2\n"
+                "```\n\n"
+                "Print:\n"
+                "```\n"
+                "R1 -> 15.4(3)M\n"
+                "SW1 -> 16.9.4\n"
+                "R2 -> 15.7(3)M\n"
+                "```\n\n"
+                "## Challenge 2 — Function Pipeline\n\n"
+                "Build three functions that chain together:\n\n"
+                "1. `validate_ips(ip_list)` — returns only valid IP strings\n"
+                "2. `classify_ips(valid_ips)` — returns a dict `{\"private\": [...], \"public\": [...]}`\n"
+                "3. `generate_report(classified)` — prints a summary with counts and lists\n\n"
+                "Test with: `[\"10.0.0.1\", \"8.8.8.8\", \"not_valid\", \"192.168.1.1\", \"1.1.1.1\"]`\n\n"
+                "## Challenge 3 — Subnet Overlap Detector\n\n"
+                "Given a list of CIDR networks, check if any two subnets overlap (one contains addresses of the other). Print any conflicts found.\n\n"
+                "```python\n"
+                "networks = [\"10.0.0.0/24\", \"10.0.0.128/25\", \"192.168.1.0/24\", \"172.16.0.0/16\", \"172.16.5.0/24\"]\n"
+                "```\n\n"
+                "Hint: `ipaddress.ip_network()` objects support the `overlaps()` method.",
+            sandbox_code='import re\n'
+                'import ipaddress\n\n'
+                '# === Challenge 1: Multi-Device show version Parser ===\n'
+                'show_output = """Device 1:\n'
+                'Cisco IOS Software, Version 15.4(3)M\n'
+                'hostname R1\n'
+                '\n'
+                'Device 2:\n'
+                'Cisco IOS Software, Version 16.9.4\n'
+                'hostname SW1\n'
+                '\n'
+                'Device 3:\n'
+                'Cisco IOS Software, Version 15.7(3)M\n'
+                'hostname R2"""\n\n'
+                '# Parse hostname and version from each device block\n'
+                '# Hint: use re.findall() with a pattern for version and hostname\n\n\n'
+                '# === Challenge 2: Function Pipeline ===\n'
+                'test_ips = ["10.0.0.1", "8.8.8.8", "not_valid", "192.168.1.1", "1.1.1.1"]\n\n'
+                'def validate_ips(ip_list):\n'
+                '    # Return only valid IP strings\n'
+                '    pass\n\n'
+                'def classify_ips(valid_ips):\n'
+                '    # Return {"private": [...], "public": [...]}\n'
+                '    pass\n\n'
+                'def generate_report(classified):\n'
+                '    # Print a formatted summary\n'
+                '    pass\n\n'
+                '# Chain: validate -> classify -> report\n\n\n'
+                '# === Challenge 3: Subnet Overlap Detector ===\n'
+                'networks = ["10.0.0.0/24", "10.0.0.128/25", "192.168.1.0/24", "172.16.0.0/16", "172.16.5.0/24"]\n\n'
+                '# Check every pair for overlaps\n',
+        )
 
         self.stdout.write(self.style.SUCCESS(
             f"\nDone! Created {Module.objects.count()} modules, "
