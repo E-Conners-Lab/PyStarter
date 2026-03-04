@@ -34,6 +34,9 @@ playwright-report/
 frontend/test-results/
 backend/test-results/
 
+# Local assets
+graphics/
+
 # Claude
 CLAUDE.md
 .claude/
