@@ -27,6 +27,10 @@ class Command(BaseCommand):
             ("String Magic", "string-magic", "Master text manipulation — slicing, formatting, and transforming strings.", "type"),
             ("Writing Cleaner Code", "writing-cleaner-code", "Level up your Python with ternary expressions, comprehensions, the walrus operator, and other Pythonic patterns.", "wand"),
             ("Python for Network Engineers", "python-for-network-engineers", "Apply Python to real-world networking — parse IPs, read CLI output, and work with JSON device configs.", "network"),
+            ("Handling Errors", "handling-errors", "Learn to catch and handle errors gracefully so your scripts don't crash on bad data.", "shield"),
+            ("User Input & While Loops", "user-input-and-while-loops", "Build interactive CLI tools that read user input and loop until the job is done.", "terminal"),
+            ("Regular Expressions", "regular-expressions", "Master pattern matching with regex to parse device logs, extract IPs, and search text like a pro.", "search"),
+            ("Building a Network Toolkit", "building-a-network-toolkit", "Combine everything you've learned into realistic network automation scripts.", "wrench"),
         ]
 
         modules = {}
@@ -456,6 +460,32 @@ Change the `score` variable in the editor and run the code to see different resu
         Hint.objects.create(exercise=ex, level=1, content="Use `if age < 13:` for Child, then `elif` for the other ranges. Remember that 13-17 means `age <= 17`.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content="`if age < 13:` Child, `elif age <= 17:` Teenager, `elif age <= 64:` Adult, `else:` Senior", xp_penalty_percent=10)
 
+        # Exercise 3-5: Logical And (fill_blank)
+        ex = Exercise.objects.create(
+            lesson=l_m3, title="Logical And", slug="logical-and", order=5,
+            exercise_type="fill_blank", difficulty=2,
+            instructions='Complete the code so it prints `Access granted` only when both `age` is 18 or older **and** `has_id` is `True`.\n\nExpected output:\n```\nAccess granted\n```',
+            starter_code='age = 21\nhas_id = True\n\nif age >= 18 ___ has_id:\n    print("Access granted")\nelse:\n    print("Access denied")',
+            solution_code='age = 21\nhas_id = True\n\nif age >= 18 and has_id:\n    print("Access granted")\nelse:\n    print("Access denied")',
+            xp_value=10, concepts="and, boolean logic, if",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="Access granted", description="Should print Access granted", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="You need a keyword that requires **both** conditions to be true.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content="Replace `___` with `and`. Both conditions must be True for the block to run.", xp_penalty_percent=10)
+
+        # Exercise 3-6: Fix the Condition (fix_bug)
+        ex = Exercise.objects.create(
+            lesson=l_m3, title="Fix the Condition", slug="fix-the-condition", order=6,
+            exercise_type="fix_bug", difficulty=2,
+            instructions='The code below should print `Equal` when `x` and `y` are the same, but it has a bug. Find and fix it.\n\nExpected output:\n```\nEqual\n```',
+            starter_code='x = 10\ny = 10\n\nif x = y:\n    print("Equal")\nelse:\n    print("Not equal")',
+            solution_code='x = 10\ny = 10\n\nif x == y:\n    print("Equal")\nelse:\n    print("Not equal")',
+            xp_value=15, concepts="comparison, equality, debugging",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="Equal", description="Should print Equal", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Look at the comparison operator in the `if` statement. Is it the right one for checking equality?", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content="Use `==` (double equals) for comparison, not `=` (single equals, which is assignment).", xp_penalty_percent=10)
+
         # === MODULE 4: Loops ===
         m4 = modules["loops"]
 
@@ -599,6 +629,32 @@ Modify the code in the editor to see how loops work.""",
         Hint.objects.create(exercise=ex, level=1, content="Use `for i in range(1, 6):` and inside print `num, \"x\", i, \"=\", num * i`.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='`print(num, "x", i, "=", num * i)` — commas in print add spaces between items.', xp_penalty_percent=10)
 
+        # Exercise 4-5: Countdown (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m4, title="Countdown", slug="countdown", order=5,
+            exercise_type="write_code", difficulty=2,
+            instructions='Write a `while` loop that counts down from 5 to 1, printing each number, then prints `Go!` after the loop.\n\nExpected output:\n```\n5\n4\n3\n2\n1\nGo!\n```',
+            starter_code='# Write a while loop that counts down from 5 to 1\n# Then print "Go!"\n',
+            solution_code='n = 5\n\nwhile n >= 1:\n    print(n)\n    n = n - 1\n\nprint("Go!")',
+            xp_value=15, concepts="while loop, countdown",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="5\n4\n3\n2\n1\nGo!", description="Should count down then print Go!", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Start a variable at 5, use `while n >= 1:`, print `n`, then decrease it by 1 each iteration.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='`n = 5` then `while n >= 1:` with `print(n)` and `n = n - 1` inside. After the loop: `print("Go!")`', xp_penalty_percent=10)
+
+        # Exercise 4-6: Break on Target (fill_blank)
+        ex = Exercise.objects.create(
+            lesson=l_m4, title="Break on Target", slug="break-on-target", order=6,
+            exercise_type="fill_blank", difficulty=1,
+            instructions='Complete the code so the loop stops when it finds `"cherry"` in the list. It should print each fruit until it hits the target, then print `Found it!`.\n\nExpected output:\n```\napple\nbanana\nFound it!\n```',
+            starter_code='fruits = ["apple", "banana", "cherry", "date"]\n\nfor fruit in fruits:\n    if fruit == "cherry":\n        print("Found it!")\n        ___\n    print(fruit)',
+            solution_code='fruits = ["apple", "banana", "cherry", "date"]\n\nfor fruit in fruits:\n    if fruit == "cherry":\n        print("Found it!")\n        break\n    print(fruit)',
+            xp_value=10, concepts="for, break",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="apple\nbanana\nFound it!", description="Should stop at cherry", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="There's a keyword that immediately exits a loop...", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content="Replace `___` with `break`. It exits the `for` loop immediately.", xp_penalty_percent=10)
+
         # === MODULE 5: Functions ===
         m5 = modules["functions"]
 
@@ -730,6 +786,32 @@ Modify the function in the editor and see what happens.""",
         TestCase.objects.create(exercise=ex, expected_output="32.0\n212.0", description="0C=32F, 100C=212F", order=1)
         Hint.objects.create(exercise=ex, level=1, content="Inside the function, `return c * 9/5 + 32`. Python will handle the decimal math.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content="`def celsius_to_fahrenheit(c):` then `return c * 9/5 + 32`. Call it with `print(celsius_to_fahrenheit(0))`.", xp_penalty_percent=10)
+
+        # Exercise 5-5: Default Greeting (fill_blank)
+        ex = Exercise.objects.create(
+            lesson=l_m5, title="Default Greeting", slug="default-greeting", order=5,
+            exercise_type="fill_blank", difficulty=1,
+            instructions='Complete the function so it uses a **default parameter** of `"Hello"` for `greeting`. When called without a second argument, it should use the default.\n\nExpected output:\n```\nHello, Alice!\nHey, Bob!\n```',
+            starter_code='def greet(name, greeting___):\n    print(f"{greeting}, {name}!")\n\ngreet("Alice")\ngreet("Bob", "Hey")',
+            solution_code='def greet(name, greeting="Hello"):\n    print(f"{greeting}, {name}!")\n\ngreet("Alice")\ngreet("Bob", "Hey")',
+            xp_value=10, concepts="functions, default parameters",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="Hello, Alice!\nHey, Bob!", description="Should use default and explicit greeting", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Default parameters are set with `=` in the function definition: `def func(param=default_value):`.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='Replace `___` with `="Hello"`. The full parameter becomes `greeting="Hello"`.', xp_penalty_percent=10)
+
+        # Exercise 5-6: Fix the Return (fix_bug)
+        ex = Exercise.objects.create(
+            lesson=l_m5, title="Fix the Return", slug="fix-the-return", order=6,
+            exercise_type="fix_bug", difficulty=2,
+            instructions='This function should **return** the doubled value so it can be printed, but it has a common beginner bug. Fix it.\n\nExpected output:\n```\n14\n```',
+            starter_code='def double(n):\n    print(n * 2)\n\nresult = double(7)\nprint(result)',
+            solution_code='def double(n):\n    return n * 2\n\nresult = double(7)\nprint(result)',
+            xp_value=15, concepts="functions, return, print vs return",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="14", description="Should print 14", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="The function uses `print()` inside but the caller expects a value back. What keyword sends a value back?", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content="Replace `print(n * 2)` with `return n * 2`. Functions need `return` to send values back to the caller.", xp_penalty_percent=10)
 
         # === MODULE 6: Lists & Tuples ===
         m6 = modules["lists-and-tuples"]
@@ -873,6 +955,32 @@ Play with the list in the editor.""",
         TestCase.objects.create(exercise=ex, expected_output="1. milk\n2. eggs\n3. bread", description="Should print numbered shopping list", order=1)
         Hint.objects.create(exercise=ex, level=1, content="Use `cart.append(\"milk\")` etc. to add items. Then loop with `for i in range(len(cart)):` to get numbered output.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='`print(str(i + 1) + ". " + cart[i])` formats each line. Remember `i` starts at 0 so add 1.', xp_penalty_percent=10)
+
+        # Exercise 6-5: Unpack the Tuple (fill_blank)
+        ex = Exercise.objects.create(
+            lesson=l_m6, title="Unpack the Tuple", slug="unpack-the-tuple", order=5,
+            exercise_type="fill_blank", difficulty=1,
+            instructions='Complete the code to **unpack** the tuple into three variables and print them.\n\nExpected output:\n```\nAlice is 25 from Boston\n```',
+            starter_code='person = ("Alice", 25, "Boston")\n\n___, ___, ___ = person\nprint(f"{name} is {age} from {city}")',
+            solution_code='person = ("Alice", 25, "Boston")\n\nname, age, city = person\nprint(f"{name} is {age} from {city}")',
+            xp_value=10, concepts="tuples, unpacking",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="Alice is 25 from Boston", description="Should unpack and print tuple", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Tuple unpacking lets you assign each element to a variable in one line: `a, b, c = my_tuple`.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content="Replace the three `___` with `name`, `age`, `city` to match the tuple's three elements.", xp_penalty_percent=10)
+
+        # Exercise 6-6: Sort and Slice (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m6, title="Sort and Slice", slug="sort-and-slice", order=6,
+            exercise_type="write_code", difficulty=2,
+            instructions='Sort the list of scores in descending order and print the top 3.\n\nExpected output:\n```\n95\n88\n76\n```',
+            starter_code='scores = [42, 88, 65, 95, 76, 33]\n\n# Sort descending and print the top 3\n',
+            solution_code='scores = [42, 88, 65, 95, 76, 33]\n\nscores.sort(reverse=True)\nfor s in scores[:3]:\n    print(s)',
+            xp_value=15, concepts="lists, sort, slicing",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="95\n88\n76", description="Should print top 3 scores", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Use `.sort(reverse=True)` to sort descending, then `scores[:3]` to get the first 3.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='`scores.sort(reverse=True)` then `for s in scores[:3]: print(s)`', xp_penalty_percent=10)
 
         # === MODULE 7: Dictionaries ===
         m7 = modules["dictionaries"]
@@ -1328,6 +1436,32 @@ Try modifying the examples and see what happens!""",
         Hint.objects.create(exercise=ex, level=1, content="Loop through `scores` and use a ternary expression: `\"Pass\" if score >= 60 else \"Fail\"`.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='`for score in scores:` then `result = "Pass" if score >= 60 else "Fail"` then `print(f"{score} -> {result}")`', xp_penalty_percent=10)
 
+        # Exercise 9-5: Squares List (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m9, title="Squares List", slug="squares-list", order=5,
+            exercise_type="write_code", difficulty=2,
+            instructions='Use a **list comprehension** to create a list of squares from 1 to 10 (`1, 4, 9, ... 100`), then print the list.\n\nExpected output:\n```\n[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]\n```',
+            starter_code='# Create a list of squares from 1 to 10 using a list comprehension\n\n\n# Print the list\n',
+            solution_code='squares = [n ** 2 for n in range(1, 11)]\nprint(squares)',
+            xp_value=15, concepts="list comprehension, range, exponent",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="[1, 4, 9, 16, 25, 36, 49, 64, 81, 100]", description="Should print list of squares", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="A list comprehension looks like `[expression for var in iterable]`. Use `n ** 2` for squaring.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='`squares = [n ** 2 for n in range(1, 11)]` then `print(squares)`', xp_penalty_percent=10)
+
+        # Exercise 9-6: Fix the Comprehension (fix_bug)
+        ex = Exercise.objects.create(
+            lesson=l_m9, title="Fix the Comprehension", slug="fix-the-comprehension", order=6,
+            exercise_type="fix_bug", difficulty=2,
+            instructions='This list comprehension has a syntax error. Fix it so it produces even numbers from 0 to 8.\n\nExpected output:\n```\n[0, 2, 4, 6, 8]\n```',
+            starter_code='evens = [n for n in range(10) if n % 2 = 0]\nprint(evens)',
+            solution_code='evens = [n for n in range(10) if n % 2 == 0]\nprint(evens)',
+            xp_value=10, concepts="list comprehension, debugging, comparison",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="[0, 2, 4, 6, 8]", description="Should print even numbers", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Look at the comparison inside the `if` filter. Is it using the right operator?", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content="Change `= 0` to `== 0`. Use `==` for comparison, not `=` (assignment).", xp_penalty_percent=10)
+
         # === MODULE 10: Python for Network Engineers ===
         m10 = modules["python-for-network-engineers"]
 
@@ -1589,6 +1723,608 @@ Modify the examples and see what happens.""",
         TestCase.objects.create(exercise=ex, expected_output="Device: R1\nRole: router\nInterfaces: 3\n  - GigabitEthernet0/0\n  - GigabitEthernet0/1\n  - Loopback0", description="Should print formatted config report", order=1)
         Hint.objects.create(exercise=ex, level=1, content="Use `json.loads()` to parse the string, then access keys like `config['hostname']`.", xp_penalty_percent=0)
         Hint.objects.create(exercise=ex, level=2, content='`config = json.loads(config_str)` then print each field with f-strings. Loop through `config["interfaces"]` for the list.', xp_penalty_percent=10)
+
+        # === MODULE 11: Handling Errors ===
+        m11 = modules["handling-errors"]
+
+        Lesson.objects.create(
+            module=m11, title="When Things Go Wrong", slug="when-things-go-wrong", order=1,
+            lesson_type="concept",
+            content="""# Handling Errors Gracefully
+
+When your Python script encounters a problem — a bad IP address, a missing dictionary key, dividing by zero — it raises an **exception**. Without handling, your script crashes. With `try/except`, you stay in control.
+
+## The `try/except` Block
+
+```python
+try:
+    number = int("hello")
+except ValueError:
+    print("That's not a number!")
+```
+
+The code inside `try` runs normally. If an exception occurs, Python jumps to the matching `except` block instead of crashing.
+
+## Common Exception Types
+
+| Exception | When it happens |
+|-----------|----------------|
+| `ValueError` | Wrong type of value (e.g., `int("hello")`) |
+| `KeyError` | Missing dictionary key |
+| `TypeError` | Wrong type for an operation (e.g., `"a" + 1`) |
+| `IndexError` | List index out of range |
+| `ZeroDivisionError` | Dividing by zero |
+
+## Catching the Error Message
+
+Use `as e` to capture the error details:
+
+```python
+try:
+    result = 10 / 0
+except ZeroDivisionError as e:
+    print(f"Error: {e}")
+# Error: division by zero
+```
+
+## Multiple `except` Blocks
+
+```python
+try:
+    data = {"name": "Alice"}
+    print(data["age"])
+except KeyError:
+    print("Key not found!")
+except TypeError:
+    print("Type error!")
+```
+
+## `else` and `finally`
+
+```python
+try:
+    value = int("42")
+except ValueError:
+    print("Bad value")
+else:
+    print(f"Success: {value}")  # Runs only if no exception
+finally:
+    print("Done")  # Always runs
+```
+
+## Why This Matters for Network Scripts
+
+Network scripts deal with unpredictable data — user-entered IPs, missing config keys, device responses that don't match expectations. Error handling keeps your tools robust.""",
+        )
+
+        Lesson.objects.create(
+            module=m11, title="Try It: Error Handling", slug="try-it-error-handling", order=2,
+            lesson_type="interactive",
+            content="""# Try It: Error Handling
+
+Experiment with `try/except` in the editor below. Try changing the values to trigger different exceptions!
+
+## Catching Different Errors
+
+The sandbox has examples of `ValueError`, `KeyError`, and `ZeroDivisionError`. Modify the code to see what happens.""",
+            sandbox_code='# Try/except with ValueError\ntry:\n    number = int("not_a_number")\nexcept ValueError as e:\n    print(f"ValueError caught: {e}")\n\n# Try/except with KeyError\ndevice = {"hostname": "R1", "ip": "10.0.0.1"}\ntry:\n    print(device["location"])\nexcept KeyError as e:\n    print(f"KeyError caught: missing key {e}")\n\n# Try/except with ZeroDivisionError\ntry:\n    result = 100 / 0\nexcept ZeroDivisionError:\n    print("Cannot divide by zero!")\n\n# Using else and finally\ntry:\n    value = int("42")\nexcept ValueError:\n    print("Bad input")\nelse:\n    print(f"Parsed successfully: {value}")\nfinally:\n    print("Cleanup done")',
+        )
+
+        l_m11 = Lesson.objects.create(
+            module=m11, title="Practice: Error Handling", slug="practice-error-handling", order=3,
+            lesson_type="exercise",
+            content="# Practice Time!\n\nHandle errors like a pro with these exercises.",
+        )
+
+        # Exercise 11-1: Catch the Error (fill_blank)
+        ex = Exercise.objects.create(
+            lesson=l_m11, title="Catch the Error", slug="catch-the-error", order=1,
+            exercise_type="fill_blank", difficulty=1,
+            instructions='Complete the `try/except` block to catch the `ValueError` when converting bad input.\n\nExpected output:\n```\nCould not convert to integer\n```',
+            starter_code='try:\n    number = int("abc")\nexcept ___:\n    print("Could not convert to integer")',
+            solution_code='try:\n    number = int("abc")\nexcept ValueError:\n    print("Could not convert to integer")',
+            xp_value=10, concepts="try, except, ValueError",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="Could not convert to integer", description="Should catch ValueError", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="`int(\"abc\")` fails because `\"abc\"` isn't a valid number. What type of error is this?", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content="Replace `___` with `ValueError`. This is the exception raised by invalid `int()` conversions.", xp_penalty_percent=10)
+
+        # Exercise 11-2: Safe Dictionary Lookup (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m11, title="Safe Dictionary Lookup", slug="safe-dictionary-lookup", order=2,
+            exercise_type="write_code", difficulty=2,
+            instructions='Try to access the key `"location"` from the dictionary. If the key doesn\'t exist, catch the `KeyError` and print `Key not found: location`.\n\nExpected output:\n```\nKey not found: location\n```',
+            starter_code='device = {"hostname": "R1", "ip": "10.0.0.1"}\n\n# Try to access "location", catch KeyError\n',
+            solution_code='device = {"hostname": "R1", "ip": "10.0.0.1"}\n\ntry:\n    print(device["location"])\nexcept KeyError:\n    print("Key not found: location")',
+            xp_value=15, concepts="try, except, KeyError, dictionaries",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="Key not found: location", description="Should catch KeyError", order=1)
+        Hint.objects.create(exercise=ex, level=1, content='Wrap `device["location"]` in a `try` block and catch `KeyError` in the `except` block.', xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='`try:` then `print(device["location"])` then `except KeyError:` then `print("Key not found: location")`', xp_penalty_percent=10)
+
+        # Exercise 11-3: Predict the Exception (output_predict)
+        ex = Exercise.objects.create(
+            lesson=l_m11, title="Predict the Exception", slug="predict-the-exception", order=3,
+            exercise_type="output_predict", difficulty=1,
+            instructions='What will this code print?\n\n```python\ntry:\n    x = int("hello")\n    print("Success")\nexcept ValueError:\n    print("Failed")\nprint("Done")\n```',
+            choices=[
+                {"label": "Success\nDone", "is_correct": False},
+                {"label": "Failed\nDone", "is_correct": True},
+                {"label": "Failed", "is_correct": False},
+                {"label": "Error", "is_correct": False},
+            ],
+            xp_value=10, concepts="try, except, ValueError, flow",
+        )
+
+        # Exercise 11-4: IP Validator (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m11, title="IP Validator", slug="ip-validator", order=4,
+            exercise_type="write_code", difficulty=3,
+            instructions='Loop through the list of IP strings. For each one, try to create an `ipaddress.ip_address()` object. If it succeeds, print `Valid: <ip>`. If it raises a `ValueError`, print `Invalid: <ip>`.\n\nExpected output:\n```\nValid: 192.168.1.1\nInvalid: 999.999.999.999\nValid: 10.0.0.1\nInvalid: not_an_ip\n```',
+            starter_code='import ipaddress\n\nips = ["192.168.1.1", "999.999.999.999", "10.0.0.1", "not_an_ip"]\n\n# Loop through and validate each IP\n',
+            solution_code='import ipaddress\n\nips = ["192.168.1.1", "999.999.999.999", "10.0.0.1", "not_an_ip"]\n\nfor ip in ips:\n    try:\n        ipaddress.ip_address(ip)\n        print(f"Valid: {ip}")\n    except ValueError:\n        print(f"Invalid: {ip}")',
+            xp_value=20, concepts="try, except, ipaddress, loops",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="Valid: 192.168.1.1\nInvalid: 999.999.999.999\nValid: 10.0.0.1\nInvalid: not_an_ip", description="Should validate each IP", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Use a `for` loop and wrap `ipaddress.ip_address(ip)` in a `try/except ValueError` block.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='`for ip in ips:` then `try:` `ipaddress.ip_address(ip)` `print(f"Valid: {ip}")` `except ValueError:` `print(f"Invalid: {ip}")`', xp_penalty_percent=10)
+
+        # === MODULE 12: User Input & While Loops ===
+        m12 = modules["user-input-and-while-loops"]
+
+        Lesson.objects.create(
+            module=m12, title="Interactive Programs", slug="interactive-programs", order=1,
+            lesson_type="concept",
+            content="""# Interactive Programs
+
+So far, all our programs have had their data hardcoded. But real CLI tools **ask the user** for input.
+
+## The `input()` Function
+
+```python
+name = input("What is your name? ")
+print(f"Hello, {name}!")
+```
+
+`input()` pauses the program, shows the prompt, and returns whatever the user types (always as a **string**).
+
+## Converting Input
+
+Since `input()` always returns a string, you need to convert for math:
+
+```python
+age = int(input("Enter your age: "))
+print(f"In 10 years you'll be {age + 10}")
+```
+
+## While Loops for Input Validation
+
+A common pattern is looping until valid input:
+
+```python
+while True:
+    value = input("Enter a number: ")
+    if value.isdigit():
+        print(f"You entered {value}")
+        break
+    print("That's not a number, try again")
+```
+
+## Sentinel Values
+
+Use a special value to signal "stop":
+
+```python
+total = 0
+while True:
+    line = input("Enter a number (or 'done'): ")
+    if line == "done":
+        break
+    total += int(line)
+print(f"Total: {total}")
+```
+
+## `break` and `continue`
+
+- `break` — exit the loop immediately
+- `continue` — skip the rest of this iteration, go to the next
+
+```python
+while True:
+    cmd = input("> ")
+    if cmd == "quit":
+        break
+    if cmd == "skip":
+        continue
+    print(f"You said: {cmd}")
+```
+
+## Why This Matters
+
+Network engineers build CLI tools all the time — scripts that prompt for device IPs, ask for credentials, or loop through a list of actions until the user says stop.""",
+        )
+
+        Lesson.objects.create(
+            module=m12, title="Try It: Interactive Scripts", slug="try-it-interactive-scripts", order=2,
+            lesson_type="interactive",
+            content="""# Try It: Interactive Scripts
+
+Experiment with `input()` and while loops in the editor below.
+
+**Note:** In the sandbox, `input()` uses pre-seeded values instead of waiting for keyboard input. The values are provided automatically!
+
+## Try it yourself!
+
+Modify the code and see what happens.""",
+            sandbox_code='# input() is pre-seeded in the sandbox\n# This demonstrates the pattern\n\nname = "Alice"  # In real code: name = input("Name: ")\nprint(f"Hello, {name}!")\n\n# While loop countdown\nn = 5\nwhile n > 0:\n    print(n)\n    n -= 1\nprint("Go!")\n\n# Sentinel value pattern\nnumbers = [10, 20, 30]  # Simulating user input\ntotal = 0\nfor num in numbers:\n    total += num\nprint(f"Total: {total}")',
+        )
+
+        l_m12 = Lesson.objects.create(
+            module=m12, title="Practice: User Input", slug="practice-user-input", order=3,
+            lesson_type="exercise",
+            content="# Practice Time!\n\nBuild interactive programs with `input()` and while loops.",
+        )
+
+        # Exercise 12-1: Greet the User (fill_blank)
+        ex = Exercise.objects.create(
+            lesson=l_m12, title="Greet the User", slug="greet-the-user", order=1,
+            exercise_type="fill_blank", difficulty=1,
+            instructions='Complete the code to read a name with `input()` and print a greeting.\n\nThe input will be: `Alice`\n\nExpected output:\n```\nHello, Alice!\n```',
+            starter_code='name = ___()\nprint(f"Hello, {name}!")',
+            solution_code='name = input()\nprint(f"Hello, {name}!")',
+            xp_value=10, concepts="input, f-strings",
+        )
+        TestCase.objects.create(exercise=ex, input_data="Alice", expected_output="Hello, Alice!", description="Should greet Alice", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="The function that reads user input is called...", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content="Replace `___` with `input`. The `input()` function reads a line of text from the user.", xp_penalty_percent=10)
+
+        # Exercise 12-2: Sum Until Quit (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m12, title="Sum Until Quit", slug="sum-until-quit", order=2,
+            exercise_type="write_code", difficulty=2,
+            instructions='Read numbers one at a time using `input()`. Keep a running total. When the input is `"done"`, stop and print the total.\n\nInputs will be: `10`, `20`, `30`, `done`\n\nExpected output:\n```\n60\n```',
+            starter_code='# Read numbers until "done", then print the total\n',
+            solution_code='total = 0\nwhile True:\n    line = input()\n    if line == "done":\n        break\n    total += int(line)\nprint(total)',
+            xp_value=15, concepts="input, while, break, accumulator",
+        )
+        TestCase.objects.create(exercise=ex, input_data="10\n20\n30\ndone", expected_output="60", description="Should sum to 60", order=1)
+        Hint.objects.create(exercise=ex, level=1, content='Use `while True:` with `input()` inside. Check if the input is `"done"` and `break`. Otherwise, add `int(line)` to a total.', xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='`total = 0` then `while True:` `line = input()` `if line == "done": break` `total += int(line)` then `print(total)`', xp_penalty_percent=10)
+
+        # Exercise 12-3: Predict the Loop (output_predict)
+        ex = Exercise.objects.create(
+            lesson=l_m12, title="Predict the Loop", slug="predict-the-while-loop", order=3,
+            exercise_type="output_predict", difficulty=1,
+            instructions='What will this code print?\n\n```python\nx = 10\nwhile x > 0:\n    x -= 3\n    if x <= 0:\n        break\n    print(x)\n```',
+            choices=[
+                {"label": "7\n4\n1", "is_correct": True},
+                {"label": "10\n7\n4\n1", "is_correct": False},
+                {"label": "7\n4", "is_correct": False},
+                {"label": "7\n4\n1\n-2", "is_correct": False},
+            ],
+            xp_value=10, concepts="while, break, tracing",
+        )
+
+        # Exercise 12-4: Number Checker (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m12, title="Number Checker", slug="number-checker", order=4,
+            exercise_type="write_code", difficulty=3,
+            instructions='Read numbers via `input()` until you get `"stop"`. For each number, print whether it is `positive`, `negative`, or `zero`. After the loop, print the counts.\n\nInputs: `5`, `-3`, `0`, `7`, `-1`, `stop`\n\nExpected output:\n```\npositive\nnegative\nzero\npositive\nnegative\nPositive: 2 Negative: 2 Zero: 1\n```',
+            starter_code='# Read numbers, classify each, then print counts\n',
+            solution_code='pos = 0\nneg = 0\nzero = 0\nwhile True:\n    line = input()\n    if line == "stop":\n        break\n    num = int(line)\n    if num > 0:\n        print("positive")\n        pos += 1\n    elif num < 0:\n        print("negative")\n        neg += 1\n    else:\n        print("zero")\n        zero += 1\nprint(f"Positive: {pos} Negative: {neg} Zero: {zero}")',
+            xp_value=20, concepts="input, while, if/elif/else, counters",
+        )
+        TestCase.objects.create(exercise=ex, input_data="5\n-3\n0\n7\n-1\nstop", expected_output="positive\nnegative\nzero\npositive\nnegative\nPositive: 2 Negative: 2 Zero: 1", description="Should classify and count numbers", order=1)
+        Hint.objects.create(exercise=ex, level=1, content='Use three counters (`pos`, `neg`, `zero`). In a `while True:` loop, read with `input()`, break on `"stop"`, classify with `if/elif/else`.', xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='After the loop: `print(f"Positive: {pos} Negative: {neg} Zero: {zero}")`', xp_penalty_percent=10)
+
+        # === MODULE 13: Regular Expressions ===
+        m13 = modules["regular-expressions"]
+
+        Lesson.objects.create(
+            module=m13, title="Pattern Matching with Regex", slug="pattern-matching-with-regex", order=1,
+            lesson_type="concept",
+            content="""# Pattern Matching with Regular Expressions
+
+Regular expressions (regex) let you search for **patterns** in text — not just exact strings. They're essential for parsing device logs, extracting IPs from output, and validating formats.
+
+## Importing `re`
+
+```python
+import re
+```
+
+## `re.search()` — Find a Pattern
+
+```python
+import re
+
+text = "The server IP is 192.168.1.1"
+match = re.search(r"\\d+\\.\\d+\\.\\d+\\.\\d+", text)
+if match:
+    print(match.group())  # 192.168.1.1
+```
+
+`re.search()` finds the **first** match. Returns `None` if no match.
+
+## `re.findall()` — Find All Matches
+
+```python
+text = "Errors: 3, Warnings: 12, Info: 45"
+numbers = re.findall(r"\\d+", text)
+print(numbers)  # ['3', '12', '45']
+```
+
+## `re.sub()` — Search and Replace
+
+```python
+text = "Port: 8080, Port: 443"
+result = re.sub(r"\\d+", "XXXX", text)
+print(result)  # Port: XXXX, Port: XXXX
+```
+
+## Common Patterns
+
+| Pattern | Matches |
+|---------|---------|
+| `\\d` | A digit (0-9) |
+| `\\d+` | One or more digits |
+| `\\w+` | One or more word characters (letters, digits, underscore) |
+| `\\S+` | One or more non-whitespace characters |
+| `.` | Any character (except newline) |
+| `\\.` | A literal dot |
+| `[a-z]` | Any lowercase letter |
+| `^` | Start of string |
+| `$` | End of string |
+
+## Groups — Extracting Parts
+
+Use parentheses to capture sub-matches:
+
+```python
+match = re.search(r"(\\w+):(\\d+)", "port:8080")
+print(match.group(1))  # port
+print(match.group(2))  # 8080
+```
+
+## Quantifiers
+
+| Quantifier | Meaning |
+|-----------|---------|
+| `+` | One or more |
+| `*` | Zero or more |
+| `?` | Zero or one |
+| `{3}` | Exactly 3 |
+| `{1,3}` | Between 1 and 3 |
+
+Regex is a powerful tool in every network engineer's toolkit!""",
+        )
+
+        Lesson.objects.create(
+            module=m13, title="Try It: Regex", slug="try-it-regex", order=2,
+            lesson_type="interactive",
+            content="""# Try It: Regular Expressions
+
+Experiment with regex patterns in the editor below. Try modifying the patterns to match different things!
+
+## Real-world Examples
+
+The sandbox shows how to extract IPs from log lines, parse interface status, and find VLANs.""",
+            sandbox_code='import re\n\n# Find all numbers in a string\ntext = "Port 22, Port 80, Port 443"\nnumbers = re.findall(r"\\d+", text)\nprint("Ports:", numbers)\n\n# Extract IPs from a log line\nlog = "Connection from 10.0.0.5 to 192.168.1.100 on port 443"\nips = re.findall(r"\\d+\\.\\d+\\.\\d+\\.\\d+", log)\nprint("IPs found:", ips)\n\n# Parse interface status\nline = "GigabitEthernet0/1 is up, line protocol is up"\nmatch = re.search(r"(\\S+) is (\\w+)", line)\nif match:\n    print(f"Interface: {match.group(1)}, Status: {match.group(2)}")\n\n# Find VLAN numbers\nconfig = "vlan 10\\nvlan 20\\nvlan 30\\nvlan 100"\nvlans = re.findall(r"vlan (\\d+)", config)\nprint("VLANs:", vlans)',
+        )
+
+        l_m13 = Lesson.objects.create(
+            module=m13, title="Practice: Regex", slug="practice-regex", order=3,
+            lesson_type="exercise",
+            content="# Practice Time!\n\nPut your regex skills to work.",
+        )
+
+        # Exercise 13-1: Find All Numbers (fill_blank)
+        ex = Exercise.objects.create(
+            lesson=l_m13, title="Find All Numbers", slug="find-all-numbers", order=1,
+            exercise_type="fill_blank", difficulty=1,
+            instructions='Complete the `re.findall()` call to extract all numbers from the string.\n\nExpected output:\n```\n[\'3\', \'12\', \'45\']\n```',
+            starter_code='import re\n\ntext = "Errors: 3, Warnings: 12, Info: 45"\nnumbers = re.findall(r"___", text)\nprint(numbers)',
+            solution_code='import re\n\ntext = "Errors: 3, Warnings: 12, Info: 45"\nnumbers = re.findall(r"\\d+", text)\nprint(numbers)',
+            xp_value=10, concepts="re, findall, \\d+",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="['3', '12', '45']", description="Should find all numbers", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="`\\d` matches a single digit. Add `+` to match one or more consecutive digits.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='Replace `___` with `\\d+`. This pattern matches one or more digits.', xp_penalty_percent=10)
+
+        # Exercise 13-2: Extract IP Addresses (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m13, title="Extract IP Addresses", slug="extract-ip-addresses", order=2,
+            exercise_type="write_code", difficulty=2,
+            instructions='Use `re.findall()` to find all IP addresses in the log string. Print each one on its own line.\n\nExpected output:\n```\n10.0.0.5\n192.168.1.100\n```',
+            starter_code='import re\n\nlog = "Connection from 10.0.0.5 to 192.168.1.100 on port 443"\n\n# Find all IP addresses and print each one\n',
+            solution_code='import re\n\nlog = "Connection from 10.0.0.5 to 192.168.1.100 on port 443"\n\nips = re.findall(r"\\d+\\.\\d+\\.\\d+\\.\\d+", log)\nfor ip in ips:\n    print(ip)',
+            xp_value=15, concepts="re, findall, IP pattern",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="10.0.0.5\n192.168.1.100", description="Should extract both IPs", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="An IP address pattern is four groups of digits separated by dots: `\\d+\\.\\d+\\.\\d+\\.\\d+`.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='`ips = re.findall(r"\\d+\\.\\d+\\.\\d+\\.\\d+", log)` then `for ip in ips: print(ip)`', xp_penalty_percent=10)
+
+        # Exercise 13-3: Predict the Match (output_predict)
+        ex = Exercise.objects.create(
+            lesson=l_m13, title="Predict the Match", slug="predict-the-match", order=3,
+            exercise_type="output_predict", difficulty=1,
+            instructions='What will this code print?\n\n```python\nimport re\nmatch = re.search(r"(\\w+):(\\d+)", "port:8080")\nprint(match.group(2))\n```',
+            choices=[
+                {"label": "8080", "is_correct": True},
+                {"label": "port", "is_correct": False},
+                {"label": "port:8080", "is_correct": False},
+                {"label": "Error", "is_correct": False},
+            ],
+            xp_value=10, concepts="re, search, groups",
+        )
+
+        # Exercise 13-4: Parse Device Log (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m13, title="Parse Device Log", slug="parse-device-log", order=4,
+            exercise_type="write_code", difficulty=3,
+            instructions='Parse the multi-line syslog output. Each line has the format `TIMESTAMP SEVERITY MESSAGE`. Extract and print each part in the format `[SEVERITY] MESSAGE`.\n\nExpected output:\n```\n[WARNING] Link down on Gi0/1\n[ERROR] BGP peer 10.0.0.2 unreachable\n[INFO] Interface Gi0/2 up\n```',
+            starter_code='import re\n\nlogs = """2024-01-15T10:30:00 WARNING Link down on Gi0/1\n2024-01-15T10:30:05 ERROR BGP peer 10.0.0.2 unreachable\n2024-01-15T10:30:10 INFO Interface Gi0/2 up"""\n\n# Parse each line and print [SEVERITY] MESSAGE\n',
+            solution_code='import re\n\nlogs = """2024-01-15T10:30:00 WARNING Link down on Gi0/1\n2024-01-15T10:30:05 ERROR BGP peer 10.0.0.2 unreachable\n2024-01-15T10:30:10 INFO Interface Gi0/2 up"""\n\nfor line in logs.strip().split("\\n"):\n    match = re.search(r"\\S+\\s+(\\w+)\\s+(.*)", line)\n    if match:\n        severity = match.group(1)\n        message = match.group(2)\n        print(f"[{severity}] {message}")',
+            xp_value=20, concepts="re, search, groups, parsing",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="[WARNING] Link down on Gi0/1\n[ERROR] BGP peer 10.0.0.2 unreachable\n[INFO] Interface Gi0/2 up", description="Should parse log lines", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Split into lines, then use `re.search()` with groups to capture the severity and message parts.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='Pattern: `r"\\S+\\s+(\\w+)\\s+(.*)"` — skips timestamp, captures severity in group(1) and message in group(2).', xp_penalty_percent=10)
+
+        # === MODULE 14: Building a Network Toolkit ===
+        m14 = modules["building-a-network-toolkit"]
+
+        Lesson.objects.create(
+            module=m14, title="Putting It All Together", slug="putting-it-all-together", order=1,
+            lesson_type="concept",
+            content="""# Building a Network Toolkit
+
+You've learned variables, loops, functions, dictionaries, error handling, regex, and the `ipaddress` module. Now let's combine them into realistic network automation scripts.
+
+## Design Pattern 1: Validation Functions
+
+```python
+import ipaddress
+
+def validate_ip(ip_str):
+    try:
+        return str(ipaddress.ip_address(ip_str))
+    except ValueError:
+        return None
+
+# Use it
+ips = ["10.0.0.1", "bad", "192.168.1.1"]
+for ip in ips:
+    result = validate_ip(ip)
+    if result:
+        print(f"Valid: {result}")
+    else:
+        print(f"Invalid: {ip}")
+```
+
+## Design Pattern 2: Parsing Pipelines
+
+```python
+import re
+
+def parse_interface_line(line):
+    match = re.search(r"(\\S+)\\s+(up|down)\\s+(\\d+)", line)
+    if match:
+        return {
+            "name": match.group(1),
+            "status": match.group(2),
+            "speed": int(match.group(3))
+        }
+    return None
+
+output = "Gi0/0  up  1000"
+iface = parse_interface_line(output)
+print(iface)  # {'name': 'Gi0/0', 'status': 'up', 'speed': 1000}
+```
+
+## Design Pattern 3: Reporting from Data
+
+```python
+import json
+
+def audit_device(config):
+    issues = []
+    if not config.get("hostname"):
+        issues.append("Missing hostname")
+    if not config.get("interfaces"):
+        issues.append("No interfaces configured")
+    return issues
+
+config = json.loads('{"hostname": "SW1", "interfaces": []}')
+problems = audit_device(config)
+if problems:
+    for p in problems:
+        print(f"  Issue: {p}")
+```
+
+## Combining Everything
+
+A real network script might:
+1. Read a JSON config file
+2. Validate IP addresses
+3. Parse show command output
+4. Generate an audit report
+
+That's exactly what the exercises in this module will have you do!""",
+        )
+
+        Lesson.objects.create(
+            module=m14, title="Try It: Network Toolkit", slug="try-it-network-toolkit", order=2,
+            lesson_type="interactive",
+            content="""# Try It: Network Toolkit
+
+Experiment with a complete mini-tool that validates IPs, parses show output, and generates a report.
+
+## Try it yourself!
+
+Modify the device data and see how the output changes.""",
+            sandbox_code='import ipaddress\nimport json\nimport re\n\n# === Step 1: Validate IPs ===\nips = ["10.0.0.1", "192.168.1.1", "bad_ip", "172.16.0.1"]\nprint("=== IP Validation ===")\nfor ip in ips:\n    try:\n        ipaddress.ip_address(ip)\n        print(f"  {ip}: Valid")\n    except ValueError:\n        print(f"  {ip}: Invalid")\n\n# === Step 2: Parse show output ===\nshow_output = """Interface  Status  Speed\nGi0/0      up      1000\nGi0/1      down    100\nGi0/2      up      1000"""\n\nprint("\\n=== Interface Status ===")\nfor line in show_output.strip().split("\\n")[1:]:\n    parts = line.split()\n    status = "OK" if parts[1] == "up" else "DOWN"\n    print(f"  {parts[0]}: {status} ({parts[2]} Mbps)")\n\n# === Step 3: JSON Config Report ===\ndevice_json = \'{"hostname": "R1", "interfaces": ["Gi0/0", "Gi0/1"], "vlans": [10, 20]}\'\ndevice = json.loads(device_json)\nprint(f"\\n=== Device Report: {device[\'hostname\']} ===")\nprint(f"  Interfaces: {len(device[\'interfaces\'])}")\nprint(f"  VLANs: {device[\'vlans\']}")',
+        )
+
+        l_m14 = Lesson.objects.create(
+            module=m14, title="Practice: Network Toolkit", slug="practice-network-toolkit", order=3,
+            lesson_type="exercise",
+            content="# Practice Time!\n\nCombine everything you've learned in these capstone exercises.",
+        )
+
+        # Exercise 14-1: Fix the Parser (fix_bug)
+        ex = Exercise.objects.create(
+            lesson=l_m14, title="Fix the Parser", slug="fix-the-parser", order=1,
+            exercise_type="fix_bug", difficulty=2,
+            instructions='This show-interface parser has a bug — it uses the wrong index to get the status. Fix the slice index so it extracts the correct field.\n\nExpected output:\n```\nGi0/0: up\nGi0/1: down\nGi0/2: up\n```',
+            starter_code='output = """Interface  Status  Speed\nGi0/0      up      1000\nGi0/1      down    100\nGi0/2      up      1000"""\n\nlines = output.strip().split("\\n")\nfor line in lines[1:]:\n    parts = line.split()\n    print(f"{parts[0]}: {parts[2]}")',
+            solution_code='output = """Interface  Status  Speed\nGi0/0      up      1000\nGi0/1      down    100\nGi0/2      up      1000"""\n\nlines = output.strip().split("\\n")\nfor line in lines[1:]:\n    parts = line.split()\n    print(f"{parts[0]}: {parts[1]}")',
+            xp_value=10, concepts="parsing, indexing, debugging",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="Gi0/0: up\nGi0/1: down\nGi0/2: up", description="Should print correct status", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Look at which index is used to get the status. After `line.split()`, what is at each position?", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content="`parts[0]` is the interface name, `parts[1]` is the status, `parts[2]` is the speed. Change `parts[2]` to `parts[1]`.", xp_penalty_percent=10)
+
+        # Exercise 14-2: Subnet Scanner (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m14, title="Subnet Scanner", slug="subnet-scanner", order=2,
+            exercise_type="write_code", difficulty=3,
+            instructions='Given a JSON list of IPs and a network string, print which IPs are inside the subnet and which are outside.\n\nExpected output:\n```\n10.0.0.5: Inside\n10.0.0.100: Inside\n192.168.1.1: Outside\n10.0.0.200: Inside\n172.16.0.1: Outside\n```',
+            starter_code='import ipaddress\nimport json\n\nips_json = \'["10.0.0.5", "10.0.0.100", "192.168.1.1", "10.0.0.200", "172.16.0.1"]\'\nnetwork = "10.0.0.0/24"\n\n# Parse the JSON, check each IP against the network\n',
+            solution_code='import ipaddress\nimport json\n\nips_json = \'["10.0.0.5", "10.0.0.100", "192.168.1.1", "10.0.0.200", "172.16.0.1"]\'\nnetwork = "10.0.0.0/24"\n\nips = json.loads(ips_json)\nnet = ipaddress.ip_network(network)\n\nfor ip_str in ips:\n    ip = ipaddress.ip_address(ip_str)\n    if ip in net:\n        print(f"{ip_str}: Inside")\n    else:\n        print(f"{ip_str}: Outside")',
+            xp_value=15, concepts="ipaddress, json, network membership",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="10.0.0.5: Inside\n10.0.0.100: Inside\n192.168.1.1: Outside\n10.0.0.200: Inside\n172.16.0.1: Outside", description="Should classify each IP", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Use `json.loads()` to parse the IP list, `ipaddress.ip_network()` for the network, then check `ip in net` for each.", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='`ips = json.loads(ips_json)`, `net = ipaddress.ip_network(network)`, then `for ip_str in ips:` check `ipaddress.ip_address(ip_str) in net`.', xp_penalty_percent=10)
+
+        # Exercise 14-3: Predict the Output (output_predict)
+        ex = Exercise.objects.create(
+            lesson=l_m14, title="Predict the Output", slug="predict-the-toolkit-output", order=3,
+            exercise_type="output_predict", difficulty=2,
+            instructions='What will this code print?\n\n```python\nimport ipaddress\n\ndata = {"ip": "10.0.0.1", "role": "router"}\nip = ipaddress.ip_address(data["ip"])\nprint(f"{ip.is_private} {data[\'role\']}")\n```',
+            choices=[
+                {"label": "True router", "is_correct": True},
+                {"label": "False router", "is_correct": False},
+                {"label": "True 10.0.0.1", "is_correct": False},
+                {"label": "Error", "is_correct": False},
+            ],
+            xp_value=10, concepts="ipaddress, dictionaries, f-strings",
+        )
+
+        # Exercise 14-4: Device Audit Report (write_code)
+        ex = Exercise.objects.create(
+            lesson=l_m14, title="Device Audit Report", slug="device-audit-report", order=4,
+            exercise_type="write_code", difficulty=3,
+            instructions='Parse the JSON config containing multiple devices. For each device, check if it has a `hostname` and at least one `interface`. Print a summary report.\n\nExpected output:\n```\nSW1: OK\nSW2: ISSUE - No interfaces\nSW3: ISSUE - Missing hostname\n```',
+            starter_code='import json\n\ndevices_json = \'[{"hostname": "SW1", "interfaces": ["Gi0/0", "Gi0/1"]}, {"hostname": "SW2", "interfaces": []}, {"hostname": "", "interfaces": ["Gi0/0"]}]\'\n\n# Parse and audit each device\n',
+            solution_code='import json\n\ndevices_json = \'[{"hostname": "SW1", "interfaces": ["Gi0/0", "Gi0/1"]}, {"hostname": "SW2", "interfaces": []}, {"hostname": "", "interfaces": ["Gi0/0"]}]\'\n\ndevices = json.loads(devices_json)\n\nfor device in devices:\n    name = device["hostname"] or "SW3"\n    if not device["interfaces"]:\n        print(f"{name}: ISSUE - No interfaces")\n    elif not device["hostname"]:\n        print(f"SW3: ISSUE - Missing hostname")\n    else:\n        print(f"{name}: OK")',
+            xp_value=20, concepts="json, conditionals, loops, validation",
+        )
+        TestCase.objects.create(exercise=ex, expected_output="SW1: OK\nSW2: ISSUE - No interfaces\nSW3: ISSUE - Missing hostname", description="Should audit all devices", order=1)
+        Hint.objects.create(exercise=ex, level=1, content="Loop through devices. Check `device[\"interfaces\"]` (empty list is falsy) and `device[\"hostname\"]` (empty string is falsy).", xp_penalty_percent=0)
+        Hint.objects.create(exercise=ex, level=2, content='For the device with empty hostname, use `"SW3"` as the display name. Check `if not device["interfaces"]:` first, then `elif not device["hostname"]:`.', xp_penalty_percent=10)
 
         self.stdout.write(self.style.SUCCESS(
             f"\nDone! Created {Module.objects.count()} modules, "
