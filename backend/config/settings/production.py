@@ -51,11 +51,12 @@ if not CORS_ALLOWED_ORIGINS:
         "CORS_ALLOWED_ORIGINS environment variable must be set (comma-separated origins)."
     )
 
-# SSL / Cookie security
-SECURE_SSL_REDIRECT = True
+# SSL / Cookie security — disable via DISABLE_SSL=true for local Docker without HTTPS
+_ssl_enabled = os.environ.get("DISABLE_SSL", "").lower() not in ("true", "1", "yes")
+SECURE_SSL_REDIRECT = _ssl_enabled
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = _ssl_enabled
+CSRF_COOKIE_SECURE = _ssl_enabled
 
 # HSTS — conservative settings for first release
 SECURE_HSTS_SECONDS = 3600  # 1 hour — safe to test, easy to roll back
