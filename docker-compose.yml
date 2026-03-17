@@ -27,6 +27,7 @@ services:
       DB_USER: pystarter
       DB_PASSWORD: ${DB_PASSWORD:-pystarter_dev}
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      DISABLE_SSL: ${DISABLE_SSL:-true}
       SENTRY_DSN: ${SENTRY_DSN:-}
     depends_on:
       db:
