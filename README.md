@@ -8,6 +8,74 @@ A self-hosted training platform that teaches Python from scratch through interac
 
 ---
 
+## Install & Run
+
+Run PyStarter locally using the pre-built Docker images. No source checkout or build step required.
+
+### 1. Download the runner bundle
+
+Grab the latest from the [Releases page](https://github.com/E-Conners-Lab/PyStarter/releases/latest), or direct:
+
+- [pystarter-v1.0.1-runner.zip](https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.1/pystarter-v1.0.1-runner.zip) (~3 KB — contains `docker-compose.yml`, `nginx.conf`, `.env.example`, and `QUICKSTART.md`)
+
+### 2. Unzip and configure
+
+```bash
+unzip pystarter-v1.0.1-runner.zip -d pystarter
+cd pystarter
+cp .env.example .env
+```
+
+Edit `.env` and set at minimum:
+
+- `DJANGO_SECRET_KEY` — generate with
+  ```bash
+  python3 -c "import secrets; print(secrets.token_urlsafe(64))"
+  ```
+- `ANTHROPIC_API_KEY` — from [console.anthropic.com](https://console.anthropic.com/). Optional; the app runs without it, but AI hints, code critique, and error explanations will be disabled.
+
+### 3. Start the stack
+
+```bash
+docker compose up -d
+```
+
+Docker pulls four images on first run (~500 MB total) and starts PostgreSQL, Django, React, and an nginx reverse proxy. Database migrations run automatically.
+
+### 4. Open the app
+
+http://localhost
+
+### Updating to a newer release
+
+```bash
+docker compose pull
+docker compose up -d
+```
+
+### Stopping
+
+```bash
+docker compose down        # stop, keep the database volume
+docker compose down -v     # stop and delete the database
+```
+
+### Requirements
+
+- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Compose v2)
+- (Optional) Anthropic API key for AI features
+
+### Container images
+
+Pulled automatically by `docker compose`:
+
+- `ghcr.io/e-conners-lab/pystarter-backend:1.0.1` — Django API + sandbox executor
+- `ghcr.io/e-conners-lab/pystarter-frontend:1.0.1` — React SPA served by nginx
+- `postgres:16-alpine` — database
+- `nginx:alpine` — reverse proxy
+
+---
+
 ## What You Get
 
 PyStarter is a complete, ready-to-run learning platform -- not a template or starter kit. Install it, seed the curriculum, and you have a fully functional Python course with 14 modules, 56 lessons, and 66 graded exercises.
