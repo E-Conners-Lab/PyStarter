@@ -16,35 +16,36 @@ Run PyStarter locally using the pre-built Docker images. No source checkout or b
 
 Grab the latest from the [Releases page](https://github.com/E-Conners-Lab/PyStarter/releases/latest), or direct:
 
-- [pystarter-v1.0.3-runner.zip](https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.3/pystarter-v1.0.3-runner.zip) (~3 KB — contains `docker-compose.yml`, `nginx.conf`, `.env.example`, and `QUICKSTART.md`)
+- [pystarter-v1.0.4-runner.zip](https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.4/pystarter-v1.0.4-runner.zip) (~5 KB — contains `init.sh`, `docker-compose.yml`, `nginx.conf`, `.env.example`, and `QUICKSTART.md`)
 
-### 2. Unzip and configure
+### 2. Unzip
 
 ```bash
-unzip pystarter-v1.0.3-runner.zip -d pystarter
+unzip pystarter-v1.0.4-runner.zip -d pystarter
 cd pystarter
-cp .env.example .env
 ```
 
-Edit `.env` and set at minimum:
+### 3. Run the setup script
 
-- `DJANGO_SECRET_KEY` — generate with
-  ```bash
-  python3 -c "import secrets; print(secrets.token_urlsafe(64))"
-  ```
-- `ANTHROPIC_API_KEY` — from [console.anthropic.com](https://console.anthropic.com/). Optional; the app runs without it, but AI hints, code critique, and error explanations will be disabled.
+```bash
+./init.sh
+```
 
-### 3. Start the stack
+The script generates a Django secret key automatically and asks for your Anthropic API key. **The Anthropic key is optional** — press **Enter** to skip. Without it, the app runs normally; only the AI features (contextual hints, code critique, error explanations) are disabled. You can add the key later by editing `.env` and running `docker compose restart backend`.
+
+### 4. Start the stack
 
 ```bash
 docker compose up -d
 ```
 
-Docker pulls four images on first run (~500 MB total) and starts PostgreSQL, Django, React, and an nginx reverse proxy. Database migrations run automatically.
+Docker pulls four images on first run (~500 MB total) and starts PostgreSQL, Django, React, and an nginx reverse proxy. Database migrations and curriculum seeding run automatically.
 
-### 4. Open the app
+### 5. Open the app
 
 http://localhost
+
+Sign up, log in — Module 1 (Your First Program) is unlocked and ready.
 
 ### Updating to a newer release
 
