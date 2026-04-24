@@ -6,8 +6,6 @@ A self-hosted training platform that teaches Python from scratch through interac
 
 <img width="1499" height="770" alt="PyStarter Dashboard" src="https://github.com/user-attachments/assets/2f453ac4-816e-4ac8-9d22-d045875871e8" />
 
-### [Get PyStarter at www.thetech-e.com](https://www.thetech-e.com)
-
 ---
 
 ## What You Get
