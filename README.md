@@ -16,12 +16,12 @@ Run PyStarter locally using the pre-built Docker images. No source checkout or b
 
 Grab the latest from the [Releases page](https://github.com/E-Conners-Lab/PyStarter/releases/latest), or direct:
 
-- [pystarter-v1.0.1-runner.zip](https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.1/pystarter-v1.0.1-runner.zip) (~3 KB — contains `docker-compose.yml`, `nginx.conf`, `.env.example`, and `QUICKSTART.md`)
+- [pystarter-v1.0.2-runner.zip](https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.2/pystarter-v1.0.2-runner.zip) (~3 KB — contains `docker-compose.yml`, `nginx.conf`, `.env.example`, and `QUICKSTART.md`)
 
 ### 2. Unzip and configure
 
 ```bash
-unzip pystarter-v1.0.1-runner.zip -d pystarter
+unzip pystarter-v1.0.2-runner.zip -d pystarter
 cd pystarter
 cp .env.example .env
 ```
@@ -69,8 +69,8 @@ docker compose down -v     # stop and delete the database
 
 Pulled automatically by `docker compose`:
 
-- `ghcr.io/e-conners-lab/pystarter-backend:1.0.1` — Django API + sandbox executor
-- `ghcr.io/e-conners-lab/pystarter-frontend:1.0.1` — React SPA served by nginx
+- `ghcr.io/e-conners-lab/pystarter-backend:1.0.2` — Django API + sandbox executor
+- `ghcr.io/e-conners-lab/pystarter-frontend:1.0.2` — React SPA served by nginx
 - `postgres:16-alpine` — database
 - `nginx:alpine` — reverse proxy
 
