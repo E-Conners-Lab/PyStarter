@@ -2,128 +2,119 @@
 
 **Learn Python. Write Code. Level Up.**
 
-A self-hosted training platform that teaches Python from scratch through interactive lessons, a sandboxed code editor, graded exercises, and AI-powered tutoring.
+A self-hosted training platform that teaches Python from scratch through interactive lessons, a sandboxed code editor, graded exercises, and AI-powered tutoring. 14 modules, 56 lessons, 66 graded exercises — complete and ready to run.
 
 <img width="1499" height="770" alt="PyStarter Dashboard" src="https://github.com/user-attachments/assets/2f453ac4-816e-4ac8-9d22-d045875871e8" />
 
 ---
 
-## Install & Run
+## Open source, and unmaintained
 
-Run PyStarter locally using the pre-built Docker images. No source checkout or build step required.
+PyStarter is **MIT licensed** and the full source is in this repo. Clone it, fork it, modify it, teach with it, rebrand it, sell it — whatever you want. No attribution required beyond keeping the copyright notice in `LICENSE`.
 
-### 1. Download the runner bundle
+**It is not actively maintained.** Treat this as a finished artifact, not a living project: issues and pull requests may go unanswered, and there are no promises of future releases, security patches, or dependency bumps. **If you deploy it, you own it** — updating Django, patching CVEs, rotating keys, and fixing whatever breaks is yours. Fork it rather than depending on this repo staying current.
 
-Grab the latest from the [Releases page](https://github.com/E-Conners-Lab/PyStarter/releases/latest), or direct:
+It is a complete, working codebase with a test suite (Django unit tests + 99 Playwright E2E tests) and CI, so it is a reasonable base to build on.
 
-- [pystarter-v1.0.6-runner.zip](https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.6/pystarter-v1.0.6-runner.zip) (~5 KB — contains `init.sh`, `docker-compose.yml`, `nginx.conf`, `.env.example`, and `QUICKSTART.md`)
+---
 
-### 2. Unzip
+## Install
+
+Two paths. **Docker** is the fastest way to just use it. **From source** is what you want if you plan to change anything.
+
+### Option A — Docker (no toolchain, ~500 MB of images)
+
+Runs PostgreSQL, Django, React, and nginx. Migrations and curriculum seeding happen automatically on first start.
 
 ```bash
+# 1. Download and unzip the runner bundle
+curl -LO https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.6/pystarter-v1.0.6-runner.zip
 unzip pystarter-v1.0.6-runner.zip -d pystarter
 cd pystarter
-```
 
-### 3. Run the setup script
-
-```bash
+# 2. Generate .env (Django secret key, optional Anthropic key)
 ./init.sh
-```
 
-The script generates a Django secret key automatically and asks for your Anthropic API key. **The Anthropic key is optional** — press **Enter** to skip. Without it, the app runs normally; only the AI features (contextual hints, code critique, error explanations) are disabled. You can add the key later by editing `.env` and running `docker compose restart backend`.
-
-### 4. Start the stack
-
-```bash
+# 3. Start
 docker compose up -d
 ```
 
-Docker pulls four images on first run (~500 MB total) and starts PostgreSQL, Django, React, and an nginx reverse proxy. Database migrations and curriculum seeding run automatically.
+Open **http://localhost**, sign up, and Module 1 is unlocked.
 
-### 5. Open the app
+`./init.sh` asks for an Anthropic API key and you can press Enter to skip it — everything except the AI features works without one.
 
-http://localhost
+Stop with `docker compose down` (keeps your data) or `docker compose down -v` (deletes the database).
 
-Sign up, log in — Module 1 (Your First Program) is unlocked and ready.
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine + Compose v2. Images are `linux/amd64` and `linux/arm64`.
 
-### Updating to a newer release
+### Option B — From source
 
-Your progress (accounts, XP, completed exercises) lives in the `pgdata` Docker volume, which upgrades never touch. The image tags in `docker-compose.yml` are pinned, so bump them, then pull:
-
-```bash
-sed -E -i.bak 's/pystarter-(backend|frontend):[0-9.]+/pystarter-\1:1.0.6/' docker-compose.yml
-docker compose pull
-docker compose up -d
-```
-
-Database migrations run automatically on start. If you would rather download the new bundle, unzip it into the **same directory name** as before and copy your existing `.env` over, so Docker reuses the existing volume.
-
-### Choosing the AI model
-
-1.0.6 defaults to `claude-opus-5` and, unlike earlier releases, the default actually applies when you leave `ANTHROPIC_MODEL` blank — on 1.0.5 and older a blank value sent an empty model name and every AI request failed, even with a valid key. To use a different model, add `ANTHROPIC_MODEL=claude-haiku-4-5` (or any current alias) to `.env` and run `docker compose restart backend`. `.env.example` also shows how to point at a local Ollama or LM Studio server instead of the Anthropic API.
-
-### Stopping
+Needs [Python 3.13+](https://www.python.org/downloads/), [uv](https://docs.astral.sh/uv/), and [Node.js 18+](https://nodejs.org/). No configuration file is required — the dev settings use SQLite and sensible defaults.
 
 ```bash
-docker compose down        # stop, keep the database volume
-docker compose down -v     # stop and delete the database
+git clone https://github.com/E-Conners-Lab/PyStarter.git
+cd PyStarter
 ```
 
-### Requirements
+**Backend** (terminal 1):
 
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/) (or Docker Engine + Compose v2)
-- (Optional) Anthropic API key for AI features
+```bash
+cd backend
+uv run python manage.py migrate
+uv run python manage.py seed_curriculum
+uv run python manage.py runserver 8002
+```
 
-### Container images
+**Frontend** (terminal 2):
 
-Pulled automatically by `docker compose`:
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-- `ghcr.io/e-conners-lab/pystarter-backend:1.0.6` — Django API + sandbox executor (linux/amd64 and linux/arm64)
-- `ghcr.io/e-conners-lab/pystarter-frontend:1.0.6` — React SPA served by nginx (linux/amd64 and linux/arm64)
-- `postgres:16-alpine` — database
-- `nginx:alpine` — reverse proxy
+Open **http://localhost:5173**. Vite proxies `/api` to the backend on port 8002.
+
+To enable AI features, `cp backend/.env.example backend/.env` and set `ANTHROPIC_API_KEY`. For production deployment from source, see the compose file and `CONTRIBUTING.md`.
 
 ---
 
-## What You Get
+## AI setup (optional)
 
-PyStarter is a complete, ready-to-run learning platform -- not a template or starter kit. Install it, seed the curriculum, and you have a fully functional Python course with 14 modules, 56 lessons, and 66 graded exercises.
+Hints, code critique, and error explanations call an LLM. Everything else — lessons, exercises, the sandbox, XP, belts — works without one.
 
-### Built-in Code Editor
-Write and run Python directly in the browser using the Monaco editor (the same engine behind VS Code). Syntax highlighting, auto-indentation, and a professional coding experience from day one.
+**Anthropic API:** put `ANTHROPIC_API_KEY=sk-ant-...` in `.env` ([get a key](https://console.anthropic.com)). Calls are billed to your account; a hint costs roughly a cent on the default model, `claude-opus-5`. For cheaper hints set `ANTHROPIC_MODEL=claude-haiku-4-5`. Always use an alias like these, never a date-suffixed snapshot ID, so the model does not retire out from under you.
 
-### Sandboxed Execution
-Student code runs in a restricted Python sandbox with an import whitelist, blocked dangerous builtins, 5-second timeouts, and memory limits. Safe enough for self-hosted use without worrying about what students might run.
+**Local model (free, offline):** point `ANTHROPIC_BASE_URL` at any OpenAI-compatible server and set `ANTHROPIC_MODEL` to its model name.
 
-### 4 Exercise Types
-- **Fill in the Blank** -- complete partially written code
-- **Fix the Bug** -- find and correct errors in broken code
-- **Write Code** -- solve problems from scratch
-- **Predict the Output** -- read code and predict what it prints
+```bash
+# Ollama
+ANTHROPIC_API_KEY=not-needed
+ANTHROPIC_MODEL=llama3.2
+ANTHROPIC_BASE_URL=http://host.docker.internal:11434/v1   # http://localhost:11434/v1 from source
+```
 
-### Progressive Hint System
-Each exercise offers two levels of hints. The first is free. The second costs 10% of the exercise's XP. Students are encouraged to try before asking for help.
-
-### AI-Powered Tutoring
-Three AI features powered by Claude (or any OpenAI-compatible LLM, including local models via Ollama):
-- **Contextual Hints** -- the AI reads the student's code and error, then guides their thinking without giving the answer
-- **Code Critique** -- after passing, the AI suggests one way to improve their solution
-- **Error Explanations** -- cryptic Python errors translated into plain English
-
-### XP and Belt Progression
-Students earn XP for completing exercises and progress through 8 belt ranks -- White through Black. XP penalties from hints make perfect scores meaningful. The belt system gives students a visible sense of progress through the curriculum.
-
-### Run vs Submit
-"Run" lets students test their code against visible test cases with no stakes. "Submit" grades against all test cases (including hidden ones) and awards XP. This separation reduces anxiety and encourages experimentation.
+Hint quality tracks model quality; models under ~13B give noticeably vaguer hints.
 
 ---
 
-## Curriculum
+## What's inside
 
-14 modules covering Python fundamentals through a network automation capstone. Each module follows the same structure: concept lesson, interactive sandbox, graded exercises, and open-ended challenges.
+**Built-in code editor** — Monaco (the VS Code engine) in the browser, with syntax highlighting and auto-indent.
 
-| # | Module | What Students Learn |
+**Sandboxed execution** — student code runs with an import whitelist, blocked builtins, a 5-second timeout, and memory limits.
+
+**4 exercise types** — fill in the blank, fix the bug, write code, predict the output.
+
+**Progressive hints** — first hint free, second costs 10% of the exercise XP.
+
+**Run vs Submit** — "Run" tests against visible cases with no stakes; "Submit" grades against hidden cases too and awards XP.
+
+**XP and belts** — 8 ranks, White through Black.
+
+### Curriculum
+
+| # | Module | What students learn |
 |---|--------|---------------------|
 | 1 | Your First Program | `print()`, strings, basic output |
 | 2 | Variables & Data Types | Assignment, int/float/str, `type()` |
@@ -138,63 +129,48 @@ Students earn XP for completing exercises and progress through 8 belt ranks -- W
 | 11 | Handling Errors | try/except, common exceptions, else/finally |
 | 12 | User Input & While Loops | `input()`, type conversion, sentinel values |
 | 13 | Regular Expressions | `re.search()`, `re.findall()`, `re.sub()`, groups |
-| 14 | Building a Network Toolkit | Capstone: validation functions, parsing pipelines, audit reports |
+| 14 | Building a Network Toolkit | Capstone: validation, parsing pipelines, audit reports |
 
 ---
 
-## Tech Stack
+## Making it yours
+
+| To change… | Edit |
+|---|---|
+| Lessons, exercises, hints, test cases | `backend/apps/curriculum/management/commands/seed_curriculum.py`, then re-seed |
+| Sandbox limits and the import whitelist | `backend/apps/executor/sandbox.py` |
+| AI prompts and behavior | `backend/apps/ai/` |
+| XP values and belt thresholds | `backend/apps/accounts/` |
+| UI, theme, pages | `frontend/src/` (TailwindCSS, dark theme) |
+| Module icons | `MODULE_ICONS` in `frontend/src/pages/Dashboard.tsx` |
+
+Re-seeding after curriculum edits rebuilds curriculum content — flush first if you have existing data.
+
+`CONTRIBUTING.md` documents the architecture, data model, conventions, test commands, and how the Docker images are built and released.
+
+---
+
+## Tech stack
 
 | Layer | Technology |
 |-------|------------|
 | Backend | Django 6, Django REST Framework, SimpleJWT |
 | Frontend | React 19, TypeScript, Vite |
 | Styling | TailwindCSS (dark theme) |
-| Code Editor | Monaco Editor |
-| State Management | Zustand + TanStack Query |
-| AI | Anthropic Claude API (or any OpenAI-compatible LLM) |
+| Code editor | Monaco Editor |
+| State | Zustand + TanStack Query |
+| AI | Anthropic Claude API, or any OpenAI-compatible LLM |
 | Database | SQLite (development) / PostgreSQL (production) |
 | Deployment | Docker Compose with nginx reverse proxy |
-| Testing | Playwright (99 E2E tests) + Django unit tests |
-| CI/CD | GitHub Actions |
+| Testing | Django unit tests + 99 Playwright E2E tests |
+| CI | GitHub Actions |
 
----
-
-## Deployment Options
-
-**Local development** -- Python 3.13 + Node.js 18. One setup script installs everything.
-
-**Docker** -- `docker compose up` runs the full stack: PostgreSQL, Django + Gunicorn, React served by nginx, and a reverse proxy. Migrations run automatically on container start.
-
-AI features are optional. The platform works fully without an API key -- students just won't have access to AI hints, code critique, or error explanations.
-
----
-
-## Who It's For
-
-- **Trainers and educators** building a Python course for their students
-- **Bootcamp operators** who want a self-hosted, brandable training platform
-- **Self-learners** who want a structured, gamified path through Python
-- **Network engineers** learning Python for automation (modules 10 and 14 are tailored for this)
-
----
-
-## Included Extras
-
-Beyond the platform itself, every purchase includes:
-
-- **`framework.md`** -- A reusable blueprint for building your own interactive learning platform. Covers data modeling, sandbox design, API architecture, frontend patterns, AI integration, and production deployment. Use it to build courses in other languages or subjects.
-- **`skills.md`** -- A detailed implementation guide documenting every architectural decision, the build order, data models, API endpoints, and testing strategy behind PyStarter.
-- **One-command setup scripts** for macOS, Linux, and Windows
-- **Docker Compose** production config with PostgreSQL, nginx, health checks, and automated backups
-- **GitHub Actions CI/CD** pipeline (backend tests, frontend build, 99 Playwright E2E tests)
-- **Database backup script** with optional automated pruning
+Pre-built images: `ghcr.io/e-conners-lab/pystarter-backend:1.0.6` and `ghcr.io/e-conners-lab/pystarter-frontend:1.0.6` (both `linux/amd64` + `linux/arm64`). `/api/v1/health/` reports the running version.
 
 ---
 
 ## License
 
-Single-user license. You may use and modify the software for personal learning. Redistribution and commercial repackaging are prohibited. See [LICENSE](LICENSE) for full terms.
+MIT — see [LICENSE](LICENSE). Provided as is, without warranty of any kind.
 
----
-
-Built by [**The Tech-E**](https://www.thetech-e.com)
+Originally built by [**The Tech-E**](https://www.thetech-e.com).
