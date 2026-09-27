@@ -7,7 +7,7 @@ This review starts at public commit `35d5500` (1.0.7) and prepares a separate
 no public hosting, classroom service or untrusted learners. The owner explicitly
 selected MIT licensing; LICENSE now matches that choice.
 
-**Release status: source update awaiting protected review/merge and final hosted checks.**
+**Release status: source candidate awaiting protected review/merge.**
 The application fixes and local tests do not update the existing 1.0.7 images or
 runner ZIP. No new images, release tags or release assets were published here.
 
@@ -57,7 +57,7 @@ owner's running application or database:
 | Production browser network/CSP | no external asset requests or CSP violations in the tested flow |
 | Frontend/proxy/database image scans | zero high/critical findings |
 | Backend Alpine image scan | zero high/critical findings without exclusions; approved SEC-31 base exception |
-| Hosted GitHub CI/CodeQL | nine checks passed before base change; final Alpine revision pending hosted verification |
+| Hosted GitHub CI/CodeQL | exact-commit results are recorded in [PR #3 checks](https://github.com/E-Conners-Lab/PyStarter/pull/3/checks); all ten are required before merge |
 | Native Windows | unsupported; Docker path supplied, PowerShell script not executed on Windows here |
 | Multi-architecture released images | not built/published by this review |
 
