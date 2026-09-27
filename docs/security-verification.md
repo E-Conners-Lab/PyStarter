@@ -43,7 +43,7 @@ owner's running application or database:
 
 | Check | Result |
 |---|---|
-| Django backend tests | 103 pass on Linux; macOS skips one Linux memory-limit test |
+| Django backend tests | 106 tests on macOS (one Linux-only skip); all 106 pass in the proposed Alpine Linux image |
 | Branch-aware backend coverage | 90%; migrations, tests and static curriculum seed content excluded |
 | Playwright browser suite | 99/99 pass |
 | Frontend type-check/production build | pass |
@@ -57,7 +57,7 @@ owner's running application or database:
 | Production browser network/CSP | no external asset requests or CSP violations in the tested flow |
 | Frontend/proxy/database image scans | zero high/critical findings |
 | Backend Debian image scan | BLOCKED: four remaining source-package CVEs; see below |
-| Hosted GitHub CI/CodeQL | pending execution on review branch |
+| Hosted GitHub CI/CodeQL | all nine non-backend-image checks pass, including hosted browser tests and both CodeQL languages; Debian backend image gate fails |
 | Native Windows | unsupported; Docker path supplied, PowerShell script not executed on Windows here |
 | Multi-architecture released images | not built/published by this review |
 
@@ -74,7 +74,12 @@ UID10001 with zero capabilities and no-new-privileges, no mount/nsenter CLI,
 no setuid/setgid utilities, and an empty fstab. Independent review found the
 privileged exploitation prerequisites absent in that configuration.
 
-Nevertheless the affected libraries remain. These findings are **not hidden**
+A separately built Alpine candidate passes all 106 Linux tests and has zero
+high/critical scan findings without VEX. Adopting it awaits the owner’s explicit
+SEC-31 exception because the supplied standard names only slim/distroless bases.
+It is not yet the repository default.
+
+Nevertheless the affected libraries remain in the committed Debian image. These findings are **not hidden**
 and the high/critical CI gate remains blocking. Existing exact-version VEX only
 covers affected executable/module code demonstrably absent from the image.
 See [package evidence and sources](../.github/security/README.md). Do not use
@@ -83,11 +88,12 @@ this assessment to run the image as root, privileged, or with host mounts.
 ## Remote repository gates
 
 At review time GitHub reports secret scanning and push protection enabled.
-Main has no branch protection or rulesets. Required independent review, signed
-commits, no force-push/admin bypass and required CI/security checks must be
-configured before calling the release compliant with SEC-34/35. No local signing
-identity was available. A draft review branch may contain unsigned commits;
-do not merge them into a release branch as an exception to the policy.
+Main protection is now enabled: one independent review, stale-review dismissal,
+last-push approval, all ten CI/security checks, signed commits, no force pushes,
+no deletions, and administrator enforcement. These settings were read back from
+GitHub. No local signing identity was available; the draft review branch is
+unsigned. The eventual release merge still needs an independently approved,
+signed commit through the protected workflow. Do not bypass that requirement.
 
 Prebuilt images additionally require hosted build provenance, SBOMs, signatures,
 and verification of every advertised architecture. This work does not silently
@@ -116,8 +122,8 @@ waive those release requirements or mark the existing artifacts verified.
 | SEC-28 | PARTIAL: sanitized security events exist; local logs are not immutable external audit storage |
 | SEC-29, SEC-30 | PASS pinned Python/npm audits; backend OS image findings still block image gate |
 | SEC-31 | PARTIAL: non-root/slim, hardening and scans; backend findings and release attestations remain gates; Kubernetes N/A |
-| SEC-34 | BLOCKED remote branch controls and signed release commits |
-| SEC-35 | PARTIAL remote push protection enabled; CI SAST gates added, required merge checks pending |
+| SEC-34 | PASS remote controls configured; signed, independently approved release merge still pending |
+| SEC-35 | PASS push protection and required secret/SAST checks configured; hosted execution tracked on PR |
 | SEC-36 | PASS v1 path/version header; no independently versioned persisted request envelope introduced |
 | AI-1 | PASS input placement/boundaries; prompt injection cannot be eliminated by delimiters |
 | AI-2 | PASS no model tools or autonomous actions exist; no tool approval workflow needed |
