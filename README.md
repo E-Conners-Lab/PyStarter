@@ -16,12 +16,12 @@ Run PyStarter locally using the pre-built Docker images. No source checkout or b
 
 Grab the latest from the [Releases page](https://github.com/E-Conners-Lab/PyStarter/releases/latest), or direct:
 
-- [pystarter-v1.0.5-runner.zip](https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.5/pystarter-v1.0.5-runner.zip) (~5 KB — contains `init.sh`, `docker-compose.yml`, `nginx.conf`, `.env.example`, and `QUICKSTART.md`)
+- [pystarter-v1.0.6-runner.zip](https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.6/pystarter-v1.0.6-runner.zip) (~5 KB — contains `init.sh`, `docker-compose.yml`, `nginx.conf`, `.env.example`, and `QUICKSTART.md`)
 
 ### 2. Unzip
 
 ```bash
-unzip pystarter-v1.0.5-runner.zip -d pystarter
+unzip pystarter-v1.0.6-runner.zip -d pystarter
 cd pystarter
 ```
 
@@ -52,7 +52,7 @@ Sign up, log in — Module 1 (Your First Program) is unlocked and ready.
 Your progress (accounts, XP, completed exercises) lives in the `pgdata` Docker volume, which upgrades never touch. The image tags in `docker-compose.yml` are pinned, so bump them, then pull:
 
 ```bash
-sed -E -i.bak 's/pystarter-(backend|frontend):[0-9.]+/pystarter-\1:1.0.5/' docker-compose.yml
+sed -E -i.bak 's/pystarter-(backend|frontend):[0-9.]+/pystarter-\1:1.0.6/' docker-compose.yml
 docker compose pull
 docker compose up -d
 ```
@@ -61,7 +61,7 @@ Database migrations run automatically on start. If you would rather download the
 
 ### Choosing the AI model
 
-1.0.5 defaults to `claude-opus-5` (earlier releases pinned `claude-sonnet-4-20250514`, which Anthropic has deprecated). To use a different model, add `ANTHROPIC_MODEL=claude-haiku-4-5` (or any current alias) to `.env` and run `docker compose restart backend`. `.env.example` also shows how to point at a local Ollama or LM Studio server instead of the Anthropic API.
+1.0.6 defaults to `claude-opus-5` and, unlike earlier releases, the default actually applies when you leave `ANTHROPIC_MODEL` blank — on 1.0.5 and older a blank value sent an empty model name and every AI request failed, even with a valid key. To use a different model, add `ANTHROPIC_MODEL=claude-haiku-4-5` (or any current alias) to `.env` and run `docker compose restart backend`. `.env.example` also shows how to point at a local Ollama or LM Studio server instead of the Anthropic API.
 
 ### Stopping
 
@@ -79,8 +79,8 @@ docker compose down -v     # stop and delete the database
 
 Pulled automatically by `docker compose`:
 
-- `ghcr.io/e-conners-lab/pystarter-backend:1.0.5` — Django API + sandbox executor (linux/amd64 and linux/arm64)
-- `ghcr.io/e-conners-lab/pystarter-frontend:1.0.5` — React SPA served by nginx (linux/amd64 and linux/arm64)
+- `ghcr.io/e-conners-lab/pystarter-backend:1.0.6` — Django API + sandbox executor (linux/amd64 and linux/arm64)
+- `ghcr.io/e-conners-lab/pystarter-frontend:1.0.6` — React SPA served by nginx (linux/amd64 and linux/arm64)
 - `postgres:16-alpine` — database
 - `nginx:alpine` — reverse proxy
 
