@@ -38,3 +38,6 @@ omit = [
 [tool.coverage.report]
 fail_under = 80
 show_missing = true
+
+[project.optional-dependencies]
+container = ["psycopg[c]==3.3.3"]

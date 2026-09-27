@@ -37,3 +37,11 @@ PASS: PLAN-01/02/03 (existing vertical loop first, bounded security scope), PLAN
 PASS: SYS-01 (local single-deploy), SYS-03/04/06/07 (browser → authenticated Django → database/executor/optional AI boundaries above), SYS-11 (existing models canonical), SYS-12 (v1 retained, headers added, no published field removals intended), SYS-13 (server-authoritative progress; shared auth counters need atomic updates), SYS-14 (deadline/provider/auth failure modes and recovery), SYS-15 (observable gates). SYS-02 PASS: one local learner is the intended load; no scale claim. SYS-05 N/A: no new certificate infrastructure, local HTTP loopback only; TLS required if deployment shape changes. SYS-08/09 N/A: no new growing-data hot path or cache beyond bounded security counters. SYS-10 PASS: subprocess is for lifecycle separation; no async-throughput claim.
 
 All 38 SEC/AI controls will be classified in the final verification record. File uploads, signed object URLs, Kubernetes, LLM tools and RAG are N/A because absent. Operational remote branch protection/signatures/secret push protection must be checked separately; unavailable evidence is not a PASS. CI and the report must distinguish scanner findings from demonstrated reachability.
+
+## Approved runtime adjustment
+
+The owner approved official Python Alpine on 2026-09-27 as a narrow SEC-31
+minimal-base exception after 106 Linux tests and a zero-HIGH/CRITICAL candidate
+scan. psycopg's C extra compiles only in the builder; the runtime stays minimal.
+Acceptance: fresh Compose/PostgreSQL/browser checks, actual-image Linux tests,
+no vulnerability exclusions, and hosted image scans. No other control is waived.

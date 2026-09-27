@@ -7,7 +7,7 @@ This review starts at public commit `35d5500` (1.0.7) and prepares a separate
 no public hosting, classroom service or untrusted learners. The owner explicitly
 selected MIT licensing; LICENSE now matches that choice.
 
-**Release status: hold the public announcement pending the remaining gates.**
+**Release status: source update awaiting protected review/merge and final hosted checks.**
 The application fixes and local tests do not update the existing 1.0.7 images or
 runner ZIP. No new images, release tags or release assets were published here.
 
@@ -43,7 +43,7 @@ owner's running application or database:
 
 | Check | Result |
 |---|---|
-| Django backend tests | 106 tests on macOS (one Linux-only skip); all 106 pass in the proposed Alpine Linux image |
+| Django backend tests | 106 tests on macOS (one Linux-only skip); all 106 pass in the Alpine Linux image |
 | Branch-aware backend coverage | 90%; migrations, tests and static curriculum seed content excluded |
 | Playwright browser suite | 99/99 pass |
 | Frontend type-check/production build | pass |
@@ -56,34 +56,26 @@ owner's running application or database:
 | Fresh Docker install | healthy; non-default local port, registration, CSRF, local editor/worker, code execution and logout pass |
 | Production browser network/CSP | no external asset requests or CSP violations in the tested flow |
 | Frontend/proxy/database image scans | zero high/critical findings |
-| Backend Debian image scan | BLOCKED: four remaining source-package CVEs; see below |
-| Hosted GitHub CI/CodeQL | all nine non-backend-image checks pass, including hosted browser tests and both CodeQL languages; Debian backend image gate fails |
+| Backend Alpine image scan | zero high/critical findings without exclusions; approved SEC-31 base exception |
+| Hosted GitHub CI/CodeQL | nine checks passed before base change; final Alpine revision pending hosted verification |
 | Native Windows | unsupported; Docker path supplied, PowerShell script not executed on Windows here |
 | Multi-architecture released images | not built/published by this review |
 
 Scans detect known patterns/advisories, not all vulnerabilities. Browser tests
 cover the app; they do not certify resistance to hostile Python code.
 
-## Remaining image findings
+## Image remediation and approved exception
 
-Trivy0.74 reports 28 HIGH package matches across four underlying issues:
-CVE-2026-76642, CVE-2026-78409, CVE-2026-78410 (privileged mount operations) and
-CVE-2026-54369 (privileged pathname ACL operations). No fixed stable Debian
-package was available during the review. The actual Compose container runs as
-UID10001 with zero capabilities and no-new-privileges, no mount/nsenter CLI,
-no setuid/setgid utilities, and an empty fstab. Independent review found the
-privileged exploitation prerequisites absent in that configuration.
+The owner approved switching from the Debian slim base to official Python Alpine
+after the candidate passed all 106 Linux tests and a zero-HIGH/CRITICAL Trivy0.74
+scan. This is a documented exception to SEC-31's literal slim/distroless naming;
+non-root execution, hardening, scanning and release integrity remain required.
 
-A separately built Alpine candidate passes all 106 Linux tests and has zero
-high/critical scan findings without VEX. Adopting it awaits the owner’s explicit
-SEC-31 exception because the supplied standard names only slim/distroless bases.
-It is not yet the repository default.
-
-Nevertheless the affected libraries remain in the committed Debian image. These findings are **not hidden**
-and the high/critical CI gate remains blocking. Existing exact-version VEX only
-covers affected executable/module code demonstrably absent from the image.
-See [package evidence and sources](../.github/security/README.md). Do not use
-this assessment to run the image as root, privileged, or with host mounts.
+The Debian image had retained four privileged mount/ACL CVEs. Alpine removes
+those affected Debian libraries. No vulnerability waiver or VEX suppression is
+used by the final image scan. A compiled psycopg driver is built in a separate
+stage for Alpine compatibility; compilers never enter the runtime. See
+[the base-image rationale and evidence](../.github/security/README.md).
 
 ## Remote repository gates
 
@@ -120,8 +112,8 @@ waive those release requirements or mark the existing artifacts verified.
 | SEC-20, SEC-21, SEC-22 | N/A no uploads/private object-storage sharing |
 | SEC-23 | PASS route+proxy allowlists and proxy405 Allow header |
 | SEC-28 | PARTIAL: sanitized security events exist; local logs are not immutable external audit storage |
-| SEC-29, SEC-30 | PASS pinned Python/npm audits; backend OS image findings still block image gate |
-| SEC-31 | PARTIAL: non-root/slim, hardening and scans; backend findings and release attestations remain gates; Kubernetes N/A |
+| SEC-29, SEC-30 | PASS pinned Python/npm dependencies and all runtime image scans; CI gates future changes |
+| SEC-31 | Approved Alpine base exception; non-root/hardening/scans pass. Binary-release attestations still required; Kubernetes N/A |
 | SEC-34 | PASS remote controls configured; signed, independently approved release merge still pending |
 | SEC-35 | PASS push protection and required secret/SAST checks configured; hosted execution tracked on PR |
 | SEC-36 | PASS v1 path/version header; no independently versioned persisted request envelope introduced |

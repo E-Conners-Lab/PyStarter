@@ -1,66 +1,55 @@
-# Container finding triage
+# Container review and approved base-image exception
 
-Reviewed 2026-09-27 using Trivy 0.74.0 and the Debian security tracker. This
-file is evidence for the local PyStarter backend image, not a general Debian
-vulnerability waiver. The backend CI job checks the stated component absence
-before applying `backend.vex.json`. Its package URLs include exact versions;
-base updates that change those versions require a new review.
+Reviewed 2026-09-27. The owner approved Alpine as a narrow exception to SEC-31's
+literal “distroless or -slim” base requirement after reviewing the scan and test
+results. This changes the minimal runtime distribution, not the non-root,
+least-privilege, scanning, or release-integrity requirements.
 
-## Verified absent vulnerable code
+## Why Alpine
 
-- [CVE-2025-69720](https://security-tracker.debian.org/tracker/CVE-2025-69720)
-  is in `infocmp`'s `analyze_string` CLI routine. The Dockerfile removes
-  `/usr/bin/infocmp`. The curses libraries do not contain that CLI routine.
-- [CVE-2026-78408](https://security-tracker.debian.org/tracker/CVE-2026-78408)
-  is in `nsenter --join-cgroup`. The Dockerfile removes `/usr/bin/nsenter`.
-- [CVE-2026-16742](https://security-tracker.debian.org/tracker/CVE-2026-16742)
-  affects `systemd-homed`. That service is not installed; the flagged
-  `libsystemd0` and `libudev1` packages share its source package only.
-- [CVE-2026-9538](https://security-tracker.debian.org/tracker/CVE-2026-9538)
-  affects Perl `Archive::Tar`. That module is not present in `perl-base`.
+The tested Debian slim backend retained four unfixed mount/ACL CVEs:
+CVE-2026-76642, CVE-2026-78409, CVE-2026-78410 and CVE-2026-54369. Their privileged
+exploitation prerequisites were absent in the supplied local Compose setup, but
+the libraries remained installed. We kept the HIGH gate blocking while checking
+alternatives. Supported Bookworm and distroless Python alternatives added other
+findings rather than resolving the gate.
 
-The CI assertions search `/usr` for each affected executable/module and fail
-if any reappears. They also verify UID 10001 and the absence of setuid/setgid
-files in `/usr/bin` and `/usr/sbin`. These four VEX statements do not suppress
-unrelated CVEs or package versions. Use this file only with the backend image
-built by this repository, not arbitrary Debian images.
+The pinned official Python 3.13 Alpine runtime omits those Debian libraries.
+The candidate passed all 106 Linux backend tests and Trivy 0.74 reported zero
+HIGH/CRITICAL vulnerabilities **without VEX or vulnerability exclusions**. The
+obsolete Debian VEX file and CI configuration have been removed. Image sizes
+reported by the local Docker engine were approximately 44 MB for Alpine and
+68 MB for slim; sizes vary by architecture and future rebuilds.
 
-## Findings still blocking the backend image gate
+Alpine uses musl rather than glibc. Pure Python psycopg could not discover libpq
+without extra runtime tooling, so the optional `container` dependency installs
+`psycopg[c]==3.3.3`. Its compiler and libpq headers stay in the builder stage;
+the final image contains the compiled driver and system libpq only. Normal
+source installations retain the existing pure Python driver. psycopg's license
+metadata remains installed with the package.
 
-The source-package scan still reports these unfixed Debian Trixie issues:
+## Enforced controls
 
-- [CVE-2026-76642](https://security-tracker.debian.org/tracker/CVE-2026-76642),
-  [CVE-2026-78409](https://security-tracker.debian.org/tracker/CVE-2026-78409),
-  and [CVE-2026-78410](https://security-tracker.debian.org/tracker/CVE-2026-78410)
-  affect privileged mount operations. Mount/umount CLIs and setuid permissions
-  have been removed, and Compose drops capabilities and forbids new privileges.
-  The underlying libmount code remains, so these are not suppressed.
-- [CVE-2026-54369](https://security-tracker.debian.org/tracker/CVE-2026-54369)
-  affects pathname-based ACL operations by a privileged caller. The runtime
-  is non-root, but libacl remains installed; this finding is not suppressed.
+- Base images and build tools are digest-pinned; Python/npm dependencies locked.
+- UID 10001, no-new-privileges, dropped capabilities and bounded process/memory
+  settings in the supplied local Compose configuration.
+- CI verifies the driver loads, the runtime identity and privileges, and that
+  compiler tools, uv and pip are absent from the final backend image.
+- CI runs the complete backend suite inside the actual Linux runtime image.
+- All four runtime images are scanned with HIGH/CRITICAL failures blocking.
+  No `ignore-unfixed`, VEX or blanket severity waiver is enabled.
+- Frontend/proxy receive Alpine security updates. PostgreSQL derives from the
+  pinned official image, runs directly as `postgres`, and removes only its
+  unused vulnerable `gosu` helper. Database files/package metadata remain intact.
 
-Debian currently labels these issues minor and postpones stable fixes. This
-reduces neither the recorded finding count nor the gate threshold. Updating
-the runtime or explicitly accepting a documented residual risk is still needed
-before claiming the image passes the high/critical scan. No `ignore-unfixed`
-setting or blanket severity exclusion is enabled.
+A clean scan is a dated check against known advisories, not a safety guarantee.
+Rebuild and rescan after any base or dependency change. Images are for trusted
+local code, not hostile execution or public hosting. Published image releases
+still need signed digests, SBOM/provenance and architecture verification.
 
-## Other fixes
+## Primary advisory evidence for the replaced Debian image
 
-Runtime pip was removed; it carried a vulnerable vendored msgpack version.
-The backend now uses pure-Python psycopg with Debian's libpq instead of opaque
-bundled PostgreSQL client libraries. Frontend Alpine libexpat was upgraded to
-2.8.5-r0. Both runtime images use non-root users and digest-pinned base images;
-build dependencies remain in separate stages.
-
-PostgreSQL is derived from the pinned upstream 16.15 Alpine image. Its unused
-`gosu` executable bundled a Go runtime with 22 high/critical findings. The image
-and Compose run directly as `postgres`, so the derived image removes only that
-helper. No upstream database files or package metadata are removed. The rebuilt
-database and proxy images pass the high/critical scan.
-
-Supported alternative Python runtime bases were evaluated without replacing
-the working runtime. The current Bookworm slim image retains the same mount/ACL
-issues and adds SQLite/Perl findings. The supported distroless Python Debian 13
-image adds older system Python/libexpat findings and would require a new startup
-path and libpq integration. Neither is a verified clean drop-in replacement.
+- [Mount hook privilege issue](https://github.com/util-linux/util-linux/security/advisories/GHSA-m25x-3hj9-m26f)
+- [Restricted mount subdirectory issue](https://github.com/util-linux/util-linux/security/advisories/GHSA-8f2p-47x3-43mv)
+- [Privileged bind-mount issue](https://github.com/util-linux/util-linux/security/advisories/GHSA-rh77-686x-2f2m)
+- [ACL caller/API analysis](https://www.openwall.com/lists/oss-security/2026/06/29/1)

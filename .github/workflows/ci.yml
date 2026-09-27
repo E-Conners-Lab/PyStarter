@@ -204,22 +204,28 @@ jobs:
           BUILD_CONTEXT: ${{ matrix.context }}
           DOCKERFILE: ${{ matrix.dockerfile }}
         run: docker build --file "$DOCKERFILE" --tag "pystarter-$IMAGE_NAME:ci" "$BUILD_CONTEXT"
-      - name: Verify backend VEX evidence and runtime privileges
+      - name: Verify backend runtime privileges and dependencies
         if: matrix.name == 'backend'
         run: |
-          docker run --rm --network none --entrypoint python pystarter-backend:ci -c '
+          docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges --entrypoint python pystarter-backend:ci -c '
           import os
+          import shutil
           from pathlib import Path
+          import psycopg
           assert os.geteuid() == 10001
-          assert not [p for p in Path("/usr").rglob("infocmp") if p.is_file() and os.access(p, os.X_OK)]
-          assert not [p for p in Path("/usr").rglob("nsenter") if p.is_file() and os.access(p, os.X_OK)]
-          assert not [p for p in Path("/usr").rglob("systemd-homed") if p.is_file() and os.access(p, os.X_OK)]
-          assert not [p for p in Path("/usr").rglob("Tar.pm") if p.parent.name == "Archive"]
-          assert not [p for root in ("/usr/bin", "/usr/sbin") for p in Path(root).iterdir() if p.is_file() and p.stat().st_mode & 0o6000]
+          assert psycopg.pq.__impl__ == "c"
+          assert not any(shutil.which(tool) for tool in ("gcc", "g++", "make", "uv", "pip"))
+          status = dict(line.split(":", 1) for line in Path("/proc/self/status").read_text().splitlines() if ":" in line)
+          assert all(int(status[key].strip(), 16) == 0 for key in ("CapEff", "CapPrm", "CapBnd"))
+          assert status["NoNewPrivs"].strip() == "1"
           '
+      - name: Test the actual backend runtime on Linux
+        if: matrix.name == 'backend'
+        run: |
+          docker run --rm --network none --cap-drop ALL --security-opt no-new-privileges \
+            --pids-limit 128 --memory 1g --env DJANGO_SETTINGS_MODULE=config.settings.development \
+            --env DOTENV_DISABLED=1 --entrypoint python pystarter-backend:ci manage.py test --noinput
       - uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # 0.35.0
-        env:
-          TRIVY_VEX: ${{ matrix.name == 'backend' && '.github/security/backend.vex.json' || '' }}
         with:
           version: v0.74.0
           image-ref: pystarter-${{ matrix.name }}:ci

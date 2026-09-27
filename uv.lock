@@ -873,6 +873,17 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/c8/5b/181e2e3becb7672b502f0ed7f16ed7352aca7c109cfb94cf3878a9186db9/psycopg-3.3.3-py3-none-any.whl", hash = "sha256:f96525a72bcfade6584ab17e89de415ff360748c766f0106959144dcbb38c698", size = 212768, upload-time = "2026-02-18T16:46:27.365Z" },
 ]
 
+[package.optional-dependencies]
+c = [
+    { name = "psycopg-c", marker = "implementation_name != 'pypy'" },
+]
+
+[[package]]
+name = "psycopg-c"
+version = "3.3.3"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/cb/a0/8feb0ca8c7c20a8b9ac4d46b335ddd57e48e593b714262f006880f34fee5/psycopg_c-3.3.3.tar.gz", hash = "sha256:86ef6f4424348247828e83fb0882c9f8acb33e64d0a5ce66c1b4a5107ee73edd", size = 631965, upload-time = "2026-02-18T16:52:18.084Z" }
+
 [[package]]
 name = "py-serializable"
 version = "2.1.0"
@@ -1011,6 +1022,11 @@ dependencies = [
     { name = "whitenoise" },
 ]
 
+[package.optional-dependencies]
+container = [
+    { name = "psycopg", extra = ["c"] },
+]
+
 [package.dev-dependencies]
 dev = [
     { name = "bandit" },
@@ -1029,10 +1045,12 @@ requires-dist = [
     { name = "gunicorn", specifier = "==26.2.0" },
     { name = "openai", specifier = "==2.54.0" },
     { name = "psycopg", specifier = "==3.3.3" },
+    { name = "psycopg", extras = ["c"], marker = "extra == 'container'", specifier = "==3.3.3" },
     { name = "python-dotenv", specifier = "==1.2.3" },
     { name = "sentry-sdk", extras = ["django"], specifier = "==2.70.0" },
     { name = "whitenoise", specifier = "==6.12.0" },
 ]
+provides-extras = ["container"]
 
 [package.metadata.requires-dev]
 dev = [
