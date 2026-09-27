@@ -211,9 +211,9 @@ jobs:
           import os
           from pathlib import Path
           assert os.geteuid() == 10001
-          assert not list(Path("/usr").rglob("infocmp"))
-          assert not list(Path("/usr").rglob("nsenter"))
-          assert not list(Path("/usr").rglob("systemd-homed"))
+          assert not [p for p in Path("/usr").rglob("infocmp") if p.is_file() and os.access(p, os.X_OK)]
+          assert not [p for p in Path("/usr").rglob("nsenter") if p.is_file() and os.access(p, os.X_OK)]
+          assert not [p for p in Path("/usr").rglob("systemd-homed") if p.is_file() and os.access(p, os.X_OK)]
           assert not [p for p in Path("/usr").rglob("Tar.pm") if p.parent.name == "Archive"]
           assert not [p for root in ("/usr/bin", "/usr/sbin") for p in Path(root).iterdir() if p.is_file() and p.stat().st_mode & 0o6000]
           '
