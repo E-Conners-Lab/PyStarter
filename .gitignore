@@ -42,3 +42,18 @@ CLAUDE.md
 .claude/
 frontend/.claude/
 publish-1.0.5.sh
+
+# Generated build / verification output
+*.tsbuildinfo
+.coverage*
+coverage.xml
+security-results/
+
+# Private local credentials and database exports
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa
+id_ed25519
+backups/

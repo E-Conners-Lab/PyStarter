@@ -1,4 +1,5 @@
 import os
+import secrets
 from datetime import timedelta
 from pathlib import Path
 
@@ -16,11 +17,11 @@ def _env_str(name: str, default: str) -> str:
 
 # Reported by /api/v1/health/. The Dockerfile passes the release tag in as APP_VERSION at
 # build time; this default is the fallback for source checkouts and must be bumped with it.
-APP_VERSION = _env_str("APP_VERSION", "1.0.7")
+APP_VERSION = _env_str("APP_VERSION", "1.0.8")
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
-    "django-insecure-change-me-in-production",
+    secrets.token_urlsafe(64),
 )
 
 INSTALLED_APPS = [
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "apps.common.security.APISecurityMiddleware",
     "corsheaders.middleware.CorsMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -73,6 +75,15 @@ WSGI_APPLICATION = "config.wsgi.application"
 
 AUTH_USER_MODEL = "accounts.User"
 
+PASSWORD_HASHERS = [
+    "apps.common.hashers.LocalArgon2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+]
+CSRF_COOKIE_HTTPONLY = True
+CSRF_COOKIE_SAMESITE = "Strict"
+SESSION_COOKIE_SAMESITE = "Strict"
+DATA_UPLOAD_MAX_MEMORY_SIZE = 65536
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -94,6 +105,10 @@ PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
 
 # REST Framework
 REST_FRAMEWORK = {
+    "DEFAULT_PARSER_CLASSES": ["rest_framework.parsers.JSONParser"],
+    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
+    "EXCEPTION_HANDLER": "apps.common.errors.api_exception_handler",
+    "NUM_PROXIES": 0,
     # Cookie-based: the frontend holds no token in JS-reachable memory, so the
     # Authorization header is never populated. Reading only the header here
     # leaves every authenticated request 401 (and silently un-authenticated).
@@ -117,6 +132,11 @@ REST_FRAMEWORK = {
 
 # JWT Settings
 SIMPLE_JWT = {
+    "CHECK_REVOKE_TOKEN": True,
+    "ALGORITHM": "HS256",
+    "ISSUER": "pystarter",
+    "AUDIENCE": "pystarter-api",
+    "AUTH_COOKIE_SECURE": True,
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "ROTATE_REFRESH_TOKENS": True,
@@ -124,7 +144,8 @@ SIMPLE_JWT = {
 }
 
 # AI Configuration
-DEFAULT_FROM_EMAIL = "noreply@pystarter.dev"
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "noreply@localhost")
+EMAIL_TIMEOUT = 10
 
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
 # Pin an alias (no date suffix) so the default tracks the current model, not a retiring snapshot.

@@ -2,6 +2,9 @@
 
 import logging
 from typing import Any
+import uuid
+
+from .input_boundary import PROMPT_VERSION
 
 from django.conf import settings
 
@@ -31,22 +34,24 @@ class AnthropicProvider:
             except ImportError:
                 logger.error("openai package required for local LLM support: pip install openai")
                 raise
-            self.client = OpenAI(api_key=settings.ANTHROPIC_API_KEY or "not-needed", base_url=base_url)
+            self.client = OpenAI(api_key=settings.ANTHROPIC_API_KEY or "not-needed", base_url=base_url, timeout=20.0, max_retries=0)
             self._use_openai = True
         else:
             import anthropic
 
-            self.client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY)
+            self.client = anthropic.Anthropic(api_key=settings.ANTHROPIC_API_KEY, timeout=20.0, max_retries=0)
             self._use_openai = False
 
     def generate(self, system_prompt: str, user_prompt: str) -> str:
+        request_id = uuid.uuid4().hex
+        logger.info("ai_request id=%s model=%s prompt_version=%s", request_id, self.model, PROMPT_VERSION)
         try:
             if self._use_openai:
                 return self._generate_openai(system_prompt, user_prompt)
             return self._generate_anthropic(system_prompt, user_prompt)
-        except Exception:
-            # Full traceback goes to the server log; the caller gets a generic message (SEC-11).
-            logger.exception("AI provider error (model=%s)", self.model)
+        except Exception as exc:
+            # SDK exceptions may embed prompt contents or credentials; omit their text.
+            logger.error("ai_failure id=%s type=%s", request_id, type(exc).__name__)
             return FALLBACK_MESSAGE
 
     def _generate_openai(self, system_prompt: str, user_prompt: str) -> str:

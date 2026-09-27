@@ -1,3 +1,4 @@
+import './monaco';
 import Editor from '@monaco-editor/react';
 
 interface CodeEditorProps {

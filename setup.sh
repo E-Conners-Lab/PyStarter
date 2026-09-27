@@ -1,9 +1,11 @@
 #!/bin/sh
 set -e
+umask 077
+cd "$(dirname "$0")"
 
 # PyStarter — Local Setup Script
 # Installs dependencies, configures the environment, and starts the app.
-# Requirements: Python 3.13+, uv, Node.js 18+
+# Requirements: Python 3.13+, uv, Node.js 22.12+
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -28,7 +30,7 @@ info "Python $PYTHON_VERSION, Node $NODE_VERSION detected"
 # ── Backend setup ──
 
 info "Installing Python dependencies..."
-uv sync
+uv sync --locked
 
 cd backend
 
@@ -48,10 +50,10 @@ else
 fi
 
 info "Running database migrations..."
-uv run python manage.py migrate --noinput
+uv run --frozen python manage.py migrate --noinput
 
 info "Seeding curriculum (14 modules, 66 exercises)..."
-uv run python manage.py seed_curriculum
+uv run --frozen python manage.py seed_curriculum
 
 cd ..
 
@@ -59,7 +61,7 @@ cd ..
 
 info "Installing frontend dependencies..."
 cd frontend
-npm install
+npm ci
 cd ..
 
 # ── Done ──
@@ -71,7 +73,7 @@ echo "  To start PyStarter, open two terminals:"
 echo ""
 echo "    Terminal 1 (backend):"
 echo "      cd backend"
-echo "      uv run python manage.py runserver 8002"
+echo "      uv run --frozen python manage.py runserver 8002"
 echo ""
 echo "    Terminal 2 (frontend):"
 echo "      cd frontend"

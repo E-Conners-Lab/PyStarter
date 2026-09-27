@@ -1,5 +1,4 @@
 from django.db import transaction
-from django.db.models import F
 from django.utils import timezone
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
@@ -7,8 +6,8 @@ from rest_framework.response import Response
 
 from apps.common.throttles import CodeExecutionThrottle
 
-from apps.accounts.models import UserExerciseProgress, UserLessonProgress
-from apps.curriculum.models import Exercise, Hint
+from apps.accounts.models import UserExerciseProgress
+from apps.curriculum.models import Exercise
 from apps.curriculum.views import _check_module_completion
 from apps.executor.sandbox import compare_output, execute_code
 
@@ -26,12 +25,14 @@ def sandbox_run(request):
     code = serializer.validated_data["code"]
 
     result = execute_code(code)
-    return Response({
-        "status": result["status"],
-        "output": result.get("output", ""),
-        "error": result.get("error", ""),
-        "execution_time": result.get("execution_time"),
-    })
+    return Response(
+        {
+            "status": result["status"],
+            "output": result.get("output", ""),
+            "error": result.get("error", ""),
+            "execution_time": result.get("execution_time"),
+        }
+    )
 
 
 @api_view(["POST"])
@@ -45,10 +46,15 @@ def run_code(request, exercise_id):
 
     try:
         exercise = Exercise.objects.prefetch_related("test_cases").get(
-            id=exercise_id, is_published=True
+            id=exercise_id,
+            is_published=True,
+            lesson__is_published=True,
+            lesson__module__is_published=True,
         )
     except Exercise.DoesNotExist:
-        return Response({"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND
+        )
 
     # Update user's streak
     request.user.update_streak()
@@ -93,10 +99,15 @@ def submit_code(request, exercise_id):
 
     try:
         exercise = Exercise.objects.prefetch_related("test_cases", "hints").get(
-            id=exercise_id, is_published=True
+            id=exercise_id,
+            is_published=True,
+            lesson__is_published=True,
+            lesson__module__is_published=True,
         )
     except Exercise.DoesNotExist:
-        return Response({"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND
+        )
 
     request.user.update_streak()
 
@@ -130,8 +141,10 @@ def submit_code(request, exercise_id):
     # Update progress and award XP if all tests passed
     with transaction.atomic():
         if all_passed:
-            progress, _ = UserExerciseProgress.objects.select_for_update().get_or_create(
-                user=request.user, exercise=exercise
+            progress, _ = (
+                UserExerciseProgress.objects.select_for_update().get_or_create(
+                    user=request.user, exercise=exercise
+                )
             )
             progress.attempts += 1
 
@@ -161,8 +174,10 @@ def submit_code(request, exercise_id):
                 progress.save(update_fields=["attempts"])
         else:
             # Track attempt even on failure
-            progress, _ = UserExerciseProgress.objects.select_for_update().get_or_create(
-                user=request.user, exercise=exercise
+            progress, _ = (
+                UserExerciseProgress.objects.select_for_update().get_or_create(
+                    user=request.user, exercise=exercise
+                )
             )
             progress.attempts += 1
             progress.save(update_fields=["attempts"])

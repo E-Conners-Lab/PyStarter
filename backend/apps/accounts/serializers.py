@@ -20,7 +20,7 @@ def _run_password_validators(password, user=None):
 
 
 class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True, min_length=8, max_length=1024, trim_whitespace=False)
     email = serializers.EmailField(required=False, default="")
 
     class Meta:
@@ -81,7 +81,7 @@ class PasswordResetRequestSerializer(serializers.Serializer):
 class PasswordResetConfirmSerializer(serializers.Serializer):
     uid = serializers.CharField()
     token = serializers.CharField()
-    new_password = serializers.CharField(min_length=8)
+    new_password = serializers.CharField(min_length=8, max_length=1024, trim_whitespace=False)
 
     def validate_new_password(self, value):
         return _run_password_validators(value)
@@ -97,3 +97,8 @@ class UserProgressSummarySerializer(serializers.Serializer):
     exercises_completed = serializers.IntegerField()
     exercises_total = serializers.IntegerField()
     current_streak = serializers.IntegerField()
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length=150)
+    password = serializers.CharField(max_length=1024, trim_whitespace=False, write_only=True)

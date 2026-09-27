@@ -1,3 +1,5 @@
+import secrets
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
@@ -8,6 +10,7 @@ from django.utils.http import urlsafe_base64_encode
 from rest_framework.test import APIClient
 
 User = get_user_model()
+TEST_PASSWORD = secrets.token_urlsafe(24)
 
 
 class PasswordResetRequestTests(TestCase):
@@ -16,12 +19,13 @@ class PasswordResetRequestTests(TestCase):
         cls.user = User.objects.create_user(
             username="resetuser",
             email="reset@example.com",
-            password="OldPass123!",
+            password=TEST_PASSWORD,
         )
 
     def setUp(self):
         cache.clear()
         self.client = APIClient()
+        self.client.default_format = "json"
 
     def test_existing_email_sends_email(self):
         response = self.client.post(
@@ -55,12 +59,13 @@ class PasswordResetConfirmTests(TestCase):
         cls.user = User.objects.create_user(
             username="confirmuser",
             email="confirm@example.com",
-            password="OldPass123!",
+            password=TEST_PASSWORD,
         )
 
     def setUp(self):
         cache.clear()
         self.client = APIClient()
+        self.client.default_format = "json"
         self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
         self.token = default_token_generator.make_token(self.user)
 

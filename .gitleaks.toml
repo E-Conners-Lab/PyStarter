@@ -1,0 +1,14 @@
+# Keep the upstream detection rules. These two public test fixture passwords
+# are synthetic strings, never deployed credentials. Scope to the exact test,
+# detector, and complete value so future credentials are still detected.
+[extend]
+useDefault = true
+
+[[rules]]
+id = "generic-api-key"
+[[rules.allowlists]]
+description = "Synthetic Django test account passwords"
+condition = "AND"
+paths = ['''^backend/apps/ai/tests/test_critique_gating\.py$''']
+regexTarget = "secret"
+regexes = ['''^(Tr0mbone-Harbor-19|Zephyr-Cobalt-8821)$''']

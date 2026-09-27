@@ -1,5 +1,5 @@
 """
-Standalone subprocess runner for sandboxed Python code execution.
+Standalone subprocess runner for trusted local Python code execution.
 Invoked by sandbox.py via subprocess — never imported by Django directly.
 
 Accepts JSON on stdin: {"code": "...", "input_data": "..."}
@@ -14,6 +14,20 @@ import traceback
 from contextlib import redirect_stderr, redirect_stdout
 
 MEMORY_LIMIT_BYTES = 128 * 1024 * 1024  # 128 MB
+MAX_OUTPUT_CHARS = 16_384
+MAX_ERROR_CHARS = 2_048
+
+
+class OutputLimitExceeded(Exception):
+    """The local program exceeded its display output budget."""
+
+
+class BoundedOutput(io.StringIO):
+    def write(self, value):
+        if self.tell() + len(value) > MAX_OUTPUT_CHARS:
+            raise OutputLimitExceeded("Your code produced too much output.")
+        return super().write(value)
+
 
 ALLOWED_IMPORTS = {
     "math",
@@ -47,7 +61,6 @@ FORBIDDEN_BUILTINS = {
     "quit",
     "vars",
     "dir",
-    "type",
     "hasattr",
     "object",
     "super",
@@ -72,7 +85,11 @@ def _set_memory_limit():
 
     try:
         _, hard = resource.getrlimit(limit_type)
-        new_soft = min(MEMORY_LIMIT_BYTES, hard) if hard != resource.RLIM_INFINITY else MEMORY_LIMIT_BYTES
+        new_soft = (
+            min(MEMORY_LIMIT_BYTES, hard)
+            if hard != resource.RLIM_INFINITY
+            else MEMORY_LIMIT_BYTES
+        )
         resource.setrlimit(limit_type, (new_soft, hard))
     except (ValueError, OSError):
         pass
@@ -148,8 +165,8 @@ def run(code, input_data=""):
     _set_memory_limit()
     sys.setrecursionlimit(200)
 
-    stdout_capture = io.StringIO()
-    stderr_capture = io.StringIO()
+    stdout_capture = BoundedOutput()
+    stderr_capture = BoundedOutput()
 
     safe_builtins = _make_safe_builtins()
     safe_builtins["__import__"] = _make_safe_import(ALLOWED_IMPORTS)
@@ -169,13 +186,13 @@ def run(code, input_data=""):
 
     safe_globals = {"__builtins__": safe_builtins, "__name__": "__main__"}
 
-    start_time = time.time()
+    start_time = time.monotonic()
     try:
         with redirect_stdout(stdout_capture), redirect_stderr(stderr_capture):
             compiled = compile(code, "<exercise>", "exec")
             exec(compiled, safe_globals)  # noqa: S102
 
-        execution_time = time.time() - start_time
+        execution_time = time.monotonic() - start_time
         return {
             "status": "success",
             "output": stdout_capture.getvalue(),
@@ -183,14 +200,14 @@ def run(code, input_data=""):
             "execution_time": round(execution_time, 4),
         }
     except Exception as e:
-        execution_time = time.time() - start_time
+        execution_time = time.monotonic() - start_time
         tb = traceback.format_exc()
         lines = tb.strip().split("\n")
         friendly_error = _make_friendly_error(e, lines)
         return {
             "status": "error",
             "output": stdout_capture.getvalue(),
-            "error": friendly_error,
+            "error": friendly_error[:MAX_ERROR_CHARS],
             "execution_time": round(execution_time, 4),
         }
 

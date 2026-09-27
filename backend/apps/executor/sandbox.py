@@ -1,11 +1,15 @@
 """
-Sandboxed Python code execution engine.
-Orchestrates code execution in an isolated subprocess with resource limits.
+Trusted local Python runner.
+A subprocess limits accidental resource use; it is not a security boundary.
 """
 
 import json
 import os
 import platform
+import selectors
+import signal
+import tempfile
+import time
 import subprocess
 import sys
 from pathlib import Path
@@ -43,7 +47,11 @@ def _set_memory_limit():
 
     try:
         old_soft, hard = resource.getrlimit(limit_type)
-        new_soft = min(MEMORY_LIMIT_BYTES, hard) if hard != resource.RLIM_INFINITY else MEMORY_LIMIT_BYTES
+        new_soft = (
+            min(MEMORY_LIMIT_BYTES, hard)
+            if hard != resource.RLIM_INFINITY
+            else MEMORY_LIMIT_BYTES
+        )
         resource.setrlimit(limit_type, (new_soft, hard))
         return (limit_type, old_soft, hard)
     except (ValueError, OSError):
@@ -63,52 +71,146 @@ def _restore_memory_limit(saved):
         pass
 
 
-def execute_code(code, input_data="", timeout=5):
-    """
-    Execute Python code in an isolated subprocess.
+MAX_CAPTURE_BYTES = 256 * 1024
+MAX_CODE_CHARS = 10_000
+MAX_INPUT_CHARS = 100_000
+MAX_OUTPUT_CHARS = 16_384
+MAX_ERROR_CHARS = 2_048
+MAX_TIMEOUT_SECONDS = 30
 
-    Returns:
-        dict with keys:
-        - status: "success", "error", "timeout"
-        - output: stdout output
-        - error: error message (if any)
-        - execution_time: time in seconds
-    """
-    payload = json.dumps({"code": code, "input_data": input_data})
 
-    # Stripped environment: only PATH and Python essentials, no secrets
-    safe_env = {
-        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
-        "HOME": os.environ.get("HOME", "/tmp"),
-        "LANG": os.environ.get("LANG", "en_US.UTF-8"),
+def _error(message, status="error", elapsed=0.0):
+    return {"status": status, "output": "", "error": message, "execution_time": elapsed}
+
+
+def _kill_process_group(process):
+    """Clean up descendants in our session, including after the runner exits.
+
+    Deliberately hostile code can create another session. This is a reliability
+    control for trusted local code, not a hostile process containment boundary.
+    """
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass  # The whole process group already exited.
+    try:
+        process.wait(timeout=1)
+    except subprocess.TimeoutExpired:
+        process.kill()
+
+
+def _collect_output(process, deadline):
+    """Drain bounded output without waiting indefinitely on descendant pipes."""
+    chunks = []
+    captured = 0
+    with selectors.DefaultSelector() as selector:
+        for stream in (process.stdout, process.stderr):
+            os.set_blocking(stream.fileno(), False)
+            selector.register(stream, selectors.EVENT_READ)
+        while selector.get_map():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                return None, "timeout"
+            ready = selector.select(min(remaining, 0.05))
+            if not ready and process.poll() is not None:
+                break  # A background child may still own a pipe; clean it up.
+            for key, _ in ready:
+                data = os.read(key.fileobj.fileno(), 8192)
+                if not data:
+                    selector.unregister(key.fileobj)
+                    continue
+                captured += len(data)
+                if captured > MAX_CAPTURE_BYTES:
+                    return None, "output"
+                if key.fileobj is process.stdout:
+                    chunks.append(data)
+    try:
+        process.wait(timeout=max(0, deadline - time.monotonic()))
+    except subprocess.TimeoutExpired:
+        return None, "timeout"
+    return b"".join(chunks), None
+
+
+def _decode_result(raw):
+    """Never pass child transport errors or unvalidated fields to the API."""
+    try:
+        result = json.loads(raw)
+    except (ValueError, UnicodeError, RecursionError):
+        return _error("Code execution failed.")
+    if not isinstance(result, dict) or result.get("status") not in ("success", "error"):
+        return _error("Code execution failed.")
+    output, error, elapsed = (
+        result.get(key) for key in ("output", "error", "execution_time")
+    )
+    if not isinstance(output, str) or not isinstance(error, str):
+        return _error("Code execution failed.")
+    if type(elapsed) not in (int, float) or not 0 <= elapsed <= MAX_TIMEOUT_SECONDS:
+        return _error("Code execution failed.")
+    if len(output) > MAX_OUTPUT_CHARS:
+        return _error("Your code produced too much output.")
+    return {
+        "status": result["status"],
+        "output": output,
+        "error": error[:MAX_ERROR_CHARS],
+        "execution_time": round(elapsed, 4),
     }
 
-    try:
-        result = subprocess.run(
-            [sys.executable, _RUNNER_PATH],
-            input=payload,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
+
+def _execute_in_directory(payload, directory, timeout):
+    # The environment reduction prevents accidental inheritance. Same-user code
+    # can still access host files/processes; do not call this secret isolation.
+    safe_env = {"PATH": os.defpath, "HOME": directory, "LANG": "C.UTF-8"}
+    deadline = time.monotonic() + timeout
+    with tempfile.TemporaryFile() as stdin:
+        stdin.write(payload)
+        stdin.seek(0)
+        process = subprocess.Popen(
+            [sys.executable, "-I", _RUNNER_PATH],
+            stdin=stdin,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            cwd=directory,
             env=safe_env,
+            start_new_session=True,
         )
         try:
-            return json.loads(result.stdout)
-        except (json.JSONDecodeError, ValueError):
-            return {
-                "status": "error",
-                "output": "",
-                "error": result.stderr.strip() or "Code execution failed.",
-                "execution_time": 0.0,
-            }
-    except subprocess.TimeoutExpired:
-        return {
-            "status": "timeout",
-            "output": "",
-            "error": f"Your code took too long to run (limit: {timeout} seconds). "
+            raw, failure = _collect_output(process, deadline)
+        finally:
+            _kill_process_group(process)
+            process.stdout.close()
+            process.stderr.close()
+    if failure == "timeout":
+        return _error(
+            f"Your code took too long to run (limit: {timeout} seconds). "
             "Check for infinite loops!",
-            "execution_time": timeout,
-        }
+            "timeout",
+            timeout,
+        )
+    if failure == "output":
+        return _error("Your code produced too much output.")
+    if process.returncode:
+        return _error("Code execution failed.")
+    return _decode_result(raw)
+
+
+def execute_code(code, input_data="", timeout=5):
+    """Execute trusted local code with best-effort resource/deadline controls."""
+    if os.name != "posix":
+        return _error(
+            "Code execution requires Docker on Windows. Start the Docker installation."
+        )
+    if not isinstance(code, str) or len(code) > MAX_CODE_CHARS:
+        return _error("Code exceeds the execution size limit.")
+    if not isinstance(input_data, str) or len(input_data) > MAX_INPUT_CHARS:
+        return _error("Input exceeds the execution size limit.")
+    if not isinstance(timeout, (int, float)) or not 0 < timeout <= MAX_TIMEOUT_SECONDS:
+        return _error("Invalid execution timeout.")
+    payload = json.dumps({"code": code, "input_data": input_data}).encode("utf-8")
+    try:
+        with tempfile.TemporaryDirectory(prefix="pystarter-run-") as directory:
+            return _execute_in_directory(payload, directory, timeout)
+    except (OSError, ValueError):
+        return _error("Code execution is temporarily unavailable.")
 
 
 def _make_friendly_error(exception, traceback_lines):
@@ -119,7 +221,7 @@ def _make_friendly_error(exception, traceback_lines):
     # Find the line number in user code
     line_info = ""
     for line in traceback_lines:
-        if '<exercise>' in line:
+        if "<exercise>" in line:
             line_info = line.strip()
             break
 
@@ -160,8 +262,8 @@ def compare_output(actual, expected):
         return True
 
     # Try comparing line by line, ignoring trailing whitespace
-    actual_lines = [l.rstrip() for l in actual.split("\n")]
-    expected_lines = [l.rstrip() for l in expected.split("\n")]
+    actual_lines = [line.rstrip() for line in actual.split("\n")]
+    expected_lines = [line.rstrip() for line in expected.split("\n")]
     if actual_lines == expected_lines:
         return True
 

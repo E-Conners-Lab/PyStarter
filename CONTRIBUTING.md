@@ -1,195 +1,121 @@
 # Contributing to PyStarter
 
-Thanks for your interest in contributing! This guide covers the project architecture, conventions, and development workflow.
+PyStarter is a local learning app, MIT licensed and not actively maintained.
+Read [SECURITY.md](SECURITY.md) before modifying execution or deployment behavior.
 
-## Development Setup
+## Development
 
-### Prerequisites
-- Python 3.13+ with [uv](https://docs.astral.sh/uv/) package manager
-- Node.js 18+
+Use Python 3.13, uv, Node 22.12+, and `./setup.sh` on macOS/Linux. The script
+uses `uv sync --locked` and `npm ci`. Run Django on localhost:8002 and Vite on
+localhost:5173 as described in [README.md](README.md). Use Docker Desktop on
+Windows; native Windows execution is intentionally unsupported.
 
-### Backend
-```bash
-cd backend
-cp .env.example .env          # fill in your API keys
-uv run python manage.py migrate
-uv run python manage.py seed_curriculum
-uv run python manage.py runserver 8002
-```
-
-### Frontend (separate terminal)
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-The app runs at http://localhost:5173 (frontend) proxying API calls to http://localhost:8002 (backend).
-
-### Development Settings
-- Backend: port 8002 (`manage.py runserver 8002`)
-- Frontend: port 5173 (Vite dev server, proxies `/api` to backend)
-- Django settings module: `config.settings.development` (set via `DJANGO_SETTINGS_MODULE`)
-- CORS: allow all origins in development
-- API prefix: `/api/v1/`
+The backend defaults to SQLite and non-debug responses. Set `DJANGO_DEBUG=true`
+only for local debugging. CORS permits the explicit local frontend origins.
+Never bind the development servers to an external network interface.
 
 ## Architecture
 
-| Layer | Stack | Directory |
-|-------|-------|-----------|
-| Backend API | Django 6, Django REST Framework, SimpleJWT | `backend/` |
-| Frontend | React 19, TypeScript, Vite | `frontend/` |
-| Database | SQLite (dev), PostgreSQL (prod) | `backend/db.sqlite3` |
-| AI features | Anthropic Claude API | `backend/apps/ai/` |
-| Code execution | Sandboxed `exec()` with import/builtin restrictions | `backend/apps/executor/` |
+| Component | Responsibility |
+|---|---|
+| accounts | HttpOnly cookie JWT sessions, CSRF, rate limits, profiles and XP |
+| curriculum | Published modules, lessons, exercises, visible tests and hints |
+| submissions | Server-side grading, ownership, progress and hint costs |
+| executor | Bounded subprocess lifecycle for trusted local Python |
+| ai | Optional text-only tutoring with bounded/redacted input |
+| common | JSON errors, request IDs, API security headers, authentication |
+| React frontend | Monaco editor, lesson UI, user state and API calls |
 
-### Backend apps (`backend/apps/`)
-- **accounts** — User registration, JWT auth, profile, XP/belt progression
-- **curriculum** — Modules, Lessons, Exercises, TestCases, Hints (the content models)
-- **submissions** — Exercise submission handling, grading, XP awards
-- **executor** — Sandboxed Python code execution engine
-- **ai** — Claude-powered hint generation, code critique, error explanation
-- **common** — Shared utilities
+Tokens stay in HttpOnly cookies; Zustand stores user/loading state. The API
+prefix is `/api/v1/`, echoed by `X-API-Version`. POSTs require JSON and CSRF.
+Frontend requests with no payload still send `{}`. Non-public data is scoped
+server-side to the authenticated user. Logout and password resets revoke sessions.
 
-### Frontend structure (`frontend/src/`)
-- **pages/** — Route-level components: `Home`, `Login`, `Register`, `Dashboard`, `ModulePage`, `LessonPage`, `ExercisePage`, `Profile`
-- **api/** — API client layer: `client.ts` (axios instance), `auth.ts`, `curriculum.ts`, `submissions.ts`, `types.ts`
-- **components/** — Reusable UI: `layout/` (navbar, footer), `editor/` (Monaco wrapper), `ProtectedRoute`
-- **stores/** — `authStore.ts` (Zustand for auth state)
+The Python subprocess shares the backend identity and is **not a hostile-code
+sandbox**. Native Windows fails closed. Linux enforces resource limits; macOS
+memory limits are advisory. Do not weaken this description when adding features.
 
-### State management
-- **Zustand** for auth state (JWT tokens, current user)
-- **TanStack Query** for all server data fetching and caching
-
-### Styling
-- TailwindCSS with a dark theme
-- Custom color palette via `tailwind.config.js`
-
-### Markdown rendering
-- **react-markdown** with **remark-gfm** for GitHub Flavored Markdown (tables, strikethrough, etc.)
-- Lesson content and exercise instructions are stored as markdown strings and rendered client-side
-
-## Data Model
-
-```
-Module (ordered 1-14)
-  └── Lesson (ordered 1-4 within module)
-        ├── 1: concept — teaches the topic
-        ├── 2: interactive — sandbox experimentation
-        ├── 3: exercise — graded exercises with test cases
-        ├── 4: interactive — "Try It Yourself" open-ended challenges
-        └── Exercise (ordered within lesson, only on exercise-type lessons)
-              ├── type: fill_blank | fix_bug | write_code | output_predict
-              ├── TestCase (expected input/output pairs)
-              └── Hint (levels 1-2, increasing XP penalties)
-```
-
-Progression is strictly linear: complete all exercises in a module to unlock the next.
-
-## Code Sandbox
-
-User code runs in `backend/apps/executor/sandbox.py` with:
-- **Allowed imports**: math, random, string, collections, datetime, json, re, typing, copy, itertools, functools, textwrap, ipaddress
-- **Blocked builtins**: exec, eval, compile, open, input (replaced), \_\_import\_\_ (restricted), getattr, setattr, etc.
-- **5-second timeout** per execution
-- Output compared against TestCase expected output (flexible: strips whitespace, case-insensitive, numeric tolerance)
-
-## Key Commands
+## Verification
 
 ```bash
-# Re-seed curriculum (flush first if data exists)
+uv sync --locked
 cd backend
-uv run python manage.py flush --no-input
-uv run python manage.py seed_curriculum
+uv run --frozen python manage.py makemigrations --check --dry-run
+uv run --frozen coverage run --rcfile=../pyproject.toml manage.py test
+uv run --frozen coverage report --rcfile=../pyproject.toml
+uv run --frozen pip-audit
+uv run --frozen bandit -r apps config -lll
+```
 
-# Run backend tests
-cd backend
-uv run python manage.py test
-
-# Run Playwright e2e tests (99 tests)
+```bash
 cd frontend
-npx playwright test
-
-# Build frontend for production
-cd frontend
+npm ci
+npm audit
 npm run build
+npx --no-install playwright install chromium
+npm run test:e2e
 ```
 
-## Conventions
+Browser tests start their own servers on 5187/8017. Prepare a disposable local
+SQLite database with `migrate` and `seed_curriculum` first. Dedicated e2e settings
+raise only the test authentication request limit; production limits remain on.
+Do not point tests at your own learning database.
 
-- Django apps live in `backend/apps/`
-- All API endpoints are prefixed with `/api/v1/`
-- Frontend pages in `frontend/src/pages/`, API layer in `frontend/src/api/`
-- Exercise types: `fill_blank`, `fix_bug`, `write_code`, `output_predict`
-- Lesson types: `concept`, `interactive`, `exercise`
-- Icons are mapped by string key in `Dashboard.tsx` (`MODULE_ICONS` dict)
-- Progressive hints: 2 levels with 0%/10% XP penalties
+CI also scans full Git history with Gitleaks, checks Python/TypeScript with
+CodeQL, builds/scans runtime images, and uploads security reports. GitHub must
+require those checks before merging; workflow files alone do not protect main.
 
-## CI/CD
+## Optional AI changes
 
-All PRs run the CI pipeline (`.github/workflows/ci.yml`):
+The tutor has no tools. Keep instructions separate from untrusted serialized
+input and never include reference solutions or credentials. Test the adversarial
+and regression cases described in [the verification record](docs/security-verification.md).
+Provider requests can cost money and disclose submitted code. Redaction is
+best-effort. Check the provider's current supported model IDs rather than
+assuming an alias will remain available indefinitely.
 
-1. **backend-tests** — migrations, seed, `uv run python manage.py test`
-2. **frontend-build** — `npm ci`, `npm run build` (includes type-check)
-3. **e2e-tests** — full Playwright suite against both servers
+## Existing Docker database upgrade
 
-All three jobs must pass before merging.
+Back up before any upgrade. Never run `down -v` to resolve an authentication
+problem: that deletes the database. Keep your original `DB_PASSWORD` and
+`DJANGO_SECRET_KEY`. Changing a PostgreSQL environment variable does not change
+an existing database role's password.
 
-## Releasing
-
-Published images live in GHCR; the runner bundle's `docker-compose.yml` pins exact tags, so
-every release is a tag bump plus a push. Nothing here is automated by CI today.
-
-**1. Bump the version.** It lives in two places that are asserted against each other:
-`APP_VERSION` in `backend/config/settings/base.py` and `ARG APP_VERSION` in `backend/Dockerfile`.
-`apps/common/tests/test_health.py::VersionDriftTest` fails if they drift apart. The backend
-reports this value at `/api/v1/health/`, which is how you confirm what is actually deployed.
-
-**2. Build and push both images, multi-arch.** The build arg is what stamps the version into
-the image — omit it and health reports the previous release.
+Fresh installs now use a limited application role (`pystarter`) and a separate
+cluster administrator (`pystarter_admin`). For an old volume whose `pystarter`
+role is the cluster superuser, create the administrator before starting the new
+Compose configuration. Connect interactively using the **old** working stack:
 
 ```bash
-VERSION=1.0.6
-docker buildx build --platform linux/amd64,linux/arm64 \
-  -f backend/Dockerfile --build-arg APP_VERSION=$VERSION \
-  -t ghcr.io/e-conners-lab/pystarter-backend:$VERSION --push .
-docker buildx build --platform linux/amd64,linux/arm64 \
-  -f frontend/Dockerfile \
-  -t ghcr.io/e-conners-lab/pystarter-frontend:$VERSION --push frontend
+docker compose exec db psql -U pystarter -d pystarter
 ```
 
-**3. Move `latest` onto the new release.** This does not happen on its own — `latest` sat on
-1.0.3 through the 1.0.4 and 1.0.5 releases, so anyone pulling it got a build whose default
-model had already been retired.
-
-```bash
-for img in backend frontend; do
-  docker buildx imagetools create \
-    -t "ghcr.io/e-conners-lab/pystarter-${img}:latest" \
-    "ghcr.io/e-conners-lab/pystarter-${img}:$VERSION"
-done
+```sql
+CREATE ROLE pystarter_admin LOGIN SUPERUSER;
+\password pystarter_admin
+ALTER ROLE pystarter NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION;
 ```
 
-`imagetools create` copies the manifest list server-side: both architectures stay attached and
-no layers are re-uploaded. Keep the braces on `${img}` — in zsh, `$img:latest` is parsed as the
-`:l` lowercase modifier and silently pushes to a `…-backendatest` repository instead.
+Enter a new random password at the prompt, then store that same value as
+`POSTGRES_ADMIN_PASSWORD` in your private `.env`. Preserve `DB_PASSWORD` for
+`pystarter`. The application role remains owner of its database for migrations.
+Only after a verified backup and successful role setup, start the updated stack.
+If your role names differ, adapt this migration to your installation; do not
+blindly recreate or delete existing roles/volumes.
 
-**4. Verify from the outside**, as a new user would — pull anonymously, not from local cache:
+## Release checklist
 
-```bash
-docker buildx imagetools inspect ghcr.io/e-conners-lab/pystarter-backend:latest   # both arches, digest == $VERSION
-curl -s localhost/api/v1/health/                                                  # {"version":"1.0.6",...}
-```
+1. Bump `APP_VERSION` in settings and the backend Dockerfile together; the health
+   test checks them. This branch prepares 1.0.8; 1.0.7 artifacts are unchanged.
+2. Pass tests, coverage >=80%, audits, secret/SAST scans, and image gates.
+3. Review source on a protected branch. Require independent approval and signed
+   commits, no force pushes or administrator bypass; keep push protection on.
+4. For a binary/image release, build each advertised architecture on hosted CI,
+   attach an SBOM and build provenance, and sign the image digests with Sigstore.
+   Verify the downloaded artifact anonymously before advertising it. Never move
+   an old version tag onto different contents.
+5. Update download links only after verified artifacts exist. A successful local
+   source build does not certify earlier published images or ZIP files.
 
-**5. Ship the runner bundle.** Bump the image tags in the bundle's `docker-compose.yml`, refresh
-the version references in the public `README.md`, re-zip as `pystarter-v$VERSION-runner.zip`, and
-attach it to the GitHub release.
-
-## Docker / Production
-
-- **Docker Compose** runs 4 services: `db` (PostgreSQL 16), `backend` (Gunicorn), `frontend` (nginx-served React), `nginx` (reverse proxy)
-- `backend/entrypoint.sh` auto-waits for DB, runs migrations, collects static files on container start
-- Backend has a healthcheck via `/api/v1/health/`; nginx waits for healthy backend
-- Production settings in `backend/config/settings/production.py` (SSL redirect, HSTS, proxy SSL header, rate limiting)
-- Rate limiting via `django-ratelimit` on auth and AI endpoints
-- Backup script: `scripts/backup-db.sh` (gzipped pg_dump with optional `PRUNE_DAYS` pruning)
+No prebuilt-image publishing workflow is supplied by this source-only change.
+The currently published 1.0.7 runner must not be presented as containing 1.0.8 fixes.

@@ -1,16 +1,25 @@
 import logging
+from smtplib import SMTPException
 
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import get_user_model
 from django.contrib.auth.password_validation import validate_password
 from django.contrib.auth.tokens import default_token_generator
 from django.conf import settings
 from django.core.exceptions import ValidationError as DjangoValidationError
 from django.core.mail import send_mail
+from django.db import transaction
+from django.middleware.csrf import get_token
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework import generics, permissions, status
-from rest_framework.decorators import api_view, permission_classes, throttle_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes, throttle_classes
 from rest_framework.response import Response
+from rest_framework.exceptions import AuthenticationFailed
+from rest_framework_simplejwt.exceptions import TokenError
+
+from apps.common.authentication import CookieJWTAuthentication, RequireCSRF
+from .sessions import clear_auth_cookies, issue_refresh, revoke_session_cookies, set_auth_cookies
+from .login_security import AuthenticationThrottle, authenticate_with_lockout
 
 from apps.common.throttles import PasswordResetThrottle
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -18,6 +27,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from apps.curriculum.models import Exercise, Module
 
 from .serializers import (
+    LoginSerializer,
     PasswordResetConfirmSerializer,
     PasswordResetRequestSerializer,
     RegisterSerializer,
@@ -29,38 +39,11 @@ logger = logging.getLogger(__name__)
 User = get_user_model()
 
 
-def _set_auth_cookies(response, refresh):
-    """Set access and refresh token cookies on a response."""
-    jwt_settings = settings.SIMPLE_JWT
-    response.set_cookie(
-        "access_token",
-        str(refresh.access_token),
-        httponly=True,
-        samesite="Lax",
-        secure=jwt_settings.get("AUTH_COOKIE_SECURE", False),
-        max_age=int(jwt_settings["ACCESS_TOKEN_LIFETIME"].total_seconds()),
-        path="/",
-    )
-    response.set_cookie(
-        "refresh_token",
-        str(refresh),
-        httponly=True,
-        samesite="Lax",
-        secure=jwt_settings.get("AUTH_COOKIE_SECURE", False),
-        max_age=int(jwt_settings["REFRESH_TOKEN_LIFETIME"].total_seconds()),
-        path="/api/v1/accounts/token/refresh/",
-    )
-
-
-def _clear_auth_cookies(response):
-    """Delete auth cookies from a response."""
-    response.delete_cookie("access_token", path="/")
-    response.delete_cookie("refresh_token", path="/api/v1/accounts/token/refresh/")
-
-
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
-    permission_classes = [permissions.AllowAny]
+    authentication_classes = []
+    permission_classes = [RequireCSRF]
+    throttle_classes = [AuthenticationThrottle]
 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -78,39 +61,37 @@ class RegisterView(generics.CreateAPIView):
                 defaults={"is_unlocked": True},
             )
 
-        refresh = RefreshToken.for_user(user)
+        refresh = issue_refresh(user)
         response = Response(
             {"user": UserSerializer(user).data},
             status=status.HTTP_201_CREATED,
         )
-        _set_auth_cookies(response, refresh)
+        set_auth_cookies(response, refresh, request)
         logger.info(
-            "audit: action=register user=%s ip=%s",
-            user.username,
-            request.META.get("REMOTE_ADDR"),
+            "audit: action=register user_id=%s", user.pk,
         )
         return response
 
 
 @api_view(["POST"])
-@permission_classes([permissions.AllowAny])
+@authentication_classes([])
+@permission_classes([RequireCSRF])
+@throttle_classes([AuthenticationThrottle])
 def login_view(request):
     """Authenticate user and set JWT cookies."""
-    username = request.data.get("username", "")
-    password = request.data.get("password", "")
-    user = authenticate(request, username=username, password=password)
+    serializer = LoginSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    user = authenticate_with_lockout(request, **serializer.validated_data)
     if user is None:
         return Response(
             {"error": "Invalid credentials."},
             status=status.HTTP_401_UNAUTHORIZED,
         )
-    refresh = RefreshToken.for_user(user)
+    refresh = issue_refresh(user)
     response = Response({"user": UserSerializer(user).data})
-    _set_auth_cookies(response, refresh)
+    set_auth_cookies(response, refresh, request)
     logger.info(
-        "audit: action=login user=%s ip=%s",
-        user.username,
-        request.META.get("REMOTE_ADDR"),
+        "audit: action=login user_id=%s", user.pk,
     )
     return response
 
@@ -148,79 +129,71 @@ def progress_summary(request):
     )
 
 
-@api_view(["POST"])
-@permission_classes([permissions.IsAuthenticated])
-def logout_view(request):
-    """Blacklist the current refresh token and clear cookies."""
-    refresh_token = request.COOKIES.get("refresh_token") or request.data.get("refresh")
-    response = Response({"status": "logged out"})
-    _clear_auth_cookies(response)
-    if refresh_token:
-        try:
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-        except Exception:
-            logger.warning("Failed to blacklist refresh token during logout")
-            _clear_auth_cookies(response)
-            response.data = {
-                "error": "Logout may not have completed fully. Your session will expire automatically."
-            }
-            response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
-            return response
-    logger.info(
-        "audit: action=logout user=%s ip=%s",
-        request.user.username,
-        request.META.get("REMOTE_ADDR"),
-    )
+@api_view(["GET"])
+@authentication_classes([])
+@permission_classes([permissions.AllowAny])
+def csrf_token(request):
+    response = Response({"csrfToken": get_token(request)})
+    # Clear the old narrow-path refresh cookie before the browser signs in.
+    # A separate bootstrap response allows Set-Cookie for the legacy path
+    # without overwriting the current same-name cookie in Django SimpleCookie.
+    response.delete_cookie("refresh_token", path="/api/v1/accounts/token/refresh/", samesite="Strict")
+    response["Cache-Control"] = "no-store"
     return response
 
 
 @api_view(["POST"])
-@permission_classes([permissions.AllowAny])
-def token_refresh(request):
-    """Refresh access token using the refresh token cookie."""
-    refresh_token = request.COOKIES.get("refresh_token")
-    if not refresh_token:
-        return Response({"error": "No refresh token"}, status=status.HTTP_401_UNAUTHORIZED)
-    try:
-        refresh = RefreshToken(refresh_token)
-        response = Response({"status": "refreshed"})
-        jwt_settings = settings.SIMPLE_JWT
-        response.set_cookie(
-            "access_token",
-            str(refresh.access_token),
-            httponly=True,
-            samesite="Lax",
-            secure=jwt_settings.get("AUTH_COOKIE_SECURE", False),
-            max_age=int(jwt_settings["ACCESS_TOKEN_LIFETIME"].total_seconds()),
-            path="/",
-        )
-        if jwt_settings.get("ROTATE_REFRESH_TOKENS", False):
-            refresh.blacklist()
-            user = User.objects.get(pk=refresh.access_token["user_id"])
-            new_refresh = RefreshToken.for_user(user)
-            response.set_cookie(
-                "refresh_token",
-                str(new_refresh),
-                httponly=True,
-                samesite="Lax",
-                secure=jwt_settings.get("AUTH_COOKIE_SECURE", False),
-                max_age=int(jwt_settings["REFRESH_TOKEN_LIFETIME"].total_seconds()),
-                path="/api/v1/accounts/token/refresh/",
-            )
-        return response
-    except Exception:
-        return Response({"error": "Invalid refresh token"}, status=status.HTTP_401_UNAUTHORIZED)
+@authentication_classes([])
+@permission_classes([RequireCSRF])
+def logout_view(request):
+    """Revoke the session even if its access token has expired."""
+    revoke_session_cookies(request)
+    response = Response({"status": "logged out"})
+    clear_auth_cookies(response)
+    logger.info("audit: action=logout")
+    return response
 
 
 @api_view(["POST"])
-@permission_classes([permissions.AllowAny])
-@throttle_classes([PasswordResetThrottle])
+@authentication_classes([])
+@permission_classes([RequireCSRF])
+@throttle_classes([AuthenticationThrottle])
+def token_refresh(request):
+    """Rotate a refresh cookie without authenticating an expired access cookie."""
+    raw_token = request.COOKIES.get("refresh_token")
+    try:
+        with transaction.atomic():
+            refresh = RefreshToken(raw_token) if raw_token else None
+            if refresh is None:
+                raise TokenError("Missing refresh token")
+            user = CookieJWTAuthentication().get_user(refresh)
+            # Serialize refreshes so the same token cannot produce two successors.
+            user = User.objects.select_for_update().get(pk=user.pk)
+            CookieJWTAuthentication().get_user(refresh)
+            refresh.check_blacklist()
+            refresh.blacklist()
+            response = Response({"status": "refreshed"})
+            set_auth_cookies(response, issue_refresh(user))
+            return response
+    except (TokenError, AuthenticationFailed, User.DoesNotExist):
+        response = Response({"error": "Invalid refresh token"}, status=status.HTTP_401_UNAUTHORIZED)
+        clear_auth_cookies(response)
+        return response
+
+
+@api_view(["POST"])
+@authentication_classes([])
+@permission_classes([RequireCSRF])
+@throttle_classes([AuthenticationThrottle, PasswordResetThrottle])
 def password_reset_request(request):
     """Send a password reset email. Always returns 200 (anti-enumeration)."""
     serializer = PasswordResetRequestSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     email = serializer.validated_data["email"]
+    response = Response({"status": "If an account with that email exists, a reset link has been sent."})
+    if settings.EMAIL_BACKEND == "django.core.mail.backends.smtp.EmailBackend" and not settings.EMAIL_HOST.strip():
+        logger.warning("Password recovery unavailable: SMTP host is not configured.")
+        return response
 
     try:
         user = User.objects.get(email=email)
@@ -236,18 +209,19 @@ def password_reset_request(request):
         )
     except User.DoesNotExist:
         pass  # Anti-enumeration: don't reveal if email exists
+    except (SMTPException, OSError):
+        logger.warning("Password recovery delivery failed; check SMTP configuration.")
 
     logger.info(
-        "audit: action=password_reset_request email=%s ip=%s",
-        email,
-        request.META.get("REMOTE_ADDR"),
+        "audit: action=password_reset_request",
     )
-    return Response({"status": "If an account with that email exists, a reset link has been sent."})
+    return response
 
 
 @api_view(["POST"])
-@permission_classes([permissions.AllowAny])
-@throttle_classes([PasswordResetThrottle])
+@authentication_classes([])
+@permission_classes([RequireCSRF])
+@throttle_classes([AuthenticationThrottle, PasswordResetThrottle])
 def password_reset_confirm(request):
     """Reset password using uid and token from the email link."""
     serializer = PasswordResetConfirmSerializer(data=request.data)
@@ -276,15 +250,16 @@ def password_reset_confirm(request):
     user.set_password(serializer.validated_data["new_password"])
     user.save()
     logger.info(
-        "audit: action=password_reset_confirm user=%s ip=%s",
-        user.username,
-        request.META.get("REMOTE_ADDR"),
+        "audit: action=password_reset_confirm user_id=%s", user.pk,
     )
-    return Response({"status": "Password has been reset successfully."})
+    response = Response({"status": "Password has been reset successfully."})
+    clear_auth_cookies(response)
+    return response
 
 
 @api_view(["GET"])
-@permission_classes([permissions.AllowAny])
+@authentication_classes([])
+@permission_classes([RequireCSRF])
 def leaderboard(request):
     users = User.objects.order_by("-total_xp")[:20]
     data = [

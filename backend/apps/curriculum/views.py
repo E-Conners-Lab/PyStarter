@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from django.db import transaction
 from django.db.models import Count, Prefetch, Q
 from django.utils import timezone
@@ -6,7 +7,11 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.generics import ListAPIView, RetrieveAPIView
 from rest_framework.response import Response
 
-from apps.accounts.models import UserExerciseProgress, UserLessonProgress, UserModuleProgress
+from apps.accounts.models import (
+    UserExerciseProgress,
+    UserLessonProgress,
+    UserModuleProgress,
+)
 
 from .models import Exercise, Hint, Lesson, Module
 from .serializers import (
@@ -16,6 +21,12 @@ from .serializers import (
     ModuleDetailSerializer,
     ModuleListSerializer,
 )
+
+
+def _published_lessons():
+    return Lesson.objects.filter(is_published=True).prefetch_related(
+        Prefetch("exercises", queryset=Exercise.objects.filter(is_published=True))
+    )
 
 
 class ModuleListView(ListAPIView):
@@ -53,11 +64,13 @@ class ModuleListView(ListAPIView):
             )
         else:
             qs = qs.annotate(
-                _completed_exercises=Count("lessons__exercises", filter=Q(pk__isnull=True))
+                _completed_exercises=Count(
+                    "lessons__exercises", filter=Q(pk__isnull=True)
+                )
             )
 
         return qs.prefetch_related(
-            "lessons", "lessons__exercises", "user_progress"
+            Prefetch("lessons", queryset=_published_lessons()), "user_progress"
         ).order_by("order")
 
 
@@ -68,7 +81,7 @@ class ModuleDetailView(RetrieveAPIView):
 
     def get_queryset(self):
         return Module.objects.filter(is_published=True).prefetch_related(
-            "lessons", "user_progress"
+            Prefetch("lessons", queryset=_published_lessons()), "user_progress"
         )
 
 
@@ -81,7 +94,9 @@ class LessonDetailView(RetrieveAPIView):
         lesson_slug = self.kwargs["lesson_slug"]
         user = self.request.user
 
-        prefetches = ["exercises"]
+        prefetches = [
+            Prefetch("exercises", queryset=Exercise.objects.filter(is_published=True))
+        ]
         if user.is_authenticated:
             prefetches.append(
                 Prefetch(
@@ -95,9 +110,8 @@ class LessonDetailView(RetrieveAPIView):
         else:
             prefetches.append("exercises__user_progress")
 
-        return Lesson.objects.select_related("module").prefetch_related(
-            *prefetches
-        ).get(
+        return get_object_or_404(
+            Lesson.objects.select_related("module").prefetch_related(*prefetches),
             module__slug=module_slug,
             slug=lesson_slug,
             is_published=True,
@@ -113,13 +127,16 @@ class ExerciseDetailView(RetrieveAPIView):
         module_slug = self.kwargs["module_slug"]
         lesson_slug = self.kwargs["lesson_slug"]
         exercise_slug = self.kwargs["exercise_slug"]
-        return Exercise.objects.select_related("lesson", "lesson__module").prefetch_related(
-            "test_cases", "hints", "user_progress"
-        ).get(
+        return get_object_or_404(
+            Exercise.objects.select_related(
+                "lesson", "lesson__module"
+            ).prefetch_related("test_cases", "hints", "user_progress"),
             lesson__module__slug=module_slug,
             lesson__slug=lesson_slug,
             slug=exercise_slug,
             is_published=True,
+            lesson__is_published=True,
+            lesson__module__is_published=True,
         )
 
 
@@ -128,9 +145,16 @@ class ExerciseDetailView(RetrieveAPIView):
 def reveal_hint(request, exercise_id):
     """Reveal the next hint for an exercise."""
     try:
-        exercise = Exercise.objects.get(id=exercise_id, is_published=True)
+        exercise = Exercise.objects.get(
+            id=exercise_id,
+            is_published=True,
+            lesson__is_published=True,
+            lesson__module__is_published=True,
+        )
     except Exercise.DoesNotExist:
-        return Response({"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND
+        )
 
     # Get user's exercise progress
     progress, _ = UserExerciseProgress.objects.get_or_create(
@@ -142,7 +166,9 @@ def reveal_hint(request, exercise_id):
     try:
         hint = Hint.objects.get(exercise=exercise, level=next_level)
     except Hint.DoesNotExist:
-        return Response({"error": "No more hints available"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"error": "No more hints available"}, status=status.HTTP_404_NOT_FOUND
+        )
 
     # Update hints used
     progress.hints_used = next_level
@@ -156,9 +182,16 @@ def reveal_hint(request, exercise_id):
 def revealed_hints(request, exercise_id):
     """Get all hints the user has already revealed for an exercise."""
     try:
-        exercise = Exercise.objects.get(id=exercise_id, is_published=True)
+        exercise = Exercise.objects.get(
+            id=exercise_id,
+            is_published=True,
+            lesson__is_published=True,
+            lesson__module__is_published=True,
+        )
     except Exercise.DoesNotExist:
-        return Response({"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND)
+        return Response(
+            {"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND
+        )
 
     progress = UserExerciseProgress.objects.filter(
         user=request.user, exercise=exercise
@@ -174,7 +207,9 @@ def revealed_hints(request, exercise_id):
 def mark_lesson_complete(request, lesson_id):
     """Mark a concept/interactive lesson as completed (no exercise required)."""
     try:
-        lesson = Lesson.objects.get(id=lesson_id, is_published=True)
+        lesson = Lesson.objects.get(
+            id=lesson_id, is_published=True, module__is_published=True
+        )
     except Lesson.DoesNotExist:
         return Response({"error": "Lesson not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -207,12 +242,12 @@ def _check_module_completion(user, module):
     completed_lesson_ids = set(
         UserLessonProgress.objects.filter(
             user=user, lesson__module=module, is_completed=True
-        ).values_list('lesson_id', flat=True)
+        ).values_list("lesson_id", flat=True)
     )
     completed_exercise_ids = set(
         UserExerciseProgress.objects.filter(
             user=user, exercise__lesson__module=module, is_completed=True
-        ).values_list('exercise_id', flat=True)
+        ).values_list("exercise_id", flat=True)
     )
 
     for lesson in all_lessons:
@@ -224,8 +259,7 @@ def _check_module_completion(user, module):
             if lesson.lesson_type == "exercise":
                 exercises = lesson.exercises.filter(is_published=True)
                 exercises_done = all(
-                    ex.id in completed_exercise_ids
-                    for ex in exercises
+                    ex.id in completed_exercise_ids for ex in exercises
                 )
                 if exercises_done and exercises.exists():
                     # Auto-complete the lesson
