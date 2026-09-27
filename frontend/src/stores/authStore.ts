@@ -1,11 +1,10 @@
 import axios from 'axios';
 import { create } from 'zustand';
-import type { AuthTokens, User } from '../api/types';
+import type { User } from '../api/types';
 import * as authApi from '../api/auth';
 
 interface AuthState {
   user: User | null;
-  tokens: AuthTokens | null;
   isLoading: boolean;
   isAuthenticated: boolean;
 
@@ -15,44 +14,35 @@ interface AuthState {
   loadUser: () => Promise<void>;
 }
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
-  tokens: (() => {
-    const stored = localStorage.getItem('tokens');
-    return stored ? JSON.parse(stored) : null;
-  })(),
-  isLoading: false,
-  isAuthenticated: !!localStorage.getItem('tokens'),
+  isLoading: true,
+  isAuthenticated: false,
 
   login: async (username, password) => {
-    const tokens = await authApi.login(username, password);
-    localStorage.setItem('tokens', JSON.stringify(tokens));
-    set({ tokens, isAuthenticated: true });
-    await get().loadUser();
+    const user = await authApi.login(username, password);
+    set({ user, isAuthenticated: true });
   },
 
   register: async (username, password) => {
-    const { user, tokens } = await authApi.register(username, password);
-    localStorage.setItem('tokens', JSON.stringify(tokens));
-    set({ user, tokens, isAuthenticated: true });
+    const { user } = await authApi.register(username, password);
+    set({ user, isAuthenticated: true });
   },
 
   logout: () => {
-    localStorage.removeItem('tokens');
-    set({ user: null, tokens: null, isAuthenticated: false });
+    authApi.logout().catch(() => {});
+    set({ user: null, isAuthenticated: false });
   },
 
   loadUser: async () => {
-    if (!get().tokens) return;
     set({ isLoading: true });
     try {
       const user = await authApi.getMe();
-      set({ user, isLoading: false });
+      set({ user, isAuthenticated: true, isLoading: false });
     } catch (err) {
       set({ isLoading: false });
-      // Only logout on 401 (invalid/expired token), not on network errors or 500s
       if (axios.isAxiosError(err) && err.response?.status === 401) {
-        get().logout();
+        set({ isAuthenticated: false, user: null });
       }
     }
   },

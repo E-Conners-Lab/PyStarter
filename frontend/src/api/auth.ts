@@ -1,15 +1,15 @@
 import client from './client';
-import type { AuthTokens, ProgressSummary, User } from './types';
+import type { ProgressSummary, User } from './types';
 
-export async function login(username: string, password: string): Promise<AuthTokens> {
+export async function login(username: string, password: string): Promise<User> {
   const res = await client.post('/accounts/login/', { username, password });
-  return res.data;
+  return res.data.user;
 }
 
 export async function register(
   username: string,
   password: string
-): Promise<{ user: User; tokens: AuthTokens }> {
+): Promise<{ user: User }> {
   const res = await client.post('/accounts/register/', { username, password });
   return res.data;
 }
@@ -45,4 +45,8 @@ export async function confirmPasswordReset(
     token,
     new_password: newPassword,
   });
+}
+
+export async function logout(): Promise<void> {
+  await client.post('/accounts/logout/');
 }

@@ -177,13 +177,13 @@ class ModuleListSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if not request or not request.user.is_authenticated:
             return obj.order == 1  # First module always shown as unlocked
-        return obj.user_progress.filter(user=request.user, is_unlocked=True).exists()
+        return any(p.is_unlocked for p in obj.user_progress.all() if p.user_id == request.user.id)
 
     def get_is_completed(self, obj):
         request = self.context.get("request")
         if not request or not request.user.is_authenticated:
             return False
-        return obj.user_progress.filter(user=request.user, is_completed=True).exists()
+        return any(p.is_completed for p in obj.user_progress.all() if p.user_id == request.user.id)
 
     def get_progress_percent(self, obj):
         request = self.context.get("request")
@@ -221,13 +221,13 @@ class ModuleDetailSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
         if not request or not request.user.is_authenticated:
             return obj.order == 1
-        return obj.user_progress.filter(user=request.user, is_unlocked=True).exists()
+        return any(p.is_unlocked for p in obj.user_progress.all() if p.user_id == request.user.id)
 
     def get_is_completed(self, obj):
         request = self.context.get("request")
         if not request or not request.user.is_authenticated:
             return False
-        return obj.user_progress.filter(user=request.user, is_completed=True).exists()
+        return any(p.is_completed for p in obj.user_progress.all() if p.user_id == request.user.id)
 
     def get_next_module(self, obj):
         next_mod = (

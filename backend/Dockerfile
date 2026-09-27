@@ -35,11 +35,18 @@ ENV PYTHONPATH=/app/backend
 
 # Release version reported by /api/v1/health/. Publish with:
 #   docker build --build-arg APP_VERSION=<tag> ...
-ARG APP_VERSION=1.0.6
+ARG APP_VERSION=1.0.7
 ENV APP_VERSION=${APP_VERSION}
 
 COPY backend/entrypoint.sh /app/backend/entrypoint.sh
 RUN chmod +x /app/backend/entrypoint.sh
+
+# Run as a named non-root user. Student code executes in a child of this process,
+# so root here would hand an escaped payload root inside the container.
+# Only the app tree needs write access (collectstatic at startup); the venv stays read-only.
+RUN useradd --create-home --uid 10001 --shell /usr/sbin/nologin pystarter \
+    && chown -R pystarter:pystarter /app/backend
+USER pystarter
 
 EXPOSE 8000
 

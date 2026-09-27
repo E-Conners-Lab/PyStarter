@@ -45,12 +45,7 @@ Student's solution:
 {code}
 ```
 
-Reference solution:
-```python
-{solution_code}
-```
-
-Give encouraging feedback on their solution."""
+Review the student's code based on the exercise instructions above. Give encouraging feedback on their solution."""
 
 EXPLAIN_ERROR_SYSTEM = """You are a friendly Python tutor helping an absolute beginner understand an error.
 

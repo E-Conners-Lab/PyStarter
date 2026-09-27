@@ -4,7 +4,7 @@ from django.urls import include, path
 from apps.common.views import health_check
 
 urlpatterns = [
-    path("admin/", admin.site.urls),
+    path("manage-app/", admin.site.urls),
     path("api/v1/health/", health_check, name="health-check"),
     path("api/v1/accounts/", include("apps.accounts.urls")),
     path("api/v1/curriculum/", include("apps.curriculum.urls")),

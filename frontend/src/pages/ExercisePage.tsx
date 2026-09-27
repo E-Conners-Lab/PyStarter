@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -51,28 +51,32 @@ export default function ExercisePage() {
   const [choiceResult, setChoiceResult] = useState<'correct' | 'wrong' | null>(null);
   const [errorMessage, setErrorMessage] = useState('');
 
-  // Initialize code when exercise loads
-  const [codeInitialized, setCodeInitialized] = useState('');
-  if (exercise && exercise.slug !== codeInitialized) {
-    setCode(exercise.starter_code);
-    setCodeInitialized(exercise.slug);
-    setResult(null);
-    setHints([]);
-    setAiHint('');
-    setAiCritique('');
-    setAiExplanation('');
-    setSelectedChoice(null);
-    setChoiceResult(null);
-  }
+  // H5: Initialize code when exercise loads (moved to useEffect)
+  useEffect(() => {
+    if (exercise) {
+      setCode(exercise.starter_code);
+      setResult(null);
+      setHints([]);
+      setAiHint('');
+      setAiCritique('');
+      setAiExplanation('');
+      setSelectedChoice(null);
+      setChoiceResult(null);
+    }
+  }, [exercise?.slug]);
 
-  // Load revealed hints
-  useQuery({
+  // H4: Load revealed hints (removed broken onSuccess, sync via useEffect)
+  const { data: hintsData } = useQuery({
     queryKey: ['hints', exercise?.id],
     queryFn: () => getRevealedHints(exercise!.id),
     enabled: !!exercise?.id,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    onSuccess: (data: any) => setHints(data),
-  } as any);
+  });
+
+  useEffect(() => {
+    if (hintsData) {
+      setHints(hintsData);
+    }
+  }, [hintsData]);
 
   const handleRun = useCallback(async () => {
     if (!exercise) return;
@@ -179,22 +183,25 @@ export default function ExercisePage() {
     }
   }, [exercise, code, result]);
 
-  const handleChoiceSubmit = useCallback(() => {
+  // H6: Fix unhandled promise — use async/await with try/catch
+  const handleChoiceSubmit = useCallback(async () => {
     if (!exercise?.choices || selectedChoice === null) return;
     const choice = exercise.choices[selectedChoice];
     setChoiceResult(choice.is_correct ? 'correct' : 'wrong');
     if (choice.is_correct) {
-      // Submit as correct
-      submitCode(exercise.id, `# Answer: ${choice.label}`).then((res) => {
+      try {
+        const res = await submitCode(exercise.id, `# Answer: ${choice.label}`);
         setResult(res);
         queryClient.invalidateQueries({ queryKey: ['exercise'] });
         queryClient.invalidateQueries({ queryKey: ['module'] });
         queryClient.invalidateQueries({ queryKey: ['modules'] });
         queryClient.invalidateQueries({ queryKey: ['progress'] });
         loadUser();
-      });
+      } catch {
+        setErrorMessage('Failed to record answer. Please try again.');
+      }
     }
-  }, [exercise, selectedChoice, queryClient]);
+  }, [exercise, selectedChoice, queryClient, loadUser]);
 
   if (isError) {
     return (
@@ -239,6 +246,7 @@ export default function ExercisePage() {
           <button
             onClick={() => setErrorMessage('')}
             className="text-red-400 hover:text-red-300 ml-4 text-lg leading-none"
+            aria-label="Dismiss error"
           >
             &times;
           </button>

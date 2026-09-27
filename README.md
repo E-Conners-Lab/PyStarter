@@ -16,6 +16,12 @@ PyStarter is **MIT licensed** and the full source is in this repo. Clone it, for
 
 It is a complete, working codebase with a test suite (Django unit tests + 99 Playwright E2E tests) and CI, so it is a reasonable base to build on.
 
+> **Read [SECURITY.md](SECURITY.md) before you deploy it.** PyStarter executes
+> student-submitted Python. That execution is sandboxed but the sandbox is *not* a
+> hard security boundary — it is meant for local use with people you trust, and the
+> default install binds to `127.0.0.1` accordingly. Do not put it on the public
+> internet with open registration.
+
 ---
 
 ## Install
@@ -28,8 +34,8 @@ Runs PostgreSQL, Django, React, and nginx. Migrations and curriculum seeding hap
 
 ```bash
 # 1. Download and unzip the runner bundle
-curl -LO https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.6/pystarter-v1.0.6-runner.zip
-unzip pystarter-v1.0.6-runner.zip -d pystarter
+curl -LO https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.7/pystarter-v1.0.7-runner.zip
+unzip pystarter-v1.0.7-runner.zip -d pystarter
 cd pystarter
 
 # 2. Generate .env (Django secret key, optional Anthropic key)
@@ -102,7 +108,7 @@ Hint quality tracks model quality; models under ~13B give noticeably vaguer hint
 
 **Built-in code editor** — Monaco (the VS Code engine) in the browser, with syntax highlighting and auto-indent.
 
-**Sandboxed execution** — student code runs with an import whitelist, blocked builtins, a 5-second timeout, and memory limits.
+**Sandboxed execution** — student code runs in a separate process with an import allowlist, blocked builtins, a scrubbed environment (no API keys or database credentials), memory limits, and a deadline that kills the job. It is a containment boundary, not an impenetrable one — see [SECURITY.md](SECURITY.md).
 
 **4 exercise types** — fill in the blank, fix the bug, write code, predict the output.
 
@@ -138,7 +144,7 @@ Hint quality tracks model quality; models under ~13B give noticeably vaguer hint
 | To change… | Edit |
 |---|---|
 | Lessons, exercises, hints, test cases | `backend/apps/curriculum/management/commands/seed_curriculum.py`, then re-seed |
-| Sandbox limits and the import whitelist | `backend/apps/executor/sandbox.py` |
+| Sandbox limits and the import allowlist | `backend/apps/executor/sandbox.py` (orchestration) and `runner.py` (the child process) |
 | AI prompts and behavior | `backend/apps/ai/` |
 | XP values and belt thresholds | `backend/apps/accounts/` |
 | UI, theme, pages | `frontend/src/` (TailwindCSS, dark theme) |
@@ -165,7 +171,7 @@ Re-seeding after curriculum edits rebuilds curriculum content — flush first if
 | Testing | Django unit tests + 99 Playwright E2E tests |
 | CI | GitHub Actions |
 
-Pre-built images: `ghcr.io/e-conners-lab/pystarter-backend:1.0.6` and `ghcr.io/e-conners-lab/pystarter-frontend:1.0.6` (both `linux/amd64` + `linux/arm64`). `/api/v1/health/` reports the running version.
+Pre-built images: `ghcr.io/e-conners-lab/pystarter-backend:1.0.7` and `ghcr.io/e-conners-lab/pystarter-frontend:1.0.7` (both `linux/amd64` + `linux/arm64`). `/api/v1/health/` reports the running version.
 
 ---
 

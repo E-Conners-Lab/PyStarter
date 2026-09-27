@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
@@ -34,11 +34,11 @@ export default function LessonPage() {
   const [error, setError] = useState('');
 
   // Initialize sandbox code when lesson loads
-  const [initialized, setInitialized] = useState(false);
-  if (lesson?.sandbox_code && !initialized) {
-    setSandboxCode(lesson.sandbox_code);
-    setInitialized(true);
-  }
+  useEffect(() => {
+    if (lesson?.sandbox_code) {
+      setSandboxCode(lesson.sandbox_code);
+    }
+  }, [lesson?.sandbox_code]);
 
   const handleRunSandbox = useCallback(async () => {
     if (!sandboxCode.trim()) return;
@@ -119,6 +119,7 @@ export default function LessonPage() {
           <button
             onClick={() => setError('')}
             className="text-red-400 hover:text-red-300 ml-4 text-lg leading-none"
+            aria-label="Dismiss error"
           >
             &times;
           </button>

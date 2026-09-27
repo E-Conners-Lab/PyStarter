@@ -53,4 +53,4 @@ class SubmissionSerializer(serializers.ModelSerializer):
 
 
 class SubmitCodeSerializer(serializers.Serializer):
-    code = serializers.CharField()
+    code = serializers.CharField(max_length=10000)

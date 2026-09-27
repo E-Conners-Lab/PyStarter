@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.db.models import Count, Prefetch, Q
 from django.utils import timezone
 from rest_framework import permissions, status
@@ -183,15 +184,16 @@ def mark_lesson_complete(request, lesson_id):
             status=status.HTTP_400_BAD_REQUEST,
         )
 
-    progress, created = UserLessonProgress.objects.get_or_create(
-        user=request.user, lesson=lesson
-    )
-    if not progress.is_completed:
-        progress.is_completed = True
-        progress.completed_at = timezone.now()
-        progress.save(update_fields=["is_completed", "completed_at"])
+    with transaction.atomic():
+        progress, created = UserLessonProgress.objects.get_or_create(
+            user=request.user, lesson=lesson
+        )
+        if not progress.is_completed:
+            progress.is_completed = True
+            progress.completed_at = timezone.now()
+            progress.save(update_fields=["is_completed", "completed_at"])
 
-    _check_module_completion(request.user, lesson.module)
+        _check_module_completion(request.user, lesson.module)
 
     return Response({"status": "completed"})
 
@@ -201,20 +203,28 @@ def _check_module_completion(user, module):
     all_lessons = module.lessons.filter(is_published=True)
     all_completed = True
 
+    # Bulk-fetch completed lesson and exercise IDs for this user+module
+    completed_lesson_ids = set(
+        UserLessonProgress.objects.filter(
+            user=user, lesson__module=module, is_completed=True
+        ).values_list('lesson_id', flat=True)
+    )
+    completed_exercise_ids = set(
+        UserExerciseProgress.objects.filter(
+            user=user, exercise__lesson__module=module, is_completed=True
+        ).values_list('exercise_id', flat=True)
+    )
+
     for lesson in all_lessons:
         # Check lesson progress
-        lesson_done = UserLessonProgress.objects.filter(
-            user=user, lesson=lesson, is_completed=True
-        ).exists()
+        lesson_done = lesson.id in completed_lesson_ids
 
         if not lesson_done:
             # For exercise lessons, check if all exercises are done
             if lesson.lesson_type == "exercise":
                 exercises = lesson.exercises.filter(is_published=True)
                 exercises_done = all(
-                    UserExerciseProgress.objects.filter(
-                        user=user, exercise=ex, is_completed=True
-                    ).exists()
+                    ex.id in completed_exercise_ids
                     for ex in exercises
                 )
                 if exercises_done and exercises.exists():

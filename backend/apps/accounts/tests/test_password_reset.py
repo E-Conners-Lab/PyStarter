@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
+from django.core.cache import cache
 from django.test import TestCase
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -19,6 +20,7 @@ class PasswordResetRequestTests(TestCase):
         )
 
     def setUp(self):
+        cache.clear()
         self.client = APIClient()
 
     def test_existing_email_sends_email(self):
@@ -57,6 +59,7 @@ class PasswordResetConfirmTests(TestCase):
         )
 
     def setUp(self):
+        cache.clear()
         self.client = APIClient()
         self.uid = urlsafe_base64_encode(force_bytes(self.user.pk))
         self.token = default_token_generator.make_token(self.user)

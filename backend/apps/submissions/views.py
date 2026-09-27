@@ -1,3 +1,5 @@
+from django.db import transaction
+from django.db.models import F
 from django.utils import timezone
 from rest_framework import permissions, status
 from rest_framework.decorators import api_view, permission_classes, throttle_classes
@@ -126,43 +128,44 @@ def submit_code(request, exercise_id):
         )
 
     # Update progress and award XP if all tests passed
-    if all_passed:
-        progress, _ = UserExerciseProgress.objects.get_or_create(
-            user=request.user, exercise=exercise
-        )
-        progress.attempts += 1
+    with transaction.atomic():
+        if all_passed:
+            progress, _ = UserExerciseProgress.objects.select_for_update().get_or_create(
+                user=request.user, exercise=exercise
+            )
+            progress.attempts += 1
 
-        if not progress.is_completed:
-            # Calculate XP with hint penalty
-            xp = exercise.xp_value
-            total_penalty = 0
-            for hint in exercise.hints.filter(level__lte=progress.hints_used):
-                total_penalty += hint.xp_penalty_percent
-            total_penalty = min(total_penalty, 100)
-            xp_awarded = max(0, xp - int(xp * total_penalty / 100))
+            if not progress.is_completed:
+                # Calculate XP with hint penalty
+                xp = exercise.xp_value
+                total_penalty = 0
+                for hint in exercise.hints.filter(level__lte=progress.hints_used):
+                    total_penalty += hint.xp_penalty_percent
+                total_penalty = min(total_penalty, 100)
+                xp_awarded = max(0, xp - int(xp * total_penalty / 100))
 
-            progress.is_completed = True
-            progress.completed_at = timezone.now()
-            progress.xp_earned = xp_awarded
-            progress.best_code = code
-            progress.save()
+                progress.is_completed = True
+                progress.completed_at = timezone.now()
+                progress.xp_earned = xp_awarded
+                progress.best_code = code
+                progress.save()
 
-            submission.xp_awarded = xp_awarded
-            submission.save(update_fields=["xp_awarded"])
+                submission.xp_awarded = xp_awarded
+                submission.save(update_fields=["xp_awarded"])
 
-            request.user.award_xp(xp_awarded)
+                request.user.award_xp(xp_awarded)
 
-            # Check if this completes the lesson/module
-            _check_module_completion(request.user, exercise.lesson.module)
+                # Check if this completes the lesson/module
+                _check_module_completion(request.user, exercise.lesson.module)
+            else:
+                progress.save(update_fields=["attempts"])
         else:
+            # Track attempt even on failure
+            progress, _ = UserExerciseProgress.objects.select_for_update().get_or_create(
+                user=request.user, exercise=exercise
+            )
+            progress.attempts += 1
             progress.save(update_fields=["attempts"])
-    else:
-        # Track attempt even on failure
-        progress, _ = UserExerciseProgress.objects.get_or_create(
-            user=request.user, exercise=exercise
-        )
-        progress.attempts += 1
-        progress.save(update_fields=["attempts"])
 
     return Response(SubmissionSerializer(submission).data)
 

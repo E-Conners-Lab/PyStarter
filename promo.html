@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PyStarter — Learn Python. Write Code. Level Up.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg-deep: #0a0f0d;
+    --bg-card: #0f1613;
+    --bg-surface: #141e1a;
+    --bg-elevated: #1a2822;
+    --green-bright: #00ff88;
+    --green-mid: #00cc6a;
+    --green-dim: #0a7a45;
+    --green-glow: rgba(0, 255, 136, 0.15);
+    --green-glow-strong: rgba(0, 255, 136, 0.3);
+    --amber: #ffb830;
+    --amber-dim: rgba(255, 184, 48, 0.15);
+    --cyan: #00d4ff;
+    --cyan-dim: rgba(0, 212, 255, 0.1);
+    --text-primary: #e8f0ec;
+    --text-secondary: #8a9e92;
+    --text-dim: #4a6055;
+    --border: rgba(0, 255, 136, 0.08);
+    --border-active: rgba(0, 255, 136, 0.2);
+  }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text-primary);
+    font-family: 'Outfit', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    overflow: hidden;
+    position: relative;
+    box-shadow:
+      0 0 80px rgba(0, 255, 136, 0.04),
+      0 40px 80px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Top glow bar */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 10%;
+    right: 10%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--green-bright), transparent);
+  }
+
+  /* Background noise texture */
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .card > * { position: relative; z-index: 1; }
+
+  /* ─── Header ─── */
+  .header {
+    padding: 40px 36px 0;
+    text-align: center;
+  }
+
+  .badge-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 100px;
+    border: 1px solid;
+  }
+
+  .badge--green {
+    color: var(--green-bright);
+    border-color: var(--green-dim);
+    background: var(--green-glow);
+  }
+
+  .badge--amber {
+    color: var(--amber);
+    border-color: rgba(255, 184, 48, 0.3);
+    background: var(--amber-dim);
+  }
+
+  .logo {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: -2px;
+    line-height: 1;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, var(--green-bright) 0%, #00ddaa 40%, var(--cyan) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 30px rgba(0, 255, 136, 0.3));
+  }
+
+  .tagline {
+    font-size: 18px;
+    font-weight: 300;
+    color: var(--text-secondary);
+    letter-spacing: 0.5px;
+    margin-bottom: 32px;
+  }
+
+  /* ─── Stats ─── */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    background: var(--border);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .stat {
+    background: var(--bg-card);
+    padding: 20px 8px;
+    text-align: center;
+  }
+
+  .stat__number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--green-bright);
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .stat__label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+  }
+
+  /* ─── Code Window ─── */
+  .code-section {
+    padding: 28px 36px;
+  }
+
+  .code-window {
+    background: #0c1210;
+    border: 1px solid var(--border-active);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow:
+      0 0 40px rgba(0, 255, 136, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.03);
+  }
+
+  .code-titlebar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .dot--red { background: #ff5f57; }
+  .dot--yellow { background: #ffbd2e; }
+  .dot--green { background: #28ca41; }
+
+  .code-titlebar span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-left: 8px;
+  }
+
+  .code-body {
+    padding: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  .code-line {
+    display: flex;
+    gap: 16px;
+  }
+
+  .line-num {
+    color: var(--text-dim);
+    user-select: none;
+    min-width: 16px;
+    text-align: right;
+  }
+
+  .kw { color: #c792ea; }
+  .fn { color: #82aaff; }
+  .str { color: var(--green-bright); }
+  .cmt { color: var(--text-dim); font-style: italic; }
+  .var { color: var(--cyan); }
+  .op { color: #89ddff; }
+
+  .code-output {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border-active);
+  }
+
+  .code-output-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .code-output-text {
+    color: var(--green-bright);
+    font-size: 14px;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+  }
+
+  /* ─── Features ─── */
+  .features {
+    padding: 0 36px 28px;
+  }
+
+  .features-title {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    margin-bottom: 16px;
+  }
+
+  .feature-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .feature {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 14px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: border-color 0.2s;
+  }
+
+  .feature:hover {
+    border-color: var(--border-active);
+  }
+
+  .feature__icon {
+    font-size: 18px;
+    line-height: 1;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-elevated);
+    border-radius: 8px;
+  }
+
+  .feature__text {
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  .feature__text strong {
+    color: var(--text-primary);
+    font-weight: 700;
+    display: block;
+    margin-bottom: 1px;
+  }
+
+  /* ─── Belt Progression ─── */
+  .belts-section {
+    padding: 0 36px 28px;
+  }
+
+  .belts-bar {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 16px 20px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .belt-dot {
+    flex: 1;
+    height: 6px;
+    border-radius: 3px;
+    position: relative;
+  }
+
+  .belt-dot--white { background: #e0e0e0; }
+  .belt-dot--yellow { background: #ffd700; }
+  .belt-dot--orange { background: #ff8c00; }
+  .belt-dot--green { background: #00cc6a; }
+  .belt-dot--blue { background: #4488ff; }
+  .belt-dot--purple { background: #aa66ff; }
+  .belt-dot--brown { background: #8b5e3c; }
+  .belt-dot--black { background: #333; border: 1px solid #555; }
+
+  .belts-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    padding: 0 20px;
+  }
+
+  .belts-labels span {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* ─── Footer ─── */
+  .footer {
+    padding: 24px 36px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .footer__link {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--green-mid);
+    text-decoration: none;
+    padding: 8px 16px;
+    border: 1px solid var(--green-dim);
+    border-radius: 8px;
+    background: var(--green-glow);
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .footer__link:hover {
+    background: var(--green-glow-strong);
+    border-color: var(--green-mid);
+    color: var(--green-bright);
+  }
+
+  .footer__link svg {
+    width: 16px;
+    height: 16px;
+    fill: currentColor;
+  }
+
+  .footer__brand {
+    font-size: 12px;
+    color: var(--text-dim);
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+
+  .footer__brand em {
+    font-style: normal;
+    color: var(--text-secondary);
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 520px) {
+    .card { border-radius: 18px; }
+    .header { padding: 28px 24px 0; }
+    .logo { font-size: 40px; letter-spacing: -1px; }
+    .tagline { font-size: 15px; margin-bottom: 24px; }
+
+    .stat { padding: 14px 4px; }
+    .stat__number { font-size: 22px; }
+    .stat__label { font-size: 9px; letter-spacing: 0.5px; }
+
+    .code-section,
+    .features,
+    .belts-section { padding-left: 20px; padding-right: 20px; }
+
+    .code-body { padding: 14px; font-size: 12px; }
+
+    .feature-grid { grid-template-columns: 1fr; }
+
+    .footer {
+      padding: 20px;
+      flex-direction: column;
+      text-align: center;
+    }
+  }
+
+  /* ─── Animations ─── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+  }
+
+  .header { animation: fadeUp 0.6s ease-out; }
+  .stats { animation: fadeUp 0.6s ease-out 0.1s both; }
+  .code-section { animation: fadeUp 0.6s ease-out 0.2s both; }
+  .features { animation: fadeUp 0.6s ease-out 0.3s both; }
+  .belts-section { animation: fadeUp 0.6s ease-out 0.35s both; }
+  .footer { animation: fadeUp 0.6s ease-out 0.4s both; }
+  .card::before { animation: glowPulse 3s ease-in-out infinite; }
+
+  .cursor-blink {
+    display: inline-block;
+    width: 2px;
+    height: 16px;
+    background: var(--green-bright);
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="card">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="badge-row">
+        <span class="badge badge--green">Free & Open Source</span>
+        <span class="badge badge--amber">Python Training</span>
+      </div>
+      <div class="logo">PyStarter</div>
+      <p class="tagline">Learn Python. Write Code. Level Up.</p>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat__number">14</div>
+        <div class="stat__label">Modules</div>
+      </div>
+      <div class="stat">
+        <div class="stat__number">56</div>
+        <div class="stat__label">Lessons</div>
+      </div>
+      <div class="stat">
+        <div class="stat__number">66</div>
+        <div class="stat__label">Exercises</div>
+      </div>
+      <div class="stat">
+        <div class="stat__number">14</div>
+        <div class="stat__label">Challenges</div>
+      </div>
+    </div>
+
+    <!-- Code Window -->
+    <div class="code-section">
+      <div class="code-window">
+        <div class="code-titlebar">
+          <div class="dot dot--red"></div>
+          <div class="dot dot--yellow"></div>
+          <div class="dot dot--green"></div>
+          <span>exercise.py</span>
+        </div>
+        <div class="code-body">
+          <div class="code-line">
+            <span class="line-num">1</span>
+            <span><span class="cmt"># Your first program</span></span>
+          </div>
+          <div class="code-line">
+            <span class="line-num">2</span>
+            <span><span class="var">name</span> <span class="op">=</span> <span class="str">"World"</span></span>
+          </div>
+          <div class="code-line">
+            <span class="line-num">3</span>
+            <span><span class="fn">print</span><span class="op">(</span><span class="kw">f</span><span class="str">"Hello, </span><span class="op">{</span><span class="var">name</span><span class="op">}</span><span class="str">!"</span><span class="op">)</span><span class="cursor-blink"></span></span>
+          </div>
+          <div class="code-output">
+            <div class="code-output-label">Output</div>
+            <div class="code-output-text">Hello, World!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features">
+      <div class="features-title">Everything You Need</div>
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="feature__icon">&#9998;</div>
+          <div class="feature__text">
+            <strong>Code Editor</strong>
+            Monaco editor in the browser
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature__icon">&#9654;</div>
+          <div class="feature__text">
+            <strong>Instant Execution</strong>
+            Write and run Python — no setup
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature__icon">&#10004;</div>
+          <div class="feature__text">
+            <strong>4 Exercise Types</strong>
+            Fill blank, fix bug, write code, predict
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature__icon">&#128161;</div>
+          <div class="feature__text">
+            <strong>Progressive Hints</strong>
+            Guided help with XP penalties
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature__icon">&#129302;</div>
+          <div class="feature__text">
+            <strong>AI Tutoring</strong>
+            Claude-powered guidance on demand
+          </div>
+        </div>
+        <div class="feature">
+          <div class="feature__icon">&#127942;</div>
+          <div class="feature__text">
+            <strong>XP & Belts</strong>
+            Earn XP, rank up White to Black
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Belt Progression -->
+    <div class="belts-section">
+      <div class="belts-bar">
+        <div class="belt-dot belt-dot--white"></div>
+        <div class="belt-dot belt-dot--yellow"></div>
+        <div class="belt-dot belt-dot--orange"></div>
+        <div class="belt-dot belt-dot--green"></div>
+        <div class="belt-dot belt-dot--blue"></div>
+        <div class="belt-dot belt-dot--purple"></div>
+        <div class="belt-dot belt-dot--brown"></div>
+        <div class="belt-dot belt-dot--black"></div>
+      </div>
+      <div class="belts-labels">
+        <span>White</span>
+        <span>Black</span>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <a href="https://github.com/E-Conners-Lab/PyStarter" class="footer__link" target="_blank">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        E-Conners-Lab/PyStarter
+      </a>
+      <div class="footer__brand">Built by <em>The Tech-E</em></div>
+    </div>
+
+  </div>
+</body>
+</html>

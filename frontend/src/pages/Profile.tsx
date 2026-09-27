@@ -1,17 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { getProgressSummary } from '../api/auth';
 import { useAuthStore } from '../stores/authStore';
-
-const BELT_COLORS: Record<string, string> = {
-  white: 'bg-white text-gray-900',
-  yellow: 'bg-yellow-400 text-gray-900',
-  orange: 'bg-orange-500 text-white',
-  green: 'bg-green-500 text-white',
-  blue: 'bg-blue-500 text-white',
-  purple: 'bg-purple-500 text-white',
-  brown: 'bg-amber-800 text-white',
-  black: 'bg-gray-900 text-white border border-gray-600',
-};
+import { BELT_COLORS } from '../constants/belts';
 
 export default function Profile() {
   const user = useAuthStore((s) => s.user);

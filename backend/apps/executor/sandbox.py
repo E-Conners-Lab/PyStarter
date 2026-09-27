@@ -1,17 +1,18 @@
 """
 Sandboxed Python code execution engine.
-Runs user code in a restricted environment with resource limits.
+Orchestrates code execution in an isolated subprocess with resource limits.
 """
 
-import io
+import json
+import os
 import platform
+import subprocess
 import sys
-import time
-import traceback
-from concurrent.futures import ThreadPoolExecutor, TimeoutError
-from contextlib import redirect_stderr, redirect_stdout
+from pathlib import Path
 
 MEMORY_LIMIT_BYTES = 128 * 1024 * 1024  # 128 MB
+
+_RUNNER_PATH = str(Path(__file__).resolve().parent / "runner.py")
 
 
 def _get_limit_type():
@@ -61,76 +62,10 @@ def _restore_memory_limit(saved):
     except (ValueError, OSError, ImportError):
         pass
 
-# Imports allowed for beginner exercises
-ALLOWED_IMPORTS = {
-    "math",
-    "random",
-    "string",
-    "collections",
-    "datetime",
-    "json",
-    "re",
-    "typing",
-    "copy",
-    "itertools",
-    "functools",
-    "textwrap",
-    "ipaddress",
-}
-
-# Builtins that are forbidden
-FORBIDDEN_BUILTINS = {
-    "exec",
-    "eval",
-    "compile",
-    "open",
-    "input",
-    "__import__",
-    "globals",
-    "getattr",
-    "setattr",
-    "delattr",
-    "breakpoint",
-    "exit",
-    "quit",
-}
-
-
-def _make_safe_builtins():
-    """Create a copy of builtins with dangerous functions removed."""
-    import builtins
-
-    safe = {k: v for k, v in vars(builtins).items() if k not in FORBIDDEN_BUILTINS}
-
-    # Replace input with a version that reads from our fake stdin
-    def safe_input(prompt=""):
-        # This will be overridden per-execution with proper stdin
-        return ""
-
-    safe["input"] = safe_input
-    return safe
-
-
-def _make_safe_import(allowed):
-    """Create a restricted __import__ that only allows specific modules."""
-
-    original_import = __import__
-
-    def restricted_import(name, *args, **kwargs):
-        top_level = name.split(".")[0]
-        if top_level not in allowed:
-            raise ImportError(
-                f"Module '{name}' is not available. "
-                f"Allowed modules: {', '.join(sorted(allowed))}"
-            )
-        return original_import(name, *args, **kwargs)
-
-    return restricted_import
-
 
 def execute_code(code, input_data="", timeout=5):
     """
-    Execute Python code in a sandboxed environment.
+    Execute Python code in an isolated subprocess.
 
     Returns:
         dict with keys:
@@ -139,80 +74,41 @@ def execute_code(code, input_data="", timeout=5):
         - error: error message (if any)
         - execution_time: time in seconds
     """
+    payload = json.dumps({"code": code, "input_data": input_data})
 
-    def _run():
-        saved_memory = _set_memory_limit()
-        old_recursion_limit = sys.getrecursionlimit()
-        sys.setrecursionlimit(200)
-        stdout_capture = io.StringIO()
-        stderr_capture = io.StringIO()
+    # Stripped environment: only PATH and Python essentials, no secrets
+    safe_env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": os.environ.get("HOME", "/tmp"),
+        "LANG": os.environ.get("LANG", "en_US.UTF-8"),
+    }
 
-        # Build safe globals
-        safe_builtins = _make_safe_builtins()
-        safe_builtins["__import__"] = _make_safe_import(ALLOWED_IMPORTS)
-
-        # If there's input data, create a fake stdin
-        if input_data:
-            fake_stdin = io.StringIO(input_data)
-            input_lines = iter(input_data.strip().split("\n"))
-
-            def safe_input(prompt=""):
-                # Print the prompt (like real input() does)
-                if prompt:
-                    stdout_capture.write(str(prompt))
-                try:
-                    return next(input_lines)
-                except StopIteration:
-                    raise EOFError("No more input available")
-
-            safe_builtins["input"] = safe_input
-
-        safe_globals = {"__builtins__": safe_builtins, "__name__": "__main__"}
-
-        start_time = time.time()
+    try:
+        result = subprocess.run(
+            [sys.executable, _RUNNER_PATH],
+            input=payload,
+            capture_output=True,
+            text=True,
+            timeout=timeout,
+            env=safe_env,
+        )
         try:
-            with redirect_stdout(stdout_capture), redirect_stderr(stderr_capture):
-                compiled = compile(code, "<exercise>", "exec")
-                exec(compiled, safe_globals)  # noqa: S102
-
-            execution_time = time.time() - start_time
-            return {
-                "status": "success",
-                "output": stdout_capture.getvalue(),
-                "error": "",
-                "execution_time": round(execution_time, 4),
-            }
-        except Exception as e:
-            execution_time = time.time() - start_time
-            # Format a beginner-friendly error message
-            tb = traceback.format_exc()
-            # Extract just the relevant part of the traceback
-            lines = tb.strip().split("\n")
-            friendly_error = _make_friendly_error(e, lines)
+            return json.loads(result.stdout)
+        except (json.JSONDecodeError, ValueError):
             return {
                 "status": "error",
-                "output": stdout_capture.getvalue(),
-                "error": friendly_error,
-                "execution_time": round(execution_time, 4),
-            }
-        finally:
-            sys.setrecursionlimit(old_recursion_limit)
-            _restore_memory_limit(saved_memory)
-
-    # Run with timeout
-    with ThreadPoolExecutor(max_workers=1) as pool:
-        future = pool.submit(_run)
-        try:
-            result = future.result(timeout=timeout)
-            return result
-        except TimeoutError:
-            return {
-                "status": "timeout",
                 "output": "",
-                "error": f"Your code took too long to run (limit: {timeout} seconds). "
-                "Check for infinite loops!",
-                "execution_time": timeout,
+                "error": result.stderr.strip() or "Code execution failed.",
+                "execution_time": 0.0,
             }
+    except subprocess.TimeoutExpired:
+        return {
+            "status": "timeout",
+            "output": "",
+            "error": f"Your code took too long to run (limit: {timeout} seconds). "
+            "Check for infinite loops!",
+            "execution_time": timeout,
+        }
 
 
 def _make_friendly_error(exception, traceback_lines):
@@ -261,10 +157,6 @@ def compare_output(actual, expected):
     expected = expected.strip()
 
     if actual == expected:
-        return True
-
-    # Try case-insensitive comparison for simple string outputs
-    if actual.lower() == expected.lower():
         return True
 
     # Try comparing line by line, ignoring trailing whitespace

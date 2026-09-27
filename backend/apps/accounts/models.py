@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models import F
 
 
 class User(AbstractUser):
@@ -14,16 +15,16 @@ class User(AbstractUser):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
-    # Belt progression thresholds
+    # Belt progression thresholds (890 total XP available across 66 exercises)
     BELT_THRESHOLDS = [
         (0, "white", "White Belt"),
-        (200, "yellow", "Yellow Belt"),
-        (600, "orange", "Orange Belt"),
-        (1500, "green", "Green Belt"),
-        (3000, "blue", "Blue Belt"),
-        (6000, "purple", "Purple Belt"),
-        (10000, "brown", "Brown Belt"),
-        (18000, "black", "Black Belt"),
+        (50, "yellow", "Yellow Belt"),       # ~4 exercises — quick first win
+        (125, "orange", "Orange Belt"),      # ~15% of curriculum
+        (250, "green", "Green Belt"),        # ~28% of curriculum
+        (400, "blue", "Blue Belt"),          # ~45% of curriculum
+        (550, "purple", "Purple Belt"),      # ~62% of curriculum
+        (700, "brown", "Brown Belt"),        # ~79% of curriculum
+        (850, "black", "Black Belt"),        # ~95% — near-perfect, minimal hints
     ]
 
     @property
@@ -36,6 +37,7 @@ class User(AbstractUser):
 
     @property
     def current_belt_display(self):
+        result = "White Belt"
         for threshold, belt_key, display in self.BELT_THRESHOLDS:
             if self.total_xp >= threshold:
                 result = display
@@ -49,8 +51,8 @@ class User(AbstractUser):
         return None
 
     def award_xp(self, amount):
-        self.total_xp += amount
-        self.save(update_fields=["total_xp"])
+        User.objects.filter(pk=self.pk).update(total_xp=F('total_xp') + amount)
+        self.refresh_from_db(fields=['total_xp'])
 
     def update_streak(self):
         from django.utils import timezone
@@ -60,7 +62,7 @@ class User(AbstractUser):
             return
         if self.last_activity_date and (today - self.last_activity_date).days == 1:
             self.current_streak += 1
-        elif self.last_activity_date != today:
+        else:
             self.current_streak = 1
         self.longest_streak = max(self.longest_streak, self.current_streak)
         self.last_activity_date = today

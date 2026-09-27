@@ -16,7 +16,7 @@ def _env_str(name: str, default: str) -> str:
 
 # Reported by /api/v1/health/. The Dockerfile passes the release tag in as APP_VERSION at
 # build time; this default is the fallback for source checkouts and must be bumped with it.
-APP_VERSION = _env_str("APP_VERSION", "1.0.6")
+APP_VERSION = _env_str("APP_VERSION", "1.0.7")
 
 SECRET_KEY = os.environ.get(
     "DJANGO_SECRET_KEY",
@@ -94,11 +94,14 @@ PASSWORD_RESET_TIMEOUT = 3600  # 1 hour
 
 # REST Framework
 REST_FRAMEWORK = {
+    # Cookie-based: the frontend holds no token in JS-reachable memory, so the
+    # Authorization header is never populated. Reading only the header here
+    # leaves every authenticated request 401 (and silently un-authenticated).
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "apps.common.authentication.CookieJWTAuthentication",
     ],
     "DEFAULT_PERMISSION_CLASSES": [
-        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
+        "rest_framework.permissions.IsAuthenticated",
     ],
     "DEFAULT_PAGINATION_CLASS": "apps.common.pagination.StandardPagination",
     "PAGE_SIZE": 20,

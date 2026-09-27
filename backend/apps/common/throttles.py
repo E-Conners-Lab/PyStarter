@@ -7,3 +7,7 @@ class PasswordResetThrottle(AnonRateThrottle):
 
 class CodeExecutionThrottle(UserRateThrottle):
     rate = "60/minute"
+
+
+class AIRequestThrottle(UserRateThrottle):
+    rate = "20/minute"

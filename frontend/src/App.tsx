@@ -18,13 +18,11 @@ const LessonPage = lazy(() => import('./pages/LessonPage'));
 const ExercisePage = lazy(() => import('./pages/ExercisePage'));
 
 export default function App() {
-  const { isAuthenticated, loadUser } = useAuthStore();
+  const loadUser = useAuthStore((s) => s.loadUser);
 
   useEffect(() => {
-    if (isAuthenticated) {
-      loadUser();
-    }
-  }, [isAuthenticated, loadUser]);
+    loadUser();
+  }, [loadUser]);
 
   return (
     <BrowserRouter>
