@@ -4,6 +4,11 @@ from .models import Submission, TestCaseResult
 
 
 class TestCaseResultSerializer(serializers.ModelSerializer):
+    expected_output = serializers.SerializerMethodField()
+
+    def get_expected_output(self, obj):
+        return "" if obj.test_case.is_hidden else obj.expected_output
+
     description = serializers.CharField(source="test_case.description", read_only=True)
     is_hidden = serializers.BooleanField(source="test_case.is_hidden", read_only=True)
 

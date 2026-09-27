@@ -8,10 +8,13 @@ from .base import *  # noqa: F401, F403
 DEBUG = False
 
 # WhiteNoise for static files
-MIDDLEWARE.insert(  # noqa: F405
-    MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1,  # noqa: F405
+security_index = MIDDLEWARE.index("django.middleware.security.SecurityMiddleware") + 1  # noqa: F405
+MIDDLEWARE = [
+    *MIDDLEWARE[:security_index],  # noqa: F405
     "whitenoise.middleware.WhiteNoiseMiddleware",
-)
+    *MIDDLEWARE[security_index:],  # noqa: F405
+]
+
 STORAGES = {
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
@@ -19,7 +22,7 @@ STORAGES = {
 }
 
 # SECRET_KEY guard — reject the insecure default from base.py
-if SECRET_KEY == "django-insecure-change-me-in-production":  # noqa: F405
+if len(os.environ.get("DJANGO_SECRET_KEY", "").strip()) < 50:
     raise ImproperlyConfigured(
         "DJANGO_SECRET_KEY must be set to a unique, random value in production."
     )
@@ -55,7 +58,12 @@ def _env_bool(name: str, default: bool) -> bool:
     raw = os.environ.get(name)
     if raw is None:
         return default
-    return raw.strip().lower() in {"1", "true", "yes", "on"}
+    normalized = raw.strip().lower()
+    if normalized in {"1", "true", "yes", "on"}:
+        return True
+    if normalized in {"0", "false", "no", "off"}:
+        return False
+    raise ImproperlyConfigured(f"{name} must be an explicit boolean.")
 
 
 # SSL / Cookie security — secure defaults; opt-in relaxation for local HTTP testing.
@@ -65,10 +73,12 @@ SESSION_COOKIE_SECURE = _env_bool("SESSION_COOKIE_SECURE", True)
 CSRF_COOKIE_SECURE = _env_bool("CSRF_COOKIE_SECURE", True)
 
 # HSTS — only meaningful when the site is reachable over HTTPS; disable when not.
-SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", "3600"))
+SECURE_HSTS_SECONDS = int(os.environ.get("SECURE_HSTS_SECONDS", "31536000"))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = _env_bool("SECURE_HSTS_INCLUDE_SUBDOMAINS", True)
 SECURE_HSTS_PRELOAD = _env_bool("SECURE_HSTS_PRELOAD", False)
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+SIMPLE_JWT = {**SIMPLE_JWT, "AUTH_COOKIE_SECURE": SESSION_COOKIE_SECURE}  # noqa: F405
 
 # Email
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
@@ -81,4 +91,7 @@ EMAIL_USE_TLS = True
 # Sentry
 SENTRY_DSN = os.environ.get("SENTRY_DSN", "")
 if SENTRY_DSN:
-    sentry_sdk.init(dsn=SENTRY_DSN, traces_sample_rate=0.1)
+    sentry_sdk.init(
+        dsn=SENTRY_DSN, traces_sample_rate=0.1,
+        max_request_body_size="never", send_default_pii=False,
+    )

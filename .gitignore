@@ -42,3 +42,9 @@ CLAUDE.md
 .claude/
 frontend/.claude/
 publish-1.0.5.sh
+
+# Generated build / verification output
+*.tsbuildinfo
+.coverage*
+coverage.xml
+security-results/

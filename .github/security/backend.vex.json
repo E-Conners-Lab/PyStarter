@@ -1,0 +1,97 @@
+{
+  "@context": "https://openvex.dev/ns/v0.2.0",
+  "@id": "urn:uuid:c4641e1d-6fa3-4809-9936-6dd93e4cec26",
+  "author": "PyStarter security review",
+  "timestamp": "2026-09-27T16:15:00Z",
+  "version": 1,
+  "statements": [
+    {
+      "vulnerability": {
+        "name": "CVE-2025-69720"
+      },
+      "products": [
+        {
+          "@id": "pkg:deb/debian/libncursesw6@6.5%2B20250216-2"
+        },
+        {
+          "@id": "pkg:deb/debian/libtinfo6@6.5%2B20250216-2"
+        },
+        {
+          "@id": "pkg:deb/debian/ncurses-base@6.5%2B20250216-2"
+        },
+        {
+          "@id": "pkg:deb/debian/ncurses-bin@6.5%2B20250216-2"
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "The vulnerable analyze_string routine is in the infocmp CLI, not the runtime curses library. backend/Dockerfile removes /usr/bin/infocmp. CI asserts no infocmp executable exists. Reference: https://security-tracker.debian.org/tracker/CVE-2025-69720"
+    },
+    {
+      "vulnerability": {
+        "name": "CVE-2026-16742"
+      },
+      "products": [
+        {
+          "@id": "pkg:deb/debian/libsystemd0@257.13-1~deb13u1"
+        },
+        {
+          "@id": "pkg:deb/debian/libudev1@257.13-1~deb13u1"
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "The affected systemd-homed component is not installed. libsystemd0 and libudev1 share a source package but do not contain the homed service. CI asserts systemd-homed is absent. Reference: https://security-tracker.debian.org/tracker/CVE-2026-16742"
+    },
+    {
+      "vulnerability": {
+        "name": "CVE-2026-9538"
+      },
+      "products": [
+        {
+          "@id": "pkg:deb/debian/perl-base@5.40.1-6%2Bdeb13u1"
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "The affected Perl Archive::Tar module is not installed in this slim image; perl-base alone does not ship it. CI asserts no Archive/Tar.pm exists. Reference: https://security-tracker.debian.org/tracker/CVE-2026-9538"
+    },
+    {
+      "vulnerability": {
+        "name": "CVE-2026-78408"
+      },
+      "products": [
+        {
+          "@id": "pkg:deb/debian/bsdutils@2.41.5-0%2Bdeb13u1"
+        },
+        {
+          "@id": "pkg:deb/debian/libblkid1@2.41.5-0%2Bdeb13u1"
+        },
+        {
+          "@id": "pkg:deb/debian/liblastlog2-2@2.41.5-0%2Bdeb13u1"
+        },
+        {
+          "@id": "pkg:deb/debian/libmount1@2.41.5-0%2Bdeb13u1"
+        },
+        {
+          "@id": "pkg:deb/debian/libsmartcols1@2.41.5-0%2Bdeb13u1"
+        },
+        {
+          "@id": "pkg:deb/debian/libuuid1@2.41.5-0%2Bdeb13u1"
+        },
+        {
+          "@id": "pkg:deb/debian/login@4.16.0-2%2Breally2.41.5-0%2Bdeb13u1"
+        },
+        {
+          "@id": "pkg:deb/debian/mount@2.41.5-0%2Bdeb13u1"
+        },
+        {
+          "@id": "pkg:deb/debian/util-linux@2.41.5-0%2Bdeb13u1"
+        }
+      ],
+      "status": "not_affected",
+      "justification": "vulnerable_code_not_present",
+      "impact_statement": "The vulnerable nsenter --join-cgroup code is in the nsenter CLI, which backend/Dockerfile removes. CI asserts nsenter is absent. Source-package matches against other util-linux binaries/libraries do not contain this CLI code. Reference: https://security-tracker.debian.org/tracker/CVE-2026-78408"
+    }
+  ]
+}

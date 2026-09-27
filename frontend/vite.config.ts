@@ -7,7 +7,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:8002',
+        target: process.env.PYSTARTER_BACKEND_URL || 'http://localhost:8002',
         changeOrigin: true,
       },
     },

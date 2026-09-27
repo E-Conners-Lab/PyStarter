@@ -2,7 +2,7 @@
 
 **Learn Python. Write Code. Level Up.**
 
-A self-hosted training platform that teaches Python from scratch through interactive lessons, a sandboxed code editor, graded exercises, and AI-powered tutoring. 14 modules, 56 lessons, 66 graded exercises — complete and ready to run.
+A self-hosted training platform that teaches Python from scratch through interactive lessons, a built-in code editor, graded exercises, and AI-powered tutoring. 14 modules, 56 lessons, 66 graded exercises — for local learning.
 
 <img width="1499" height="770" alt="PyStarter Dashboard" src="https://github.com/user-attachments/assets/2f453ac4-816e-4ac8-9d22-d045875871e8" />
 
@@ -14,7 +14,7 @@ PyStarter is **MIT licensed** and the full source is in this repo. Clone it, for
 
 **It is not actively maintained.** Treat this as a finished artifact, not a living project: issues and pull requests may go unanswered, and there are no promises of future releases, security patches, or dependency bumps. **If you deploy it, you own it** — updating Django, patching CVEs, rotating keys, and fixing whatever breaks is yours. Fork it rather than depending on this repo staying current.
 
-It is a complete, working codebase with a test suite (Django unit tests + 99 Playwright E2E tests) and CI, so it is a reasonable base to build on.
+It is a complete, working codebase with a test suite (Django tests + Playwright browser tests) and CI, so it is a reasonable base to build on.
 
 > **Read [SECURITY.md](SECURITY.md) before you deploy it.** PyStarter executes
 > student-submitted Python. That execution is sandboxed but the sandbox is *not* a
@@ -28,79 +28,106 @@ It is a complete, working codebase with a test suite (Django unit tests + 99 Pla
 
 Two paths. **Docker** is the fastest way to just use it. **From source** is what you want if you plan to change anything.
 
-### Option A — Docker (no toolchain, ~500 MB of images)
+### Option A — Docker (recommended, including Windows)
 
-Runs PostgreSQL, Django, React, and nginx. Migrations and curriculum seeding happen automatically on first start.
+This source checkout prepares **1.0.8**. Existing **1.0.7** images and runner ZIPs
+are older artifacts and do not include these fixes. Build from this checkout;
+do not substitute an older runner bundle.
 
-```bash
-# 1. Download and unzip the runner bundle
-curl -LO https://github.com/E-Conners-Lab/PyStarter/releases/download/v1.0.7/pystarter-v1.0.7-runner.zip
-unzip pystarter-v1.0.7-runner.zip -d pystarter
-cd pystarter
-
-# 2. Generate .env (Django secret key, optional Anthropic key)
-./init.sh
-
-# 3. Start
-docker compose up -d
-```
-
-Open **http://localhost**, sign up, and Module 1 is unlocked.
-
-`./init.sh` asks for an Anthropic API key and you can press Enter to skip it — everything except the AI features works without one.
-
-Stop with `docker compose down` (keeps your data) or `docker compose down -v` (deletes the database).
-
-Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/) or Docker Engine + Compose v2. Images are `linux/amd64` and `linux/arm64`.
-
-### Option B — From source
-
-Needs [Python 3.13+](https://www.python.org/downloads/), [uv](https://docs.astral.sh/uv/), and [Node.js 18+](https://nodejs.org/). No configuration file is required — the dev settings use SQLite and sensible defaults.
+Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) with
+Linux containers (or Docker Engine + Compose v2), then download this repository
+with GitHub's **Code → Download ZIP**, extract it, and open a terminal there.
+Alternatively:
 
 ```bash
 git clone https://github.com/E-Conners-Lab/PyStarter.git
 cd PyStarter
 ```
 
-**Backend** (terminal 1):
+On macOS/Linux:
 
 ```bash
-cd backend
-uv run python manage.py migrate
-uv run python manage.py seed_curriculum
-uv run python manage.py runserver 8002
+./init.sh
+docker compose up --build -d
 ```
 
-**Frontend** (terminal 2):
+On Windows, open PowerShell in the extracted folder:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\init.ps1
+docker compose up --build -d
+```
+
+Open **http://localhost:8080**, sign up, and start Module 1. The initial build
+requires internet access; normal lessons and the editor work without a CDN.
+AI features are optional. Change `NGINX_PORT` in `.env` if port 8080 is occupied.
+The web port is always bound to `127.0.0.1`; do not forward it through a tunnel.
+
+`init.sh` / `init.ps1` generate unique application and database credentials and
+leave an existing `.env` unchanged. Keep that file private and out of Git.
+Stop with `docker compose down` (keeps your data).
+**`docker compose down -v` deletes your learning database.**
+
+**Upgrading an existing install:** back up your data first. The new database
+setup separates the application user from the database administrator. An old
+PostgreSQL volume needs an explicit role migration; do not replace its passwords
+or delete its volume to work around a startup error. See [CONTRIBUTING.md](CONTRIBUTING.md).
+
+### Option B — From source (macOS/Linux)
+
+Needs Python **3.13**, [uv](https://docs.astral.sh/uv/), and Node.js **22.12+**.
+Windows users should use Docker: native Windows execution is not supported.
+After cloning, run `./setup.sh` to install the pinned dependencies and initialize
+the local SQLite database. Then start two terminals:
 
 ```bash
+# Terminal 1, from the repository root
+cd backend
+uv run --frozen python manage.py runserver 8002
+```
+
+```bash
+# Terminal 2, from the repository root
 cd frontend
-npm install
 npm run dev
 ```
 
-Open **http://localhost:5173**. Vite proxies `/api` to the backend on port 8002.
+Open **http://localhost:5173**. Neither server needs a public network bind.
+Submitted code has the same filesystem permissions as your local account;
+use Docker for a smaller filesystem exposure, and run only code you trust.
 
-To enable AI features, `cp backend/.env.example backend/.env` and set `ANTHROPIC_API_KEY`. For production deployment from source, see the compose file and `CONTRIBUTING.md`.
 
 ---
+
+## Password recovery (optional)
+
+Password-reset email requires a real email address on the account and configured
+SMTP (`EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`,
+`DEFAULT_FROM_EMAIL`). Signup without an email uses a placeholder and cannot
+receive recovery messages. Reset links are never printed to the terminal.
+Without SMTP, keep your login credentials safe; recovery mail is disabled.
 
 ## AI setup (optional)
 
 Hints, code critique, and error explanations call an LLM. Everything else — lessons, exercises, the sandbox, XP, belts — works without one.
 
-**Anthropic API:** put `ANTHROPIC_API_KEY=sk-ant-...` in `.env` ([get a key](https://console.anthropic.com)). Calls are billed to your account; a hint costs roughly a cent on the default model, `claude-opus-5`. For cheaper hints set `ANTHROPIC_MODEL=claude-haiku-4-5`. Always use an alias like these, never a date-suffixed snapshot ID, so the model does not retire out from under you.
+**Hosted provider:** set `ANTHROPIC_API_KEY` and an available `ANTHROPIC_MODEL`
+in `.env` for Docker, or `backend/.env` for source installs. Provider calls may
+cost money. Check the provider's current model availability and pricing before
+turning this on. Your submitted code and relevant lesson context are sent to
+that provider; do not submit credentials, private data, or confidential code.
+Pattern-based redaction is a precaution, not a guarantee.
 
-**Local model (free, offline):** point `ANTHROPIC_BASE_URL` at any OpenAI-compatible server and set `ANTHROPIC_MODEL` to its model name.
+**Local model:** set `ANTHROPIC_BASE_URL` to your OpenAI-compatible server and
+`ANTHROPIC_MODEL` to its model name. For source installs a typical URL is
+`http://localhost:11434/v1`. Docker Desktop can use
+`http://host.docker.internal:11434/v1`; Linux Docker Engine requires separate
+host-network access configuration. Keep that model server private too.
 
-```bash
-# Ollama
-ANTHROPIC_API_KEY=not-needed
-ANTHROPIC_MODEL=llama3.2
-ANTHROPIC_BASE_URL=http://host.docker.internal:11434/v1   # http://localhost:11434/v1 from source
-```
-
-Hint quality tracks model quality; models under ~13B give noticeably vaguer hints.
+The tutor returns text only and has no execution tools. Core lessons, grading,
+XP, and the editor do not require a provider. Test your chosen model against
+[the AI evaluation checklist](docs/security-verification.md) before relying on
+its advice.
 
 ---
 
@@ -108,7 +135,7 @@ Hint quality tracks model quality; models under ~13B give noticeably vaguer hint
 
 **Built-in code editor** — Monaco (the VS Code engine) in the browser, with syntax highlighting and auto-indent.
 
-**Sandboxed execution** — student code runs in a separate process with an import allowlist, blocked builtins, a scrubbed environment (no API keys or database credentials), memory limits, and a deadline that kills the job. It is a containment boundary, not an impenetrable one — see [SECURITY.md](SECURITY.md).
+**Local code execution** — separate processes, bounded output, timeouts, and Linux resource limits protect against ordinary programming mistakes. Python restrictions are bypassable, and code runs under the application’s OS identity. This is not an isolation boundary for hostile code — see [SECURITY.md](SECURITY.md).
 
 **4 exercise types** — fill in the blank, fix the bug, write code, predict the output.
 
@@ -168,10 +195,11 @@ Re-seeding after curriculum edits rebuilds curriculum content — flush first if
 | AI | Anthropic Claude API, or any OpenAI-compatible LLM |
 | Database | SQLite (development) / PostgreSQL (production) |
 | Deployment | Docker Compose with nginx reverse proxy |
-| Testing | Django unit tests + 99 Playwright E2E tests |
+| Testing | Django tests + Playwright browser tests |
 | CI | GitHub Actions |
 
-Pre-built images: `ghcr.io/e-conners-lab/pystarter-backend:1.0.7` and `ghcr.io/e-conners-lab/pystarter-frontend:1.0.7` (both `linux/amd64` + `linux/arm64`). `/api/v1/health/` reports the running version.
+`/api/v1/health/` reports the running version. A source change does not update
+previously published Docker images or release ZIPs.
 
 ---
 

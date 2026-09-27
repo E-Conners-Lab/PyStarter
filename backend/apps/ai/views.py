@@ -16,11 +16,19 @@ from .prompts import (
     EXPLAIN_ERROR_USER,
 )
 from .providers import get_provider
+from .input_boundary import TutorInputSerializer, UNTRUSTED_GUIDANCE, bounded_prompt
 
-NOT_CONFIGURED_RESPONSE = Response(
-    {"error": "AI features are not configured. Add an ANTHROPIC_API_KEY to backend/.env to enable hints."},
-    status=status.HTTP_503_SERVICE_UNAVAILABLE,
-)
+def _not_configured():
+    return Response(
+        {"error": "AI features are not configured."},
+        status=status.HTTP_503_SERVICE_UNAVAILABLE,
+    )
+
+
+def _validated_input(request):
+    serializer = TutorInputSerializer(data=request.data)
+    serializer.is_valid(raise_exception=True)
+    return serializer.validated_data
 
 
 def _has_passed(user, exercise):
@@ -30,7 +38,7 @@ def _has_passed(user, exercise):
     is an answer-key disclosure surface: a caller who has not solved the exercise
     can steer the model into revealing it.
     """
-    return Submission.objects.filter(user=user, exercise=exercise, status="passed").exists()
+    return Submission.objects.filter(user=user, exercise=exercise, status="passed", is_run_only=False).exists()
 
 
 def _ai_is_configured():
@@ -47,15 +55,15 @@ def _ai_is_configured():
 def ai_hint(request, exercise_id):
     """Get an AI-generated hint for an exercise."""
     if not _ai_is_configured():
-        return NOT_CONFIGURED_RESPONSE
+        return _not_configured()
 
     try:
-        exercise = Exercise.objects.get(id=exercise_id, is_published=True)
+        exercise = Exercise.objects.get(id=exercise_id, is_published=True, lesson__is_published=True, lesson__module__is_published=True)
     except Exercise.DoesNotExist:
         return Response({"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    code = request.data.get("code", "")[:10000]
-    error = request.data.get("error", "")[:5000]
+    data = _validated_input(request)
+    code, error = data["code"], data["error"]
 
     error_context = ""
     if error:
@@ -70,7 +78,7 @@ def ai_hint(request, exercise_id):
     )
 
     provider = get_provider()
-    hint = provider.generate(BEGINNER_HINT_SYSTEM, user_prompt)
+    hint = provider.generate(BEGINNER_HINT_SYSTEM + UNTRUSTED_GUIDANCE, bounded_prompt(user_prompt))
     return Response({"hint": hint})
 
 
@@ -80,10 +88,10 @@ def ai_hint(request, exercise_id):
 def ai_critique(request, exercise_id):
     """Get AI feedback on a successful submission."""
     if not _ai_is_configured():
-        return NOT_CONFIGURED_RESPONSE
+        return _not_configured()
 
     try:
-        exercise = Exercise.objects.get(id=exercise_id, is_published=True)
+        exercise = Exercise.objects.get(id=exercise_id, is_published=True, lesson__is_published=True, lesson__module__is_published=True)
     except Exercise.DoesNotExist:
         return Response({"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND)
 
@@ -93,7 +101,7 @@ def ai_critique(request, exercise_id):
             status=status.HTTP_403_FORBIDDEN,
         )
 
-    code = request.data.get("code", "")[:10000]
+    code = _validated_input(request)["code"]
 
     user_prompt = CODE_CRITIQUE_USER.format(
         exercise_title=exercise.title,
@@ -103,7 +111,7 @@ def ai_critique(request, exercise_id):
     )
 
     provider = get_provider()
-    feedback = provider.generate(CODE_CRITIQUE_SYSTEM, user_prompt)
+    feedback = provider.generate(CODE_CRITIQUE_SYSTEM + UNTRUSTED_GUIDANCE, bounded_prompt(user_prompt))
     return Response({"feedback": feedback})
 
 
@@ -113,15 +121,15 @@ def ai_critique(request, exercise_id):
 def explain_error(request, exercise_id):
     """Get a beginner-friendly explanation of an error."""
     if not _ai_is_configured():
-        return NOT_CONFIGURED_RESPONSE
+        return _not_configured()
 
     try:
-        exercise = Exercise.objects.get(id=exercise_id, is_published=True)
+        exercise = Exercise.objects.get(id=exercise_id, is_published=True, lesson__is_published=True, lesson__module__is_published=True)
     except Exercise.DoesNotExist:
         return Response({"error": "Exercise not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    code = request.data.get("code", "")[:10000]
-    error = request.data.get("error", "")[:5000]
+    data = _validated_input(request)
+    code, error = data["code"], data["error"]
 
     if not error:
         return Response(
@@ -135,5 +143,5 @@ def explain_error(request, exercise_id):
     )
 
     provider = get_provider()
-    explanation = provider.generate(EXPLAIN_ERROR_SYSTEM, user_prompt)
+    explanation = provider.generate(EXPLAIN_ERROR_SYSTEM + UNTRUSTED_GUIDANCE, bounded_prompt(user_prompt))
     return Response({"explanation": explanation})

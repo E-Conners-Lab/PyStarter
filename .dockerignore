@@ -10,3 +10,13 @@ backend/__pycache__
 .env
 .venv
 backups
+
+**/.env
+**/.env.*
+!**/.env.example
+**/*.sqlite3
+**/.coverage*
+**/test-results
+**/playwright-report
+**/node_modules
+security-results

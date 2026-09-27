@@ -128,3 +128,13 @@ class UserExerciseProgress(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.exercise.title}"
+
+
+class AuthenticationAttempt(models.Model):
+    """Shared rate/lockout state; identities are keyed digests, never raw input."""
+
+    identity = models.CharField(max_length=64, primary_key=True)
+    request_times = models.JSONField(default=list)
+    failures = models.PositiveSmallIntegerField(default=0)
+    locked_until = models.DateTimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True, db_index=True)

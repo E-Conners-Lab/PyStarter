@@ -1,55 +1,59 @@
 # Security
 
-PyStarter is MIT licensed and **not actively maintained**. There is no security
-response process: no advisory feed, no patch SLA, no guarantee that a reported
-issue is ever fixed. If you deploy it, you own its security. Fork it and patch
-your fork.
+PyStarter is MIT licensed and intended for one person's local learning on their
+own machine. It is not actively maintained; there is no promised patch schedule
+or monitored security response channel. Keep your installation and dependencies
+updated. See [the verification record](docs/security-verification.md) for the
+scope and outstanding release gates of this review.
 
-## The code sandbox is not a security boundary
+## Run only code you trust
 
-PyStarter runs student-submitted Python. It restricts that code with an import
-allowlist, a builtins blocklist, a separate OS process, resource limits, and an
-execution deadline.
+Submitted Python runs as the backend's OS user. Python import/builtin
+restrictions are bypassable. A separate process and a scrubbed child environment
+**do not protect backend secrets**: escaped code may access same-user files,
+process information, database credentials, network services, and application data.
+Do not paste or run untrusted code, including code suggested by an AI tutor.
+Do not load this application with valuable credentials or private source code.
 
-**Those restrictions are defeatable, and you should assume they will be.** The
-Python-level restrictions in particular can be escaped: submitted code can reach
-real builtins through ordinary object attributes and import modules that are not
-on the allowlist. This is a known property of restricting Python inside Python,
-not a bug with a pending fix.
+Timeouts and output limits handle ordinary mistakes. The parent terminates the
+job's process group, but deliberately detached descendants can evade that group.
+Linux enforces memory/process resource limits; macOS does not provide the same
+memory guarantees. Native Windows execution is unsupported: use Linux containers
+in Docker Desktop. Docker uses a non-root backend, drops capabilities, disables
+privilege escalation, and mounts no host working directory into the backend.
+These reduce exposure; they do not make hostile multi-user execution safe.
 
-What actually contains an escape today:
+## Local deployment only
 
-| Control | What it gives you |
-|---|---|
-| Separate subprocess | An escape does not land in the Django process, its database connection, or its request context |
-| Scrubbed environment | The child sees `PATH`, `HOME`, `LANG` only — no API keys, no `DJANGO_SECRET_KEY`, no database password |
-| `subprocess` deadline | A runaway or infinite loop is killed rather than occupying a worker |
-| Resource limits | Memory and recursion caps on the child |
-| Non-root container user | An escape inside Docker is not root |
+- Keep the web port on `127.0.0.1`. Do not expose it to a LAN, public internet,
+  reverse tunnel, classroom, or untrusted users. Registration is public to
+  anyone who can reach the service.
+- Local HTTP is an explicit exception to HTTPS/Secure-cookie/HSTS requirements.
+  The supplied Compose configuration is loopback-only. Internet hosting is not
+  supported by this release.
+- Use a unique password. Authentication cookies are HttpOnly and SameSite=Strict;
+  writes require CSRF tokens. Access expires after 30 minutes and refresh after
+  seven days with rotation. Logout/reset revoke affected sessions server-side.
+- Keep `.env`, databases, backups, and API keys private. Fresh Docker installs
+  generate separate application, DB administrator, and DB application secrets.
+  Rotate provider keys in the provider console and replace your local setting;
+  changing the Django signing key signs everyone out.
+- AI is optional. Provider requests include submitted code and lesson context.
+  Pattern redaction cannot identify every secret or personal detail. No tools
+  are granted to the tutor. Telemetry is off by default; optional backend Sentry
+  disables request-body and default PII capture.
+- Production CSP permits inline **styles** for Monaco's dynamic positioning and
+  syntax rendering. Scripts remain self-only, with no unsafe-inline/unsafe-eval;
+  editor code and workers are bundled locally. This style-only exception does
+  not authorize injecting untrusted HTML.
 
-What still is **not** contained: escaped code runs as the application's OS user,
-with that user's filesystem access and outbound network access. There is no
-seccomp profile, no user namespace, no network namespace, and no filesystem
-isolation beyond ordinary Unix permissions.
+Real isolation for untrusted learners would require a separately designed
+execution service with per-job identities, filesystem/network isolation,
+resource accounting and an independent security review. It is out of scope here.
 
-## Deploy accordingly
+## Reporting and release integrity
 
-- **Intended use is local or small-group, with people you trust.** The default
-  `docker compose` binds to `127.0.0.1` for this reason.
-- **Do not expose this to the public internet**, and do not run it with open
-  registration for strangers. Signup is public by default; anyone with an account
-  can execute code.
-- **If you must run it multi-user**, put real isolation underneath the executor —
-  a container or microVM per execution (gVisor, Firecracker, nsjail), a dedicated
-  unprivileged user, no outbound network, a read-only filesystem — and treat the
-  in-process restrictions as defense in depth only.
-- **Run it on a host you can afford to lose.** Do not co-locate it with data or
-  credentials that matter.
-- **Keep dependencies patched yourself.** The published images are snapshots and
-  will drift; rebuild from source with updated pins.
-
-## Reporting
-
-There is no monitored channel. Open a public GitHub issue if you want other users
-to see it, but expect no response. For anything serious, the useful action is to
-fix it in your fork and, if you like, open a PR so others can find the patch.
+There is no monitored reporting channel or patch SLA. GitHub issues and pull
+requests may go unanswered; never post credentials or private data in an issue.
+A fix in source does not repair old release ZIPs or images. Use a reviewed commit
+and verified artifacts. Do not treat this review as a guarantee against all bugs.

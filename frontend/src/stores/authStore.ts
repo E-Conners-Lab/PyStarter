@@ -10,7 +10,9 @@ interface AuthState {
 
   login: (username: string, password: string) => Promise<void>;
   register: (username: string, password: string) => Promise<void>;
-  logout: () => void;
+  authError: string | null;
+  logout: () => Promise<void>;
+  clearSession: () => void;
   loadUser: () => Promise<void>;
 }
 
@@ -18,24 +20,32 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isLoading: true,
   isAuthenticated: false,
+  authError: null,
 
   login: async (username, password) => {
     const user = await authApi.login(username, password);
-    set({ user, isAuthenticated: true });
+    set({ user, isAuthenticated: true, authError: null });
   },
 
   register: async (username, password) => {
     const { user } = await authApi.register(username, password);
-    set({ user, isAuthenticated: true });
+    set({ user, isAuthenticated: true, authError: null });
   },
 
-  logout: () => {
-    authApi.logout().catch(() => {});
-    set({ user: null, isAuthenticated: false });
+  clearSession: () => set({ user: null, isAuthenticated: false, isLoading: false }),
+
+  logout: async () => {
+    try {
+      await authApi.logout();
+      set({ user: null, isAuthenticated: false, authError: null });
+    } catch {
+      set({ authError: "Sign out failed. Please try again." });
+    }
   },
 
   loadUser: async () => {
-    set({ isLoading: true });
+    // Refreshing XP must not unmount protected pages and discard their results.
+    set((state) => ({ isLoading: !state.isAuthenticated }));
     try {
       const user = await authApi.getMe();
       set({ user, isAuthenticated: true, isLoading: false });

@@ -1,12 +1,8 @@
-"""Isolation guarantees for student code execution.
+"""Trusted-local runner regression tests.
 
-These lock in the properties a security review found missing in the 1.0.6 release,
-where code ran inside the Django process with a timeout that did not stop it.
-
-What these tests do NOT claim: that the Python-level restrictions cannot be
-escaped. They can be — a student can still reach real builtins through a
-function's __globals__. These assert the boundary that actually contains that
-escape: a separate process, without the server's secrets, that dies on deadline.
+These check separate-process execution and accidental environment inheritance.
+They do NOT establish secret isolation: same-user code can access application
+files and other processes. Python restrictions can be escaped intentionally.
 """
 
 import time
@@ -23,10 +19,10 @@ RUNAWAY = "x = 0\nfor i in range(1_000_000_000):\n    x += 1\nprint(x)"
 # security review confirmed. Used here to probe what the escape can still reach.
 ESCAPE_PREAMBLE = (
     'b = input.__globals__["__builtins__"]\n'
-    'try:\n'
+    "try:\n"
     '    imp = b["__import__"]\n'
-    'except Exception:\n'
-    '    imp = b.__import__\n'
+    "except Exception:\n"
+    "    imp = b.__import__\n"
 )
 
 
@@ -46,13 +42,13 @@ class TimeoutTest(SimpleTestCase):
 
 
 class ProcessIsolationTest(SimpleTestCase):
-    """Student code must not reach the server's credentials, even after escaping."""
+    """Child process behavior; not hostile-code containment."""
 
-    def test_server_secrets_are_not_in_the_child_environment(self):
+    def test_server_environment_is_not_directly_inherited(self):
         probe = ESCAPE_PREAMBLE + (
             'os_mod = imp("os")\n'
             'names = ("ANTHROPIC_API_KEY", "DJANGO_SECRET_KEY", "DB_PASSWORD", "SENTRY_DSN")\n'
-            'found = [n for n in names if os_mod.environ.get(n)]\n'
+            "found = [n for n in names if os_mod.environ.get(n)]\n"
             'print("LEAKED:" + ",".join(found))\n'
         )
         with self.settings():
@@ -65,8 +61,7 @@ class ProcessIsolationTest(SimpleTestCase):
 
     def test_runs_outside_the_django_process(self):
         probe = ESCAPE_PREAMBLE + (
-            'os_mod = imp("os")\n'
-            'print("PID:" + str(os_mod.getpid()))\n'
+            'os_mod = imp("os")\nprint("PID:" + str(os_mod.getpid()))\n'
         )
         result = execute_code(probe)
 

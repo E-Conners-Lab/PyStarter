@@ -3,7 +3,7 @@ import { useAuthStore } from '../../stores/authStore';
 import { BELT_COLORS } from '../../constants/belts';
 
 export default function Header() {
-  const { user, isAuthenticated, logout } = useAuthStore();
+  const { user, isAuthenticated, logout, authError } = useAuthStore();
 
   return (
     <header className="border-b border-gray-800 bg-gray-900/80 backdrop-blur-sm sticky top-0 z-50">
@@ -40,6 +40,7 @@ export default function Header() {
                 )}
                 <span>{user?.username}</span>
               </Link>
+              {authError && <span role="alert" className="text-sm text-red-400">{authError}</span>}
               <button
                 onClick={logout}
                 className="text-gray-400 hover:text-gray-200 text-sm transition-colors"
