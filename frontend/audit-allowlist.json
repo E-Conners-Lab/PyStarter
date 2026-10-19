@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "advisories": [
+    {
+      "id": "GHSA-vfj7-8cjw-p6xm",
+      "package": "braces",
+      "expires": "2027-01-17",
+      "reviewed": "2026-10-19",
+      "reason": "No patched braces release exists (<=3.0.3 affected; 3.0.3 is latest). Reached only through tailwindcss 3 at build time (chokidar, micromatch, fast-glob); never shipped in the bundle, and the glob patterns come from tailwind.config.js, not users. Lasting fix is the Tailwind 4 migration."
+    },
+    {
+      "id": "GHSA-p98j-92pf-mc4p",
+      "package": "dompurify",
+      "expires": "2027-01-17",
+      "reviewed": "2026-10-19",
+      "reason": "monaco-editor 0.57.0 (latest) runs its own vendored DOMPurify 3.4.15, so an npm override would only silence the audit, not change the shipped code. Exploitation requires sanitize(node, { IN_PLACE: true }); Monaco's domSanitize.js only sanitizes strings (RETURN_DOM_FRAGMENT / RETURN_TRUSTED_TYPE) and the app never imports DOMPurify. Remove when Monaco ships DOMPurify >= 3.4.16."
+    },
+    {
+      "id": "GHSA-6688-9rhm-gjv2",
+      "package": "dompurify",
+      "expires": "2027-01-17",
+      "reviewed": "2026-10-19",
+      "reason": "Same vendored DOMPurify 3.4.15 in monaco-editor 0.57.0; this advisory also requires IN_PLACE mode on a Node input, which Monaco never uses. Remove when Monaco ships DOMPurify >= 3.4.16."
+    }
+  ]
+}
